@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vida de Agencia — Simulador de carrera publicitaria</title>
+  <style>
+    :root{
+      --bg:#0b0b10;
+      --panel:#14141d;
+      --panel-2:#1b1b27;
+      --text:#f5f5f7;
+      --muted:#a8a8b6;
+      --line:#2c2c3a;
+      --accent:#b8ff42;
+      --accent-2:#8d6bff;
+      --danger:#ff5a78;
+      --warning:#ffcf4a;
+      --good:#45e0a8;
+      --shadow: 0 24px 70px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(141,107,255,.22), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(184,255,66,.10), transparent 26%),
+        var(--bg);
+      min-height:100vh;
+    }
+
+    button, input, select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:1180px;margin:0 auto;padding:24px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      margin-bottom:18px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.03em;
+    }
+    .brand-mark{
+      width:40px;height:40px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;color:#09090d;font-weight:1000;
+      box-shadow:0 10px 30px rgba(141,107,255,.25);
+    }
+    .tag{
+      border:1px solid var(--line);background:rgba(255,255,255,.03);
+      color:var(--muted);padding:7px 11px;border-radius:999px;font-size:.8rem;
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+
+    .hero{
+      min-height:76vh;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;
+    }
+    .hero-card,.setup-card,.game-card,.side-card,.result-card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+      border-radius:28px;box-shadow:var(--shadow);
+    }
+    .hero-card{padding:44px}
+    .eyebrow{
+      color:var(--accent);text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:800;
+    }
+    h1{
+      font-size:clamp(3rem,8vw,7.5rem);line-height:.84;letter-spacing:-.075em;
+      margin:14px 0 22px;max-width:900px;
+    }
+    .hero-copy{font-size:1.08rem;line-height:1.65;color:#d4d4dc;max-width:680px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .btn{
+      border:none;border-radius:14px;padding:14px 18px;font-weight:850;
+      transition:.2s transform,.2s opacity,.2s background;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:var(--accent);color:#0d0d11}
+    .btn-secondary{background:#242433;color:var(--text);border:1px solid #343447}
+    .btn-danger{background:var(--danger);color:white}
+    .hero-aside{padding:24px;display:grid;gap:14px}
+    .fake-brief{
+      border:1px solid var(--line);background:var(--panel);padding:20px;border-radius:20px;
+      transform:rotate(-1deg);
+    }
+    .fake-brief:nth-child(2){transform:rotate(1.5deg)}
+    .brief-title{font-weight:900;margin-bottom:8px}
+    .brief-line{height:8px;background:#2b2b38;border-radius:10px;margin:8px 0}
+    .brief-line.short{width:65%}
+    .stamp{
+      display:inline-block;border:2px solid var(--danger);color:var(--danger);
+      transform:rotate(-7deg);padding:6px 9px;border-radius:8px;font-weight:1000;
+      margin-top:10px;
+    }
+
+    .setup-card{padding:28px;max-width:860px;margin:34px auto}
+    .setup-head h2,.game-card h2,.result-card h2{font-size:2rem;letter-spacing:-.04em;margin:6px 0 10px}
+    .setup-head p{color:var(--muted);line-height:1.6}
+    .field{margin-top:22px}
+    label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:8px;font-weight:750}
+    input{
+      width:100%;padding:15px 16px;background:#111118;color:var(--text);
+      border:1px solid var(--line);border-radius:14px;outline:none;
+    }
+    input:focus{border-color:var(--accent-2)}
+    .choice-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;
+    }
+    .choice-card{
+      text-align:left;border:1px solid var(--line);background:var(--panel-2);
+      color:var(--text);border-radius:18px;padding:18px;min-height:122px;
+    }
+    .choice-card:hover,.choice-card.selected{
+      border-color:var(--accent);box-shadow:0 0 0 2px rgba(184,255,66,.12) inset;
+    }
+    .choice-card strong{display:block;font-size:1.08rem;margin-bottom:6px}
+    .choice-card span{color:var(--muted);line-height:1.45;font-size:.93rem}
+    .hidden{display:none!important}
+    .setup-footer{display:flex;justify-content:flex-end;margin-top:26px}
+
+    .game-layout{
+      display:grid;
+      grid-template-columns:330px minmax(0,1fr);
+      grid-template-areas:"profile decisions";
+      gap:18px;
+      align-items:start;
+    }
+    .game-card{
+      grid-area:decisions;
+      padding:26px;
+      min-height:630px;
+    }
+    .side-card{
+      grid-area:profile;
+      padding:20px;
+      height:max-content;
+      position:sticky;
+      top:18px;
+      background:
+        linear-gradient(180deg,rgba(141,107,255,.10),rgba(255,255,255,.018)),
+        var(--panel);
+    }
+    .year-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .year-pill{
+      background:var(--accent);color:#0b0b10;border-radius:999px;padding:8px 12px;
+      font-size:.8rem;font-weight:1000;white-space:nowrap;
+    }
+    .decision-progress{
+      display:flex;align-items:center;gap:9px;margin:18px 0 8px;
+      padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#111118;
+    }
+    .decision-progress strong{font-size:.82rem;margin-right:auto}
+    .decision-dot{
+      width:11px;height:11px;border-radius:999px;background:#353545;
+      box-shadow:0 0 0 1px #48485c inset;
+    }
+    .decision-dot.active{background:var(--accent);box-shadow:0 0 0 4px rgba(184,255,66,.10)}
+    .decision-dot.done{background:var(--accent-2)}
+    .event-kicker{color:var(--accent-2);font-size:.78rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .event-text{color:#d8d8df;line-height:1.65;font-size:1.02rem}
+    .quote{
+      padding:16px 18px;border-left:4px solid var(--accent-2);background:#111118;
+      border-radius:0 14px 14px 0;color:#ededf2;margin:18px 0;
+    }
+    .options{display:grid;gap:11px;margin-top:22px}
+    .option-btn{
+      text-align:left;border:1px solid var(--line);background:#181821;color:var(--text);
+      border-radius:16px;padding:16px 17px;line-height:1.45;font-weight:700;
+    }
+    .option-btn:hover{border-color:var(--accent-2);background:#20202d}
+    .consequence{
+      display:none;margin-top:20px;padding:18px;border-radius:18px;
+      background:linear-gradient(135deg,rgba(141,107,255,.13),rgba(184,255,66,.06));
+      border:1px solid #39394b;
+    }
+    .consequence.active{display:block}
+    .consequence h3{margin:0 0 8px}
+    .effect-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .chip{font-size:.8rem;border-radius:999px;padding:7px 10px;background:#222230;border:1px solid #353548}
+    .chip.good{color:var(--good)}
+    .chip.bad{color:#ff8ca1}
+    .chip.warn{color:var(--warning)}
+    .next-wrap{display:flex;justify-content:flex-end;margin-top:16px}
+
+    .profile{
+      display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line);
+    }
+    .avatar{
+      width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--accent-2),#ef64ff);
+      display:grid;place-items:center;font-size:1.25rem;font-weight:1000;
+    }
+    .profile h3{margin:0;font-size:1rem}
+    .profile p{margin:3px 0 0;color:var(--muted);font-size:.86rem}
+    .salary{
+      margin:16px 0;padding:14px;border-radius:16px;background:#101016;border:1px solid var(--line);
+    }
+    .salary small{color:var(--muted)}
+    .salary strong{display:block;font-size:1.28rem;margin-top:4px}
+    .stats{display:grid;gap:12px}
+    .stat-head{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px}
+    .stat-head span:last-child{color:var(--muted)}
+    .bar{height:9px;background:#282836;border-radius:999px;overflow:hidden}
+    .bar > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent-2),var(--accent));width:50%}
+    .bar.danger > i{background:linear-gradient(90deg,#ffcf4a,var(--danger))}
+    .timeline{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+    .timeline h4{margin:0 0 10px}
+    .timeline-list{display:grid;gap:8px;max-height:210px;overflow:auto;padding-right:4px}
+    .timeline-item{font-size:.78rem;color:#c8c8d2;padding:9px 10px;background:#111118;border-radius:10px}
+    .disclaimer{
+      margin-top:14px;color:#8e8e9e;font-size:.72rem;line-height:1.45;
+    }
+
+    .result-card{max-width:900px;margin:34px auto;padding:32px}
+    .result-badge{display:inline-block;background:var(--accent);color:#0d0d11;border-radius:999px;padding:8px 12px;font-weight:1000}
+    .result-title{font-size:clamp(2.4rem,7vw,5rem);line-height:.92;letter-spacing:-.065em;margin:18px 0}
+    .result-copy{font-size:1.08rem;line-height:1.65;color:#d3d3dc}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+    .summary-box{background:#111118;border:1px solid var(--line);border-radius:18px;padding:18px}
+    .summary-box h3{margin-top:0}
+    .result-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+    canvas{max-width:100%;border-radius:18px;margin-top:20px;display:none}
+
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:20px;z-index:30;
+    }
+    .modal.active{display:grid}
+    .modal-card{
+      max-width:560px;background:#171720;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow);
+    }
+    .modal-card h3{margin-top:0;font-size:1.5rem}
+    .modal-card p{color:#d0d0d8;line-height:1.6}
+    .agency-offers{display:grid;gap:11px;margin:18px 0}
+    .agency-offer{
+      width:100%;text-align:left;border:1px solid var(--line);background:#101016;color:var(--text);
+      border-radius:17px;padding:15px 16px;transition:.2s transform,.2s border-color,.2s background;
+    }
+    .agency-offer:hover{transform:translateY(-2px);border-color:var(--accent-2);background:#1c1c28}
+    .agency-offer strong{display:flex;justify-content:space-between;gap:12px;font-size:1rem}
+    .agency-offer span{display:block;color:var(--muted);font-size:.86rem;line-height:1.45;margin-top:6px}
+    .agency-offer small{display:inline-block;margin-top:9px;color:var(--accent);font-weight:850}
+    .agency-source{
+      color:#8e8e9e!important;font-size:.73rem!important;line-height:1.45!important;
+      border-top:1px solid var(--line);padding-top:12px;margin-top:14px!important;
+    }
+
+    @media (max-width:900px){
+      .hero,.result-grid{grid-template-columns:1fr}
+      .game-layout{
+        grid-template-columns:1fr;
+        grid-template-areas:
+          "profile"
+          "decisions";
+      }
+      .side-card{position:static}
+      .hero-card{padding:28px}
+      .hero{min-height:auto}
+    }
+    @media (max-width:620px){
+      .app{padding:14px}
+      .choice-grid{grid-template-columns:1fr}
+      .topbar{align-items:flex-start}
+      .hero-card,.setup-card,.game-card,.side-card,.result-card{border-radius:22px}
+      .game-card{padding:20px}
+      h1{font-size:3.6rem}
+      .year-row{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">VA</div>
+        <div>
+          VIDA DE AGENCIA
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700">Simulador de carrera publicitaria</div>
+        </div>
+      </div>
+      <div class="tag">Basado en hechos demasiado posibles</div>
+    </header>
+
+    <main>
+      <section id="home" class="screen active">
+        <div class="hero">
+          <div class="hero-card">
+            <div class="eyebrow">ELIGE · SOBREVIVE · ENTREGA</div>
+            <h1>Sobrevive al brief.</h1>
+            <p class="hero-copy">
+              Empieza desde el cargo que elijas, enfrenta tres decisiones por año y descubre si terminas dirigiendo campañas,
+              cobrando facturas freelance, trabajando para una marca o abandonando el rubro con tu salud mental intacta.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" onclick="showScreen('setup')">Comenzar carrera</button>
+              <button class="btn btn-secondary" onclick="openInfo()">¿Qué tan real es esto?</button>
+            </div>
+          </div>
+          <div class="hero-aside">
+            <div class="fake-brief">
+              <div class="brief-title">BRIEF URGENTE</div>
+              <div class="brief-line"></div><div class="brief-line short"></div>
+              <div class="stamp">PARA AYER</div>
+            </div>
+            <div class="fake-brief">
+              <div class="brief-title">CAMBIO PEQUEÑITO</div>
+              <div class="brief-line"></div><div class="brief-line"></div><div class="brief-line short"></div>
+              <div class="stamp">V17 FINAL AHORA SÍ</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="setup" class="screen">
+        <div class="setup-card">
+          <div class="setup-head">
+            <div class="eyebrow">CREA TU PERSONAJE</div>
+            <h2>Tu carrera comienza con una mala decisión vocacional.</h2>
+            <p>Elige carrera, área, especialidad, cargo inicial y la agencia donde partirás. Después podrás cambiarte, ascender, irte al lado del cliente o trabajar por tu cuenta.</p>
+          </div>
+
+          <div class="field">
+            <label for="playerName">Tu nombre</label>
+            <input id="playerName" maxlength="28" placeholder="Ej: Paula del Brief" />
+          </div>
+
+          <div class="field">
+            <label>1. ¿Qué estudiaste?</label>
+            <div class="choice-grid" id="professionChoices">
+              <button class="choice-card" data-value="Publicidad" onclick="selectProfession(this)">
+                <strong>Publicidad</strong>
+                <span>Briefs ambiguos, clientes urgentes y cargos con nombres en inglés.</span>
+              </button>
+              <button class="choice-card" data-value="Diseño" onclick="selectProfession(this)">
+                <strong>Diseño</strong>
+                <span>Logos más grandes, cuarenta adaptaciones y archivos que nunca llegaron.</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field hidden" id="areaField">
+            <label>2. Elige tu área</label>
+            <div class="choice-grid" id="areaChoices"></div>
+          </div>
+
+          <div class="field hidden" id="subareaField">
+            <label>3. Elige tu especialidad</label>
+            <div class="choice-grid" id="subareaChoices"></div>
+          </div>
+
+          <div class="field hidden" id="experienceField">
+            <label>4. ¿Con qué cargo y experiencia comienzas?</label>
+            <p id="experienceHelp" style="color:var(--muted);margin:0 0 12px;line-height:1.5"></p>
+            <div class="choice-grid" id="experienceChoices"></div>
+          </div>
+
+          <div class="field hidden" id="agencyField">
+            <label>5. ¿En qué agencia quieres comenzar?</label>
+            <p id="agencyHelp" style="color:var(--muted);margin:0 0 12px;line-height:1.5"></p>
+            <div class="choice-grid" id="agencyChoices"></div>
+            <div style="display:flex;justify-content:center;margin-top:14px">
+              <button id="showAllAgenciesBtn" class="btn btn-secondary hidden" onclick="showAllStartingAgencies()">
+                Ver todas las agencias disponibles
+              </button>
+            </div>
+          </div>
+
+          <div class="setup-footer">
+            <button class="btn btn-primary" onclick="startGame()">Firmar contrato sin leer</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="game" class="screen">
+        <div class="game-layout">
+          <article class="game-card">
+            <div class="eyebrow" style="margin-bottom:10px">DECISIONES DEL AÑO</div>
+            <div class="year-row">
+              <div>
+                <div class="event-kicker" id="eventKicker">AÑO 1 · AGENCIA</div>
+                <h2 id="eventTitle">Tu primer día</h2>
+              </div>
+              <div class="year-pill" id="yearPill">Año 1</div>
+            </div>
+            <div class="decision-progress" id="decisionProgress">
+              <strong id="decisionProgressLabel">Decisión 1 de 3</strong>
+              <i class="decision-dot active"></i>
+              <i class="decision-dot"></i>
+              <i class="decision-dot"></i>
+            </div>
+            <p class="event-text" id="eventText"></p>
+            <div class="quote" id="eventQuote"></div>
+            <div class="options" id="options"></div>
+
+            <div class="consequence" id="consequence">
+              <h3 id="consequenceTitle">Consecuencia</h3>
+              <p id="consequenceText"></p>
+              <div class="effect-chips" id="effectChips"></div>
+              <div class="next-wrap">
+                <button id="consequenceNextBtn" class="btn btn-primary" onclick="proceedAfterDecision()">Siguiente decisión</button>
+              </div>
+            </div>
+          </article>
+
+          <aside class="side-card">
+            <div class="eyebrow" style="margin-bottom:14px">TU ESTADO ACTUAL</div>
+            <div class="profile">
+              <div class="avatar" id="avatar">P</div>
+              <div>
+                <h3 id="profileName">Publicista</h3>
+                <p id="profileRole">Junior</p>
+              </div>
+            </div>
+            <div class="salary">
+              <small>Sueldo simulado</small>
+              <strong id="salaryValue">$650.000</strong>
+              <small id="workplaceValue">Agencia inicial</small>
+              <small id="agencyTierValue" style="display:block;margin-top:4px;color:var(--accent-2)">Boutique / independiente</small>
+              <small id="salaryStageValue" style="display:block;margin-top:5px;color:var(--muted)">Progresión anual activa</small>
+            </div>
+            <div class="stats" id="stats"></div>
+            <div class="timeline">
+              <h4>Tu historial</h4>
+              <div class="timeline-list" id="timelineList"></div>
+            </div>
+            <p class="disclaimer">
+              Esta experiencia es ficción inspirada en situaciones frecuentes del rubro. No romantiza la explotación,
+              el burnout ni el consumo problemático. Los nombres de agencias son referencias reales del mercado;
+              los niveles de acceso, sueldos, efectos y condiciones del juego son ficticios y no describen a esas empresas.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="result" class="screen">
+        <div class="result-card">
+          <span class="result-badge">FIN DE CARRERA</span>
+          <h2 class="result-title" id="resultTitle"></h2>
+          <p class="result-copy" id="resultCopy"></p>
+
+          <div class="result-grid">
+            <div class="summary-box">
+              <h3>Resumen profesional</h3>
+              <div id="careerSummary"></div>
+            </div>
+            <div class="summary-box">
+              <h3>Indicadores finales</h3>
+              <div id="finalStats"></div>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button class="btn btn-primary" onclick="generateCard()">Crear tarjeta compartible</button>
+            <button class="btn btn-secondary" onclick="copyResult()">Copiar resultado</button>
+            <button class="btn btn-secondary" onclick="restartGame()">Volver a jugar</button>
+          </div>
+          <canvas id="shareCanvas" width="1080" height="1350"></canvas>
+          <div id="downloadWrap" class="result-actions hidden">
+            <a id="downloadLink" class="btn btn-primary" download="mi-carrera-publicitaria.png">Descargar tarjeta</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="infoModal" class="modal">
+    <div class="modal-card">
+      <h3>Demasiado real para ser ficción</h3>
+      <p>
+        El juego usa humor para mostrar condiciones reconocibles: urgencias permanentes, sueldos bajos,
+        cargos acumulados, licitaciones gratuitas, jornadas extensas, presión social y desgaste.
+        El consumo problemático nunca entrega una ventaja sostenible: puede empeorar la salud, el dinero,
+        las relaciones y la carrera.
+      </p>
+      <button class="btn btn-primary" onclick="closeInfo()">Entendido, igual entro a agencia</button>
+    </div>
+  </div>
+
+  <div id="agencyModal" class="modal">
+    <div class="modal-card">
+      <div class="eyebrow">CIERRE DEL AÑO</div>
+      <h3 id="agencyModalTitle">¿Te quedas o cambias de agencia?</h3>
+      <p id="agencyModalCopy">
+        El mercado se movió mientras estabas corrigiendo la versión final_final_ahora_sí.
+        Revisa tus opciones antes de comenzar el próximo año.
+      </p>
+      <div id="agencyOffers" class="agency-offers"></div>
+      <button class="btn btn-secondary" style="width:100%" onclick="chooseToStay()">Opción 3: quedarme en mi agencia actual</button>
+      <p class="agency-source">
+        Los nombres se incorporan como referencias del ecosistema publicitario chileno a partir de rankings, finalistas y jurados Effie Chile 2024–2025.
+        Los niveles de experiencia, categorías, aumentos y consecuencias son mecánicas ficticias, no requisitos ni evaluaciones laborales de las agencias.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      name: "",
+      profession: "",
+      area: "",
+      track: "",
+      experienceLevel: null,
+      experienceLabel: "",
+      experienceYears: 0,
+      startExperienceYears: 0,
+      selectedAgency: "",
+      selectedAgencyTier: "",
+      showAllStartingAgencies: false,
+      year: 1,
+      maxYears: 12,
+      questionInYear: 1,
+      questionsPerYear: 3,
+      salary: 650000,
+      completedYears: 0,
+      workplace: "",
+      agencyTier: "boutique",
+      pendingAgencyOffers: [],
+      roleIndex: 0,
+      usedEvents: [],
+      history: [],
+      flags: {
+        freelance:false,
+        clientSide:false,
+        boutique:false,
+        recovery:false,
+        award:false,
+        viral:false,
+        fired:false
+      },
+      stats: {
+        carrera: 32,
+        reputacion: 28,
+        portafolio: 25,
+        dinero: 22,
+        salud: 78,
+        vida: 72,
+        riesgo: 5
+      },
+      currentEvent:null,
+      result:null
+    };
+
+    // Agencias y empresas creativas presentes en rankings, finalistas o jurados de Effie Chile 2024–2025.
+    // minLevel controla el desbloqueo narrativo dentro del simulador:
+    // 0 = recién egresado, 1 = junior, 2 = semi senior, 3 = senior.
+    // No representa requisitos reales de contratación.
+    const agencyPools = {
+      boutique: [
+        {name:"La Vulca", tier:"boutique", minLevel:0},
+        {name:"BOND", tier:"boutique", minLevel:0},
+        {name:"Berlín", tier:"boutique", minLevel:0},
+        {name:"Puer.to", tier:"boutique", minLevel:0},
+        {name:"FRI", tier:"boutique", minLevel:0},
+        {name:"Redon", tier:"boutique", minLevel:0},
+        {name:"LOCA Santiago", tier:"boutique", minLevel:0},
+        {name:"La Firma", tier:"boutique", minLevel:0},
+        {name:"MODO1984", tier:"boutique", minLevel:0},
+        {name:"Thrive", tier:"boutique", minLevel:0},
+        {name:"Kinderlab", tier:"boutique", minLevel:0},
+        {name:"Dale Publicidad", tier:"boutique", minLevel:0},
+        {name:"Jelly", tier:"boutique", minLevel:0},
+        {name:"Barlovento", tier:"boutique", minLevel:0},
+        {name:"Buena Suerte", tier:"boutique", minLevel:0},
+        {name:"Estudio B", tier:"boutique", minLevel:0},
+        {name:"Propalta", tier:"boutique", minLevel:0},
+        {name:"Walkers", tier:"boutique", minLevel:0},
+        {name:"Bla!", tier:"boutique", minLevel:0},
+        {name:"Mkzeta", tier:"boutique", minLevel:0}
+      ],
+      independent: [
+        {name:"10:10", tier:"independent", minLevel:1},
+        {name:"MEAT", tier:"independent", minLevel:1},
+        {name:"Raya", tier:"independent", minLevel:1},
+        {name:"Grupo Mass", tier:"independent", minLevel:1},
+        {name:"Wolf BCPP", tier:"independent", minLevel:1},
+        {name:"Porta", tier:"independent", minLevel:1},
+        {name:"Groenlandia", tier:"independent", minLevel:1},
+        {name:"Moov Media Group", tier:"independent", minLevel:1},
+        {name:"BPN Chile", tier:"independent", minLevel:1},
+        {name:"Rebold Chile", tier:"independent", minLevel:1},
+        {name:"Mosst", tier:"independent", minLevel:1},
+        {name:"SimpleWorks Marketing", tier:"independent", minLevel:1},
+        {name:"La Familia", tier:"independent", minLevel:1},
+        {name:"Strong", tier:"independent", minLevel:1},
+        {name:"ALTA Comunicación", tier:"independent", minLevel:1}
+      ],
+      global: [
+        {name:"BBDO Chile", tier:"global", minLevel:2},
+        {name:"VML Chile", tier:"global", minLevel:2},
+        {name:"McCann Santiago", tier:"global", minLevel:2},
+        {name:"DDB Chile", tier:"global", minLevel:2},
+        {name:"Ogilvy Chile", tier:"global", minLevel:2},
+        {name:"Initiative", tier:"global", minLevel:2},
+        {name:"Hearts & Science", tier:"global", minLevel:2},
+        {name:"Havas Chile", tier:"global", minLevel:2},
+        {name:"Cheil Chile", tier:"global", minLevel:2},
+        {name:"OMD Chile", tier:"global", minLevel:2},
+        {name:"Publicis Groupe Chile", tier:"global", minLevel:2},
+        {name:"UM Chile", tier:"global", minLevel:2},
+        {name:"KINESSO Chile", tier:"global", minLevel:2},
+        {name:"WPP Media Chile", tier:"global", minLevel:2},
+        {name:"MRM Chile", tier:"global", minLevel:2},
+        {name:"Zenith Chile", tier:"global", minLevel:2},
+        {name:"Arena Media Chile", tier:"global", minLevel:2}
+      ]
+    };
+
+    const designerTracks = ["RRSS","Branding","Motion","Dirección de Arte"];
+
+    const experienceProfilesByTrack = {
+      "Designer": [
+        {label:"Práctica de Diseño", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-5,portafolio:-2,salud:6,vida:6}},
+        {label:"Diseñador Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:4,reputacion:3,portafolio:6}},
+        {label:"Diseñador Mid", years:"3 a 5 años", startYears:3, careerYear:3, roleIndex:2, baseSalary:1000000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
+        {label:"Diseñador Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1350000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
+        {label:"Supervisor de Arte", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1650000, statEffects:{carrera:28,reputacion:25,portafolio:25,salud:-5,vida:-4}},
+        {label:"Head of Art", years:"9 años o más", startYears:9, careerYear:9, roleIndex:5, baseSalary:2100000, statEffects:{carrera:36,reputacion:34,portafolio:30,salud:-7,vida:-5}}
+      ],
+      "Community Manager": [
+        {label:"Práctica de CM", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
+        {label:"CM Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:680000, statEffects:{carrera:4,reputacion:4,portafolio:6}},
+        {label:"CM Mid", years:"3 a 5 años", startYears:3, careerYear:3, roleIndex:2, baseSalary:950000, statEffects:{carrera:12,reputacion:11,portafolio:12,salud:-2}},
+        {label:"CM Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1250000, statEffects:{carrera:20,reputacion:19,portafolio:18,salud:-4,vida:-3}},
+        {label:"SMM", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1550000, statEffects:{carrera:28,reputacion:27,portafolio:22,salud:-5,vida:-4}},
+        {label:"Director Digital", years:"9 años o más", startYears:9, careerYear:9, roleIndex:5, baseSalary:2050000, statEffects:{carrera:37,reputacion:35,portafolio:28,salud:-7,vida:-5}}
+      ],
+      "Cuentas": [
+        {label:"Práctica de Cuentas", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-3,salud:6,vida:6}},
+        {label:"Cuentas Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:5,portafolio:4}},
+        {label:"Cuentas Senior", years:"4 años o más", startYears:4, careerYear:4, roleIndex:2, baseSalary:1150000, statEffects:{carrera:16,reputacion:16,portafolio:10,salud:-3,vida:-2}},
+        {label:"Supervisor de Cuentas", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1450000, statEffects:{carrera:23,reputacion:23,portafolio:14,salud:-4,vida:-3}},
+        {label:"Director de Cuentas", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1900000, statEffects:{carrera:33,reputacion:32,portafolio:18,salud:-6,vida:-5}}
+      ],
+      "Content Creator": [
+        {label:"Práctica de Content", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
+        {label:"Content Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:4,portafolio:8}},
+        {label:"Content Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:2, baseSalary:1250000, statEffects:{carrera:20,reputacion:18,portafolio:22,salud:-4,vida:-3}}
+      ],
+      "Redactor": [
+        {label:"Práctica de Redacción", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
+        {label:"Redactor Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:4,portafolio:7}},
+        {label:"Redactor Mid", years:"3 a 5 años", startYears:3, careerYear:3, roleIndex:2, baseSalary:1000000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
+        {label:"Redactor Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1350000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
+        {label:"Director Creativo Asociado", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1700000, statEffects:{carrera:29,reputacion:27,portafolio:25,salud:-5,vida:-4}},
+        {label:"Director Creativo", years:"9 años o más", startYears:9, careerYear:9, roleIndex:5, baseSalary:2200000, statEffects:{carrera:38,reputacion:36,portafolio:30,salud:-7,vida:-5}}
+      ],
+      "Medios": [
+        {label:"Práctica de Medios", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:300000, statEffects:{carrera:-4,reputacion:-4,portafolio:-3,salud:6,vida:6}},
+        {label:"Media Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:750000, statEffects:{carrera:5,reputacion:5,portafolio:5}},
+        {label:"Media Planner Mid", years:"3 a 5 años", startYears:3, careerYear:3, roleIndex:2, baseSalary:1050000, statEffects:{carrera:13,reputacion:12,portafolio:10,salud:-2}},
+        {label:"Media Planner Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1400000, statEffects:{carrera:21,reputacion:20,portafolio:15,salud:-4,vida:-3}},
+        {label:"Supervisor de Medios", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1750000, statEffects:{carrera:29,reputacion:28,portafolio:20,salud:-5,vida:-4}},
+        {label:"Director de Medios", years:"9 años o más", startYears:9, careerYear:9, roleIndex:5, baseSalary:2250000, statEffects:{carrera:38,reputacion:36,portafolio:24,salud:-7,vida:-5}}
+      ]
+    };
+
+    const roleYearThresholds = {
+      "Designer":[0.5,1,3,5,7,9],
+      "Community Manager":[0.5,1,3,5,7,9],
+      "Cuentas":[0.5,1,4,5,7],
+      "Content Creator":[0.5,1,5],
+      "Redactor":[0.5,1,3,5,7,9],
+      "Medios":[0.5,1,3,5,7,9]
+    };
+
+    const agencyTierMeta = {
+      boutique: {
+        label:"Boutique / independiente",
+        copy:"Equipos más compactos, funciones amplias y mayor cercanía con los proyectos.",
+        startSalary:0,
+        startEffects:{portafolio:4,salud:3,vida:2},
+        raise:[0.04,0.10],
+        effects:{carrera:3,reputacion:2,portafolio:6,salud:2,vida:1}
+      },
+      independent: {
+        label:"Independiente consolidada",
+        copy:"Más exposición, cuentas de mayor escala y espacio para especializarte.",
+        startSalary:90000,
+        startEffects:{carrera:4,reputacion:3,salud:-2},
+        raise:[0.10,0.18],
+        effects:{carrera:6,reputacion:6,portafolio:5,salud:-2,vida:-1}
+      },
+      global: {
+        label:"Red global / gran agencia",
+        copy:"Procesos regionales, marcas grandes y mayor visibilidad dentro de la industria.",
+        startSalary:170000,
+        startEffects:{carrera:7,reputacion:5,salud:-5,vida:-3},
+        raise:[0.18,0.28],
+        effects:{carrera:9,reputacion:9,portafolio:6,salud:-4,vida:-3}
+      }
+    };
+
+    const roleLadders = {
+      "Cuentas": ["Práctica de Cuentas","Cuentas Jr","Cuentas Senior","Supervisor de Cuentas","Director de Cuentas"],
+      "Medios": ["Práctica de Medios","Media Jr","Media Planner Mid","Media Planner Senior","Supervisor de Medios","Director de Medios"],
+      "Community Manager": ["Práctica de CM","CM Jr","CM Mid","CM Senior","SMM","Director Digital"],
+      "Redactor": ["Práctica de Redacción","Redactor Jr","Redactor Mid","Redactor Senior","Director Creativo Asociado","Director Creativo"],
+      "Content Creator": ["Práctica de Content","Content Jr","Content Senior"],
+      "RRSS": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
+      "Branding": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
+      "Motion": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
+      "Dirección de Arte": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"]
+    };
+
+    const professionAreas = {
+      "Publicidad": [
+        {value:"Cuentas", desc:"Relación con clientes, timings, presupuestos, scope, coordinación interna y rentabilidad."},
+        {value:"Creatividad", desc:"Elige una especialidad: CM, Redacción o Content. Cada ruta tendrá situaciones propias."},
+        {value:"Medios", desc:"Implementación de campañas, inversión, optimización, pacing, métricas, reportería y plataformas."}
+      ],
+      "Diseño": [
+        {value:"Diseño", desc:"Elige una especialidad visual y prepárate para adaptar todo a cuarenta formatos."}
+      ]
+    };
+
+    const subareas = {
+      "Creatividad": [
+        {value:"Community Manager", desc:"Publicar, responder, reportar y sobrevivir a comentarios."},
+        {value:"Redactor", desc:"Ideas, conceptos, copys y titulares que el cliente hará más largos."},
+        {value:"Content Creator", desc:"Grabar, editar, aparecer en cámara y cargar el celular ajeno."}
+      ],
+      "Diseño": [
+        {value:"RRSS", desc:"Piezas diarias, campañas always on y formatos infinitos."},
+        {value:"Branding", desc:"Identidades, manuales y logos que terminarán usados en Word."},
+        {value:"Motion", desc:"Animación, edición y renders solicitados para mañana."},
+        {value:"Dirección de Arte", desc:"Concepto visual, producción y opiniones detrás de tu pantalla."}
+      ]
+    };
+
+    function experienceTrackKey(){
+      return designerTracks.includes(state.track) ? "Designer" : state.track;
+    }
+
+    function getExperienceProfiles(){
+      return experienceProfilesByTrack[experienceTrackKey()] || experienceProfilesByTrack["Redactor"];
+    }
+
+    function getRoleThresholds(){
+      return roleYearThresholds[experienceTrackKey()] || roleYearThresholds["Redactor"];
+    }
+
+    function formatExperienceYears(value){
+      if(value < 1) return "3 a 6 meses de experiencia";
+      if(value === 1) return "1 año de experiencia";
+      return `${Math.floor(value)} años de experiencia`;
+    }
+
+    const statsMeta = {
+      carrera:{label:"Carrera", icon:"📈"},
+      reputacion:{label:"Reputación", icon:"⭐"},
+      portafolio:{label:"Portafolio", icon:"🎨"},
+      dinero:{label:"Dinero", icon:"💰"},
+      salud:{label:"Salud mental", icon:"🧠"},
+      vida:{label:"Vida personal", icon:"🫂"},
+      riesgo:{label:"Consumo de riesgo", icon:"⚠️", danger:true}
+    };
+
+
+    const trackSpecificEvents = {
+      "Cuentas": [
+        {
+          id:"accounts-client-brief-late", minYear:1,
+          title:"El cliente mandó el brief después del deadline",
+          text:"El equipo necesitaba el brief el lunes. Llegó el jueves a las 18:30, pero la fecha de entrega sigue siendo el viernes.",
+          quote:"“La fecha no se puede mover.”",
+          options:[
+            {text:"Renegociar timing y priorizar entregables.", consequence:"No haces magia, pero logras una entrega parcial realista.", effects:{carrera:8,reputacion:8,salud:2,vida:2}},
+            {text:"Aceptar el plazo original y apretar al equipo.", consequence:"Se entrega, pero creatividad empieza a odiar tus mensajes.", effects:{reputacion:4,carrera:5,salud:-10,vida:-9}},
+            {text:"Prometer que sale todo sin revisar capacidad.", consequence:"La promesa dura menos que la primera reunión interna.", effects:{reputacion:-9,carrera:-6,salud:-5}}
+          ]
+        },
+        {
+          id:"accounts-scope-creep", minYear:1,
+          title:"El proyecto creció, el presupuesto no",
+          text:"La campaña partió con 6 piezas. Ahora son 24, dos videos y una activación. La orden de compra sigue igual.",
+          quote:"“Son solo unas adaptaciones.”",
+          options:[
+            {text:"Levantar cambio de alcance y recotizar.", consequence:"Hay incomodidad, pero el trabajo extra deja de ser invisible.", effects:{carrera:9,reputacion:8,dinero:5}},
+            {text:"Absorber el trabajo para cuidar la relación.", consequence:"El cliente queda feliz. El margen y el equipo no.", effects:{reputacion:5,carrera:2,salud:-12,vida:-8,dinero:-4}},
+            {text:"Reducir entregables sin avisar.", consequence:"La reunión de avance se vuelve una investigación.", effects:{reputacion:-10,carrera:-6}}
+          ]
+        },
+        {
+          id:"accounts-client-whatsapp", minYear:1,
+          title:"WhatsApp del cliente a las 23:14",
+          text:"El mensaje empieza con “perdona la hora” y termina pidiendo una entrega para primera hora.",
+          quote:"El horario laboral acaba de recibir un audio de 3:42.",
+          options:[
+            {text:"Responder al día siguiente dentro del horario.", consequence:"El mundo no termina y el límite queda un poco más claro.", effects:{salud:7,vida:8,reputacion:-1}},
+            {text:"Responder y activar al equipo inmediatamente.", consequence:"El cliente agradece la rapidez. Tu equipo recuerda la hora.", effects:{reputacion:6,carrera:4,salud:-10,vida:-10}},
+            {text:"Confirmar recepción y negociar prioridad mañana.", consequence:"No ignoras la urgencia, pero tampoco conviertes la noche en jornada.", effects:{reputacion:5,carrera:5,salud:3,vida:3}}
+          ]
+        },
+        {
+          id:"accounts-missing-oc", minYear:1,
+          title:"Quieren partir sin orden de compra",
+          text:"El cliente pide comenzar producción “para ganar tiempo”, pero aún no existe OC ni aprobación formal de presupuesto.",
+          quote:"“Después regularizamos.”",
+          options:[
+            {text:"Esperar la aprobación formal antes de comprometer costos.", consequence:"La producción parte más tarde, pero nadie queda financiando al cliente.", effects:{carrera:8,reputacion:5,dinero:6}},
+            {text:"Partir igual confiando en la relación.", consequence:"El proyecto avanza. Finanzas pregunta quién autorizó el gasto.", effects:{reputacion:4,dinero:-8,carrera:-3,salud:-4}},
+            {text:"Negociar una aprobación escrita transitoria.", consequence:"Consigues respaldo suficiente para mover lo urgente.", effects:{carrera:9,reputacion:8,dinero:3}}
+          ]
+        },
+        {
+          id:"accounts-creative-conflict", minYear:2,
+          title:"Creatividad dice que el timing es imposible",
+          text:"El cliente no mueve fecha y el equipo creativo dice que no llega con calidad.",
+          quote:"Estás justo entre “lo necesito mañana” y “así no se puede trabajar”.",
+          options:[
+            {text:"Volver al cliente con alternativas y trade-offs.", consequence:"El cliente elige qué priorizar y el equipo recupera margen de maniobra.", effects:{carrera:9,reputacion:9,salud:2}},
+            {text:"Presionar a creatividad para cumplir todo.", consequence:"La fecha se mantiene. La relación interna se deteriora.", effects:{reputacion:3,carrera:4,vida:-6,salud:-8}},
+            {text:"Decir al cliente que creatividad se atrasó.", consequence:"Te sacas presión inmediata y pierdes confianza interna.", effects:{reputacion:-8,carrera:-6}}
+          ]
+        },
+        {
+          id:"accounts-budget-cut", minYear:2,
+          title:"El cliente recortó 30% del presupuesto",
+          text:"La expectativa de campaña sigue intacta, pero ahora hay bastante menos dinero.",
+          quote:"Mismos objetivos. Menos presupuesto. Más reuniones.",
+          options:[
+            {text:"Redefinir alcance y resultados esperables.", consequence:"La campaña cambia de tamaño antes de convertirse en pérdida.", effects:{carrera:9,reputacion:9,dinero:6}},
+            {text:"Mantener todo y pedir descuentos a proveedores.", consequence:"Logras bajar costos, pero el margen desaparece.", effects:{reputacion:5,dinero:-6,carrera:1}},
+            {text:"Aceptar y resolver después.", consequence:"Después llega durante producción, como siempre.", effects:{carrera:-6,reputacion:-5,salud:-7}}
+          ]
+        },
+        {
+          id:"accounts-crisis-call", minYear:2,
+          title:"El cliente pide reunión urgente por una crisis",
+          text:"Una publicación está recibiendo críticas y el cliente necesita un plan en 20 minutos.",
+          quote:"“Necesitamos saber qué hacemos YA.”",
+          options:[
+            {text:"Reunir hechos, responsables y próximos pasos antes de responder.", consequence:"La urgencia se convierte en un plan concreto.", effects:{carrera:10,reputacion:10,salud:-3}},
+            {text:"Prometer una solución antes de hablar con el equipo.", consequence:"El cliente recibe seguridad. El equipo recibe una promesa ajena.", effects:{reputacion:4,carrera:-3,salud:-6}},
+            {text:"Escalar todo sin proponer nada.", consequence:"La reunión crece en asistentes y sigue sin una decisión.", effects:{reputacion:-4,carrera:-4}}
+          ]
+        },
+        {
+          id:"accounts-profitability", minYear:3,
+          title:"La cuenta vende mucho, pero deja poco margen",
+          text:"El cliente pide cada vez más horas y la agencia empieza a perder rentabilidad.",
+          quote:"Facturar no siempre significa ganar.",
+          options:[
+            {text:"Revisar horas, alcance y fee con datos.", consequence:"La conversación comercial se apoya en números y no en sensaciones.", effects:{carrera:10,reputacion:8,dinero:8}},
+            {text:"Seguir absorbiendo para no arriesgar la cuenta.", consequence:"La cuenta sigue. La rentabilidad deja de existir.", effects:{reputacion:4,dinero:-10,salud:-8}},
+            {text:"Reducir dedicación silenciosamente.", consequence:"El cliente nota la caída de servicio antes de que puedas explicarla.", effects:{reputacion:-8,carrera:-5}}
+          ]
+        },
+        {
+          id:"accounts-pitch-lead", minYear:3,
+          title:"Te toca liderar una licitación",
+          text:"Debes coordinar estrategia, creatividad, medios, producción y presupuesto para una presentación en una semana.",
+          quote:"Cinco áreas. Una PPT. Cero horas extra presupuestadas.",
+          options:[
+            {text:"Definir responsables, hitos y decisiones desde el primer día.", consequence:"La licitación sigue siendo intensa, pero deja de ser completamente caótica.", effects:{carrera:11,reputacion:10,portafolio:7,salud:-5}},
+            {text:"Ir resolviendo sobre la marcha.", consequence:"Todo avanza hasta que tres áreas necesitan lo mismo al mismo tiempo.", effects:{carrera:2,reputacion:-2,salud:-10}},
+            {text:"Hacer tú mismo lo que no avanza.", consequence:"La presentación sale. Tú te transformas en cuello de botella.", effects:{carrera:6,reputacion:5,salud:-14,vida:-10}}
+          ]
+        },
+        {
+          id:"accounts-team-burnout", minYear:3,
+          title:"Tu equipo está quemado",
+          text:"Llevan semanas con urgencias. Una persona te dice que no puede seguir con ese ritmo.",
+          quote:"El problema ya no cabe en una minuta.",
+          options:[
+            {text:"Repriorizar carga y escalar capacidad con jefatura.", consequence:"No solucionas todo, pero conviertes desgaste en una decisión de gestión.", effects:{carrera:10,reputacion:10,salud:4,vida:4}},
+            {text:"Pedir un último esfuerzo.", consequence:"Siempre hay un último esfuerzo hasta que alguien renuncia.", effects:{carrera:3,reputacion:-8,salud:-7,vida:-5}},
+            {text:"Decir que todos están igual.", consequence:"La frase une al equipo, pero contra ti.", effects:{reputacion:-12,carrera:-7}}
+          ]
+        },
+        {
+          id:"accounts-client-change", minYear:4,
+          title:"Cambió el gerente de marketing del cliente",
+          text:"La nueva jefatura quiere revisar estrategia, equipo, fee y todo lo aprobado en los últimos seis meses.",
+          quote:"Nueva persona, nuevo PowerPoint sobre por qué existes.",
+          options:[
+            {text:"Preparar contexto, resultados y acuerdos para revalidar la relación.", consequence:"La transición se convierte en una oportunidad para ordenar la cuenta.", effects:{carrera:10,reputacion:10,portafolio:5}},
+            {text:"Seguir igual hasta que pidan cambios.", consequence:"Los cambios llegan todos juntos y con urgencia.", effects:{reputacion:-4,carrera:-2,salud:-5}},
+            {text:"Vender todo de nuevo aunque no sea necesario.", consequence:"Consigues atención, pero también nuevas expectativas.", effects:{reputacion:3,carrera:4,salud:-3}}
+          ]
+        },
+        {
+          id:"accounts-renewal", minYear:5,
+          title:"La renovación anual está en riesgo",
+          text:"El cliente está conforme con el trabajo, pero Procurement quiere bajar el fee.",
+          quote:"La creatividad puede gustar. Compras igual quiere descuento.",
+          options:[
+            {text:"Defender fee con alcance, resultados y horas reales.", consequence:"No recuperas todo, pero evitas regalar el servicio.", effects:{carrera:11,reputacion:9,dinero:10}},
+            {text:"Aceptar la baja para asegurar la cuenta.", consequence:"Renuevas. El equipo trabajará lo mismo por menos.", effects:{reputacion:5,dinero:-10,salud:-6}},
+            {text:"Amenazar con dejar la cuenta.", consequence:"La negociación se pone seria. También arriesgas la relación.", effects:{carrera:3,reputacion:-4,dinero:2}}
+          ]
+        }
+      ],
+
+      "Community Manager": [
+        {
+          id:"cm-comment-crisis", minYear:1,
+          title:"Un comentario negativo empieza a crecer",
+          text:"Una persona reclama públicamente y otras comienzan a sumarse. Todavía no hay protocolo claro.",
+          quote:"Cinco comentarios pueden convertirse en cincuenta bastante rápido.",
+          options:[
+            {text:"Escalar, reunir contexto y responder según tono de marca.", consequence:"La conversación se contiene antes de transformarse en crisis.", effects:{carrera:8,reputacion:8,portafolio:4}},
+            {text:"Responder rápido sin validar antecedentes.", consequence:"La velocidad ayuda poco cuando la respuesta contiene un dato incorrecto.", effects:{reputacion:-8,carrera:-5,salud:-4}},
+            {text:"Ocultar comentarios.", consequence:"La conversación migra a screenshots.", effects:{reputacion:-10,carrera:-7}}
+          ]
+        },
+        {
+          id:"cm-post-wrong-account", minYear:1,
+          title:"Publicaste desde la cuenta equivocada",
+          text:"El contenido era para otra marca y ya lleva algunos minutos arriba.",
+          quote:"Cambiar de pestaña también es una habilidad profesional.",
+          options:[
+            {text:"Bajar, informar y registrar el error.", consequence:"El impacto es pequeño y el proceso queda corregido.", effects:{carrera:6,reputacion:5,salud:-4}},
+            {text:"Borrar y no decir nada.", consequence:"Tal vez nadie lo vio. Tal vez alguien ya hizo captura.", effects:{reputacion:-4,carrera:-3}},
+            {text:"Intentar convertirlo en humor.", consequence:"Puede funcionar, pero acabas de crear una campaña sin aprobación.", effects:{portafolio:5,reputacion:1,carrera:-2}}
+          ]
+        },
+        {
+          id:"cm-weekend-monitoring", minYear:1,
+          title:"La marca quiere monitoreo sábado y domingo",
+          text:"No existe turno definido, pero el cliente espera respuestas rápidas.",
+          quote:"Always on no debería significar persona always on.",
+          options:[
+            {text:"Proponer turnos y criterios de escalamiento.", consequence:"La comunidad queda cubierta sin regalar todo el fin de semana.", effects:{carrera:8,reputacion:7,salud:5,vida:5}},
+            {text:"Responder tú todo el fin de semana.", consequence:"La marca se mantiene activa. Tú también, demasiado.", effects:{reputacion:6,salud:-13,vida:-14,riesgo:2}},
+            {text:"No mirar nada hasta el lunes.", consequence:"Proteges tu descanso, pero faltaba un protocolo real.", effects:{salud:8,vida:8,reputacion:-4}}
+          ]
+        },
+        {
+          id:"cm-trend-approval", minYear:2,
+          title:"El trend muere antes de la aprobación",
+          text:"Detectaste una tendencia perfecta, pero el circuito de aprobación demora cuatro días.",
+          quote:"Internet dura horas. La minuta dura para siempre.",
+          options:[
+            {text:"Crear un flujo rápido para contenidos oportunos.", consequence:"El equipo gana autonomía controlada para reaccionar a tiempo.", effects:{carrera:9,reputacion:8,portafolio:7}},
+            {text:"Esperar el proceso normal.", consequence:"La pieza sale cuando el trend ya aparece en presentaciones de marketing.", effects:{reputacion:1,portafolio:-3}},
+            {text:"Publicar sin aprobación.", consequence:"Funciona, pero la conversación interna dura bastante más.", effects:{portafolio:8,reputacion:-4,carrera:1}}
+          ]
+        },
+        {
+          id:"cm-inbox-overload", minYear:2,
+          title:"Hay 430 mensajes sin responder",
+          text:"Una promoción disparó preguntas por DM y comentarios. El equipo sigue siendo de una persona.",
+          quote:"Engagement: excelente. Capacidad operativa: ausente.",
+          options:[
+            {text:"Priorizar casos, respuestas tipo y pedir apoyo temporal.", consequence:"Bajas el backlog sin convertir todo en respuestas robóticas.", effects:{carrera:9,reputacion:8,salud:2}},
+            {text:"Responder todo tú solo.", consequence:"Bajas el número. Tu energía también.", effects:{reputacion:6,carrera:5,salud:-12,vida:-8}},
+            {text:"Cerrar comentarios por unas horas.", consequence:"El inbox deja de crecer. La percepción de servicio también.", effects:{reputacion:-7,carrera:-4}}
+          ]
+        },
+        {
+          id:"cm-report-engagement", minYear:2,
+          title:"El engagement bajó este mes",
+          text:"El cliente pregunta qué salió mal porque el porcentaje cayó respecto al mes anterior.",
+          quote:"Un número bajó. Comienza la autopsia.",
+          options:[
+            {text:"Revisar mix de contenido, alcance, formatos y contexto antes de concluir.", consequence:"El reporte explica el cambio en vez de dramatizarlo.", effects:{carrera:8,reputacion:9,portafolio:5}},
+            {text:"Culpar al algoritmo.", consequence:"Es una explicación popular y casi nunca suficiente.", effects:{reputacion:-5,carrera:-3}},
+            {text:"Cambiar la fórmula de engagement.", consequence:"El número mejora mágicamente. La credibilidad no.", effects:{reputacion:-9,carrera:-7}}
+          ]
+        },
+        {
+          id:"cm-influencer-mention", minYear:3,
+          title:"Un influencer grande etiqueta a la marca",
+          text:"La publicación está generando conversación y nadie tenía preparada una respuesta.",
+          quote:"La oportunidad llegó sin reunión previa.",
+          options:[
+            {text:"Responder rápido y escalar una oportunidad de contenido.", consequence:"La marca entra a la conversación sin sentirse desesperada.", effects:{carrera:9,reputacion:9,portafolio:8}},
+            {text:"Esperar aprobación formal.", consequence:"Cuando respondes, la conversación ya se movió.", effects:{reputacion:1,portafolio:-2}},
+            {text:"Forzar una interacción demasiado promocional.", consequence:"La marca aparece. También aparece el cringe.", effects:{reputacion:-5,portafolio:-3}}
+          ]
+        },
+        {
+          id:"cm-brand-tone", minYear:3,
+          title:"La marca quiere sonar joven",
+          text:"El cliente pide usar expresiones que no encajan con su audiencia ni con su personalidad.",
+          quote:"Poner “bro” no rejuvenece una marca.",
+          options:[
+            {text:"Proponer un tono actual sin imitar a la audiencia.", consequence:"La marca se siente más cercana sin disfrazarse.", effects:{carrera:9,reputacion:8,portafolio:7}},
+            {text:"Usar todos los modismos pedidos.", consequence:"El contenido parece escrito por alguien intentando parecer joven.", effects:{reputacion:-4,portafolio:-5}},
+            {text:"Mantener el tono antiguo sin explorar nada.", consequence:"Evitas el cringe y también cualquier evolución.", effects:{carrera:1,reputacion:1}}
+          ]
+        },
+        {
+          id:"cm-social-listening", minYear:4,
+          title:"La conversación sobre la marca cambió",
+          text:"Empiezan a aparecer menciones sobre un problema que todavía no figura en los reportes internos.",
+          quote:"La comunidad a veces avisa antes que el dashboard.",
+          options:[
+            {text:"Levantar patrones, volumen y ejemplos antes de escalar.", consequence:"El equipo detecta un riesgo antes de que se convierta en crisis.", effects:{carrera:10,reputacion:10,portafolio:6}},
+            {text:"Esperar a que aumente el volumen.", consequence:"Aumenta. Ahora también hay prensa preguntando.", effects:{reputacion:-8,carrera:-5}},
+            {text:"Responder caso a caso sin levantar tendencia.", consequence:"Atiendes personas, pero pierdes la señal general.", effects:{reputacion:3,carrera:-2}}
+          ]
+        },
+        {
+          id:"cm-team-lead", minYear:5,
+          title:"Ahora lideras a otros CM",
+          text:"El equipo tiene estilos distintos y el cliente espera una voz consistente.",
+          quote:"Escalar personas es más difícil que escalar comentarios.",
+          options:[
+            {text:"Crear criterios, ejemplos y autonomía por tipo de respuesta.", consequence:"El equipo gana consistencia sin necesitar aprobación para todo.", effects:{carrera:11,reputacion:10,portafolio:6}},
+            {text:"Revisar personalmente cada respuesta.", consequence:"La calidad sube y tú te conviertes en cuello de botella.", effects:{carrera:5,reputacion:5,salud:-10}},
+            {text:"Dejar que cada persona responda a su estilo.", consequence:"La marca desarrolla varias personalidades simultáneas.", effects:{reputacion:-8,carrera:-5}}
+          ]
+        }
+      ],
+
+      "Content Creator": [
+        {
+          id:"content-shoot-tomorrow", minYear:1,
+          title:"Hay que grabar mañana",
+          text:"El cliente aprobó una idea a última hora. No hay locación, talento ni utilería confirmada.",
+          quote:"La producción existe principalmente en el calendario.",
+          options:[
+            {text:"Reducir la idea a una producción viable.", consequence:"Grabas algo simple que sí se puede ejecutar bien.", effects:{carrera:8,reputacion:7,portafolio:6}},
+            {text:"Intentar producir la idea original completa.", consequence:"Sale, pero con horas extra y favores acumulados.", effects:{portafolio:9,reputacion:6,salud:-12,vida:-9}},
+            {text:"Cancelar hasta tener todos los recursos.", consequence:"Proteges calidad, pero pierdes la oportunidad de contenido.", effects:{salud:5,reputacion:-3,carrera:1}}
+          ]
+        },
+        {
+          id:"content-you-are-talent", minYear:1,
+          title:"Ahora también eres el rostro",
+          text:"No hay presupuesto para talento y el cliente pregunta si puedes aparecer tú en cámara.",
+          quote:"Cargo: Content Creator. Subcargo: persona disponible.",
+          options:[
+            {text:"Aceptar si está dentro del concepto y uso acordado.", consequence:"El contenido funciona y dejas claros los límites de uso.", effects:{portafolio:8,reputacion:6,carrera:4}},
+            {text:"Aceptar siempre que lo pidan.", consequence:"Te conviertes en rostro recurrente sin que tu contrato cambie.", effects:{reputacion:5,carrera:3,salud:-6,vida:-4}},
+            {text:"Negarte y proponer otra solución.", consequence:"Encuentran un formato que no depende de convertirte en talento gratuito.", effects:{salud:5,carrera:5,reputacion:3}}
+          ]
+        },
+        {
+          id:"content-editing-night", minYear:1,
+          title:"El video tiene 14 cambios",
+          text:"La pieza estaba aprobada. Llegó un correo con cambios de música, ritmo, textos, planos y duración.",
+          quote:"“Son detalles.”",
+          options:[
+            {text:"Agrupar cambios y pedir una ronda consolidada.", consequence:"Reduces iteraciones y vuelves a editar una sola vez.", effects:{carrera:8,reputacion:7,salud:3}},
+            {text:"Hacer cada cambio apenas llega.", consequence:"Terminas exportando versiones que envejecen en minutos.", effects:{reputacion:5,salud:-10,vida:-8}},
+            {text:"Ignorar los cambios tardíos.", consequence:"No editas de noche. Tampoco entregas lo que el cliente esperaba.", effects:{salud:6,reputacion:-6}}
+          ]
+        },
+        {
+          id:"content-phone-storage", minYear:2,
+          title:"Tu celular es ahora equipo de producción",
+          text:"Grabaciones, aplicaciones, archivos y respaldos ocupan casi todo tu almacenamiento personal.",
+          quote:"La marca está creciendo. Tu memoria interna no.",
+          options:[
+            {text:"Pedir equipo y almacenamiento de trabajo.", consequence:"La agencia entiende que producir contenido necesita infraestructura.", effects:{carrera:7,reputacion:5,dinero:3}},
+            {text:"Seguir usando tu equipo personal.", consequence:"Ahorras discusión y pagas tú el costo operativo.", effects:{reputacion:4,dinero:-6,salud:-4}},
+            {text:"Borrar archivos después de publicar.", consequence:"Liberas espacio y luego alguien pide el bruto del mes pasado.", effects:{reputacion:-4,carrera:-3}}
+          ]
+        },
+        {
+          id:"content-platform-format", minYear:2,
+          title:"El mismo video para todas las plataformas",
+          text:"El cliente quiere subir exactamente el mismo corte a TikTok, Reels, Shorts y LinkedIn.",
+          quote:"Una pieza. Cuatro algoritmos. Cero adaptaciones.",
+          options:[
+            {text:"Adaptar duración, apertura y edición por plataforma.", consequence:"El trabajo aumenta, pero cada formato tiene una lógica real.", effects:{carrera:9,reputacion:8,portafolio:9}},
+            {text:"Usar un único corte para ahorrar tiempo.", consequence:"Cumples con volumen, no necesariamente con rendimiento.", effects:{carrera:2,reputacion:2}},
+            {text:"Publicar solo donde crees que funcionará.", consequence:"La estrategia mejora, pero el cliente pregunta por qué faltan canales.", effects:{portafolio:4,reputacion:-3}}
+          ]
+        },
+        {
+          id:"content-viral-pressure", minYear:3,
+          title:"El cliente quiere otro viral",
+          text:"Un video funcionó muy bien y ahora esperan repetir el resultado cada semana.",
+          quote:"El éxito accidental acaba de convertirse en KPI.",
+          options:[
+            {text:"Explicar qué elementos son replicables y cuáles no.", consequence:"Transformas el caso en aprendizaje en vez de promesa imposible.", effects:{carrera:9,reputacion:9,portafolio:7}},
+            {text:"Prometer que el siguiente será igual.", consequence:"Tu calendario ahora incluye fabricar viralidad.", effects:{reputacion:3,carrera:-3,salud:-6}},
+            {text:"Copiar exactamente la fórmula anterior.", consequence:"El segundo video se siente como secuela obligatoria.", effects:{portafolio:-4,reputacion:-2}}
+          ]
+        },
+        {
+          id:"content-production-budget", minYear:3,
+          title:"Producción grande con presupuesto pequeño",
+          text:"La idea requiere locación, arte, talento y equipo técnico, pero el presupuesto solo alcanza para una parte.",
+          quote:"Cine de autor con presupuesto de Reel.",
+          options:[
+            {text:"Rediseñar la idea según recursos reales.", consequence:"La creatividad se adapta a producción sin fingir que el dinero no existe.", effects:{carrera:10,reputacion:9,portafolio:8}},
+            {text:"Pedir favores a todo el mundo.", consequence:"La pieza sale y tu red de favores queda en números rojos.", effects:{portafolio:7,reputacion:4,vida:-7}},
+            {text:"Mantener idea y bajar calidad.", consequence:"Se nota exactamente dónde faltó presupuesto.", effects:{portafolio:-7,reputacion:-5}}
+          ]
+        },
+        {
+          id:"content-rights-music", minYear:4,
+          title:"La canción perfecta no tiene derechos",
+          text:"El corte funciona increíble con una canción comercial, pero la marca no tiene licencia para usarla.",
+          quote:"Buen gusto musical, mal uso comercial.",
+          options:[
+            {text:"Buscar una alternativa licenciable con la misma intención.", consequence:"Pierdes la canción soñada y mantienes la pieza publicable.", effects:{carrera:9,reputacion:9,portafolio:6}},
+            {text:"Usarla igual porque está en tendencia.", consequence:"El video puede salir y también puede llegar un problema legal.", effects:{reputacion:-9,carrera:-7}},
+            {text:"Quitar música completamente.", consequence:"Evitas riesgos, pero la edición pierde energía.", effects:{carrera:2,portafolio:-2}}
+          ]
+        },
+        {
+          id:"content-team-scale", minYear:5,
+          title:"Ahora produces contenido para seis marcas",
+          text:"El volumen aumentó más rápido que el equipo.",
+          quote:"Calendario always on, capacidad sometimes on.",
+          options:[
+            {text:"Crear bloques de producción y reutilización inteligente.", consequence:"Reduces montajes y haces rendir mejor cada jornada.", effects:{carrera:10,reputacion:9,portafolio:7,salud:3}},
+            {text:"Grabar cada marca en días distintos.", consequence:"La agenda se llena y el cansancio también.", effects:{reputacion:5,salud:-11,vida:-9}},
+            {text:"Bajar la calidad para cumplir volumen.", consequence:"Se cumple el calendario y desaparece el diferencial.", effects:{portafolio:-8,reputacion:-5}}
+          ]
+        }
+      ],
+
+      "Redactor": [
+        {
+          id:"copy-brief-empty", minYear:1,
+          title:"El brief no tiene una idea",
+          text:"La solicitud dice “campaña disruptiva, cercana y viral”. No hay objetivo claro ni insight.",
+          quote:"Tres adjetivos no son una estrategia.",
+          options:[
+            {text:"Pedir objetivo, audiencia y problema antes de escribir.", consequence:"El trabajo parte más tarde, pero con una dirección real.", effects:{carrera:8,reputacion:7,portafolio:5}},
+            {text:"Escribir diez rutas para ver cuál prende.", consequence:"Producción alta, foco bajo.", effects:{portafolio:5,salud:-6}},
+            {text:"Usar una idea genérica y avanzar.", consequence:"El concepto pasa la primera revisión y muere en la segunda.", effects:{portafolio:-5,reputacion:-3}}
+          ]
+        },
+        {
+          id:"copy-headline-long", minYear:1,
+          title:"El titular ya parece párrafo",
+          text:"El cliente agregó beneficio, legal, CTA, precio y tres mensajes al headline.",
+          quote:"Todo es importante, por lo tanto nada destaca.",
+          options:[
+            {text:"Defender jerarquía y separar mensajes.", consequence:"El titular vuelve a ser titular.", effects:{carrera:8,reputacion:7,portafolio:7}},
+            {text:"Agregar todo como pidieron.", consequence:"La pieza informa muchísimo y comunica muy poco.", effects:{reputacion:3,portafolio:-6}},
+            {text:"Reducirlo sin avisar.", consequence:"La pieza mejora y el cliente pregunta dónde quedó su frase.", effects:{portafolio:5,reputacion:-3}}
+          ]
+        },
+        {
+          id:"copy-concept-rejected", minYear:2,
+          title:"La idea favorita murió en cinco minutos",
+          text:"La ruta que más defendiste es descartada al inicio de la reunión.",
+          quote:"“No me mata.”",
+          options:[
+            {text:"Entender la objeción y rescatar el insight.", consequence:"La segunda ruta mejora sin empezar desde cero.", effects:{carrera:8,reputacion:7,portafolio:6}},
+            {text:"Defenderla hasta agotar la reunión.", consequence:"Tal vez tienes razón. Ya nadie quiere escucharla.", effects:{reputacion:-3,salud:-4}},
+            {text:"Cambiar todo sin preguntar por qué.", consequence:"Escribes otra campaña y conservas el mismo problema.", effects:{carrera:-4,portafolio:-4}}
+          ]
+        },
+        {
+          id:"copy-ai-request", minYear:2,
+          title:"“¿No lo puede hacer una IA?”",
+          text:"El cliente pregunta por qué una bajada de campaña demora si existen herramientas generativas.",
+          quote:"La herramienta escribe. El criterio todavía tiene horario.",
+          options:[
+            {text:"Explicar dónde acelera el proceso y dónde sigue haciendo falta criterio.", consequence:"La conversación cambia de reemplazo a herramienta.", effects:{carrera:9,reputacion:8}},
+            {text:"Generar cien opciones y mandar todo.", consequence:"Ahora el cliente debe revisar cien versiones.", effects:{reputacion:-3,portafolio:-4}},
+            {text:"Negarte a usar cualquier herramienta.", consequence:"Proteges tu proceso, pero pierdes eficiencia donde sí podía servir.", effects:{carrera:1,reputacion:-2}}
+          ]
+        },
+        {
+          id:"copy-legal", minYear:3,
+          title:"Legal mató el remate",
+          text:"El concepto funciona, pero una frase clave no puede usarse por riesgo regulatorio.",
+          quote:"Creatividad conoce a su verdadero director creativo: Legal.",
+          options:[
+            {text:"Buscar una nueva forma de decirlo sin perder la idea.", consequence:"El concepto sobrevive con otra ejecución.", effects:{carrera:9,reputacion:8,portafolio:8}},
+            {text:"Insistir en usar la frase.", consequence:"La discusión dura más que la campaña.", effects:{reputacion:-4,carrera:-3}},
+            {text:"Eliminar el concepto completo.", consequence:"Resuelves el riesgo y también todo lo interesante.", effects:{portafolio:-7,carrera:-2}}
+          ]
+        },
+        {
+          id:"copy-pitch", minYear:3,
+          title:"Hay que escribir una licitación completa",
+          text:"Concepto, manifiesto, guiones, titulares y racional estratégico en tres días.",
+          quote:"Word abierto. Café frío. Documento sin nombre.",
+          options:[
+            {text:"Definir una idea madre y escribir desde ella.", consequence:"El volumen sigue siendo alto, pero todo pertenece a la misma campaña.", effects:{carrera:10,reputacion:9,portafolio:10,salud:-5}},
+            {text:"Escribir piezas sueltas para avanzar rápido.", consequence:"Hay mucho material y poca campaña.", effects:{portafolio:2,salud:-5}},
+            {text:"Trasnochar hasta tener todo perfecto.", consequence:"La presentación queda fuerte. Tu semana desaparece.", effects:{portafolio:11,reputacion:7,salud:-15,vida:-12,riesgo:3}}
+          ]
+        },
+        {
+          id:"copy-award-vs-effective", minYear:4,
+          title:"La idea premiable o la que probablemente vende",
+          text:"Tienes una ruta muy festivalera y otra menos espectacular, pero mucho más conectada con el negocio.",
+          quote:"La carpeta de premios también tiene KPIs.",
+          options:[
+            {text:"Defender la ruta que mejor responde al problema.", consequence:"Tal vez no gana un metal, pero tiene una razón clara de existir.", effects:{carrera:9,reputacion:9,portafolio:7}},
+            {text:"Ir por la más premiable.", consequence:"El caso puede verse increíble. El resultado de negocio todavía es una incógnita.", effects:{portafolio:10,reputacion:3}},
+            {text:"Mezclar ambas sin elegir.", consequence:"La campaña intenta ser dos cosas y termina sin una voz clara.", effects:{portafolio:-4,carrera:-3}}
+          ]
+        },
+        {
+          id:"copy-junior-mentoring", minYear:5,
+          title:"Ahora revisas textos de otras personas",
+          text:"Tu trabajo ya no es solo escribir: también debes mejorar ideas sin reescribirlas todas tú.",
+          quote:"Editar no es secuestrar el documento.",
+          options:[
+            {text:"Dar criterio y feedback sin reemplazar la voz de la persona.", consequence:"El equipo mejora y tú empiezas a liderar de verdad.", effects:{carrera:11,reputacion:10,portafolio:6}},
+            {text:"Reescribir todo porque es más rápido.", consequence:"La calidad sube y nadie aprende.", effects:{carrera:5,salud:-8}},
+            {text:"Aprobar casi todo para evitar conflicto.", consequence:"El equipo está contento hasta la reunión con cliente.", effects:{reputacion:-6,carrera:-4}}
+          ]
+        }
+      ],
+
+      "RRSS": [
+        {
+          id:"design-social-20-formats", minYear:1,
+          title:"Una campaña, 20 formatos",
+          text:"El KV está aprobado. Ahora debe vivir en feed, story, reel cover, display, mailing y varios tamaños más.",
+          quote:"El concepto terminó. Comienza la adaptación infinita.",
+          options:[
+            {text:"Crear un sistema y componentes reutilizables.", consequence:"Las adaptaciones dejan de sentirse como veinte piezas distintas.", effects:{carrera:8,reputacion:7,portafolio:6}},
+            {text:"Diseñar cada formato desde cero.", consequence:"Todo queda cuidado. También consumes el doble de tiempo.", effects:{portafolio:8,salud:-10,vida:-6}},
+            {text:"Estirar el arte maestro en todos los tamaños.", consequence:"Cumples rápido y aparecen composiciones que nadie debería ver.", effects:{portafolio:-8,reputacion:-5}}
+          ]
+        },
+        {
+          id:"design-social-copy-change", minYear:2,
+          title:"Cambió el copy y rompe todas las piezas",
+          text:"El texto aprobado ahora tiene el doble de caracteres.",
+          quote:"El layout tenía un plan. El texto tenía otro.",
+          options:[
+            {text:"Replantear jerarquía y pedir una versión más corta.", consequence:"El diseño y el contenido vuelven a conversar.", effects:{carrera:8,reputacion:7,portafolio:6}},
+            {text:"Achicar tipografía hasta que quepa.", consequence:"Cabe. Leerlo ya es otro proyecto.", effects:{portafolio:-6,reputacion:-3}},
+            {text:"Cortar el texto por tu cuenta.", consequence:"La pieza mejora hasta que contenido pregunta qué pasó.", effects:{portafolio:4,reputacion:-3}}
+          ]
+        },
+        {
+          id:"design-social-template", minYear:3,
+          title:"La marca necesita velocidad sin perder identidad",
+          text:"El volumen de contenido creció y cada pieza se está diseñando como si fuera campaña.",
+          quote:"La consistencia también puede ser creativa.",
+          options:[
+            {text:"Crear un sistema modular de plantillas flexibles.", consequence:"El equipo produce más rápido sin convertir todo en copia-pega.", effects:{carrera:10,reputacion:9,portafolio:8}},
+            {text:"Seguir diseñando cada pieza desde cero.", consequence:"La calidad se mantiene y los timings dejan de hacerlo.", effects:{portafolio:8,salud:-10}},
+            {text:"Hacer una plantilla rígida para todo.", consequence:"La marca gana consistencia y pierde variedad.", effects:{carrera:3,portafolio:-3}}
+          ]
+        }
+      ],
+
+      "Branding": [
+        {
+          id:"branding-logo-feedback", minYear:1,
+          title:"“¿Puedes hacer el logo más moderno?”",
+          text:"El cliente no sabe explicar qué significa moderno, pero está seguro de que todavía no lo ve.",
+          quote:"Moderno: palabra, no dirección.",
+          options:[
+            {text:"Traducir el comentario a atributos visuales concretos.", consequence:"La conversación pasa de gustos a criterios.", effects:{carrera:8,reputacion:8,portafolio:7}},
+            {text:"Mostrar diez logos distintos.", consequence:"Aumentan las opciones y también la confusión.", effects:{portafolio:4,salud:-5}},
+            {text:"Agregar una tipografía sans y decir que ahora es moderno.", consequence:"Tal vez funciona. Tal vez solo cambiaste la fuente.", effects:{carrera:-2,portafolio:-3}}
+          ]
+        },
+        {
+          id:"branding-guidelines", minYear:2,
+          title:"El cliente no usa el manual de marca",
+          text:"Aprobaste un sistema completo y ahora aparecen piezas con tipografías y colores que nunca existieron.",
+          quote:"El manual está impecable. Nadie lo abrió.",
+          options:[
+            {text:"Simplificar reglas y crear recursos fáciles de usar.", consequence:"La identidad se vuelve más aplicable fuera del estudio.", effects:{carrera:9,reputacion:9,portafolio:7}},
+            {text:"Mandar nuevamente el PDF de 180 páginas.", consequence:"El archivo vuelve a viajar por correo.", effects:{reputacion:1,carrera:-1}},
+            {text:"Corregir cada pieza manualmente.", consequence:"La marca se mantiene consistente a costa de convertirte en soporte permanente.", effects:{portafolio:5,salud:-8}}
+          ]
+        },
+        {
+          id:"branding-rebrand", minYear:3,
+          title:"Hay que cambiar todo sin perder nada",
+          text:"El cliente quiere un rebranding radical, pero también quiere que todo siga siendo reconocible.",
+          quote:"Nuevo, pero igual. Diferente, pero no tanto.",
+          options:[
+            {text:"Definir qué activos deben mantenerse y cuáles pueden evolucionar.", consequence:"El proyecto encuentra un territorio realista.", effects:{carrera:10,reputacion:9,portafolio:10}},
+            {text:"Cambiar todo para demostrar transformación.", consequence:"La identidad se siente nueva y desconectada.", effects:{portafolio:6,reputacion:-3}},
+            {text:"Cambiar casi nada.", consequence:"El cliente pregunta exactamente qué pagó.", effects:{reputacion:-7,carrera:-4}}
+          ]
+        }
+      ],
+
+      "Motion": [
+        {
+          id:"motion-export", minYear:1,
+          title:"El render falla a 98%",
+          text:"La entrega es pronto y el archivo decide morir casi al final.",
+          quote:"98% es una emoción, no un progreso.",
+          options:[
+            {text:"Revisar códecs, assets y render por segmentos.", consequence:"Encuentras el problema y evitas repetir dos horas completas.", effects:{carrera:8,reputacion:7,portafolio:6}},
+            {text:"Volver a renderizar exactamente igual.", consequence:"Obtienes una nueva oportunidad de mirar la barra de progreso.", effects:{salud:-7,carrera:-2}},
+            {text:"Exportar una versión de menor calidad.", consequence:"Entregas a tiempo, pero el resultado se nota.", effects:{reputacion:-4,portafolio:-5}}
+          ]
+        },
+        {
+          id:"motion-last-minute-duration", minYear:2,
+          title:"El video debe pasar de 30 a 6 segundos",
+          text:"La pieza estaba pensada con desarrollo narrativo. Ahora debe vivir como bumper.",
+          quote:"Misma historia. Un quinto del tiempo.",
+          options:[
+            {text:"Reeditar desde una idea principal y un solo mensaje.", consequence:"La pieza cambia de lenguaje en lugar de solo acelerarse.", effects:{carrera:9,reputacion:8,portafolio:8}},
+            {text:"Acelerar todo.", consequence:"En seis segundos pasan treinta segundos de información.", effects:{portafolio:-6,reputacion:-4}},
+            {text:"Cortar los últimos 24 segundos.", consequence:"El bumper tiene inicio y una fe enorme en el espectador.", effects:{portafolio:-7}}
+          ]
+        },
+        {
+          id:"motion-assets", minYear:3,
+          title:"Faltan los archivos editables",
+          text:"Debes animar una identidad que llegó como JPG comprimido.",
+          quote:"Capas: concepto teórico.",
+          options:[
+            {text:"Pedir editables y avanzar con lo que sí puede resolverse.", consequence:"El timeline se mueve sin fingir que un JPG tiene capas.", effects:{carrera:8,reputacion:7,salud:2}},
+            {text:"Reconstruir todo tú mismo.", consequence:"Resuelves el problema y absorbes trabajo que no estaba contemplado.", effects:{portafolio:8,salud:-10,vida:-6}},
+            {text:"Animar el JPG tal cual.", consequence:"Se mueve. Técnicamente.", effects:{portafolio:-5,reputacion:-4}}
+          ]
+        }
+      ],
+
+      "Dirección de Arte": [
+        {
+          id:"art-direction-shoot", minYear:1,
+          title:"El shooting perdió una locación",
+          text:"La locación principal se cayó la noche anterior a la producción.",
+          quote:"Moodboard aprobado. Realidad no aprobada.",
+          options:[
+            {text:"Adaptar concepto a una locación viable sin perder intención.", consequence:"La producción cambia, la idea principal sobrevive.", effects:{carrera:9,reputacion:8,portafolio:8}},
+            {text:"Forzar una locación parecida aunque no funcione.", consequence:"La foto se parece al moodboard y no a la idea.", effects:{portafolio:-4,reputacion:-2}},
+            {text:"Suspender todo.", consequence:"Proteges calidad, pero el costo de producción sube.", effects:{dinero:-6,reputacion:-3}}
+          ]
+        },
+        {
+          id:"art-direction-client-set", minYear:2,
+          title:"El cliente empieza a dirigir desde el monitor",
+          text:"Durante el shooting aparecen instrucciones contradictorias sobre encuadre, producto, talento y props.",
+          quote:"Hay cuatro directores de arte. Solo uno está contratado como tal.",
+          options:[
+            {text:"Ordenar feedback y volver a los objetivos aprobados.", consequence:"La producción recupera dirección.", effects:{carrera:9,reputacion:8,portafolio:7}},
+            {text:"Aplicar cada comentario en tiempo real.", consequence:"La sesión avanza con muchas versiones y poca coherencia.", effects:{reputacion:4,portafolio:-4,salud:-5}},
+            {text:"Ignorar al cliente.", consequence:"Mantienes criterio y creas otro problema más grande.", effects:{reputacion:-8,carrera:-4}}
+          ]
+        },
+        {
+          id:"art-direction-budget", minYear:3,
+          title:"El moodboard cuesta tres veces el presupuesto",
+          text:"La referencia visual fue aprobada antes de cotizar producción.",
+          quote:"Pinterest no incluye valores netos.",
+          options:[
+            {text:"Rediseñar recursos visuales según presupuesto real.", consequence:"El concepto se adapta antes de llegar al set.", effects:{carrera:10,reputacion:9,portafolio:8}},
+            {text:"Intentar replicar todo barato.", consequence:"La diferencia entre referencia y realidad se vuelve protagonista.", effects:{portafolio:-7,reputacion:-5}},
+            {text:"Pedir más presupuesto sin alternativas.", consequence:"Tal vez llega. Tal vez también una nueva referencia.", effects:{carrera:2,reputacion:-2}}
+          ]
+        }
+      ]
+    };
+
+    const events = [
+      {
+        id:"campaign-overnight", minYear:1, tags:["all"],
+        title:"La campaña que nació ayer",
+        text:"Son las 17:42. El cliente necesita una campaña completa para mañana a primera hora. Todavía no existe brief, presupuesto ni una definición de “campaña completa”.",
+        quote:"“Es algo sencillo, confío en ustedes.”",
+        options:[
+          {text:"Aceptar y trabajar toda la noche.", consequence:"La campaña sale. Nadie recuerda quién la hizo, pero todos recuerdan que respondes rápido.", effects:{carrera:8,reputacion:6,portafolio:4,salud:-18,vida:-15,riesgo:3}, salary:0},
+          {text:"Negociar una entrega parcial y un calendario realista.", consequence:"El cliente protesta durante siete minutos. Después acepta porque, sorpresa, era posible planificar.", effects:{carrera:4,reputacion:5,salud:2,vida:2}},
+          {text:"Decir que el plazo es inviable y pedir prioridades.", consequence:"Tu jefatura dice que te falta actitud. El equipo te agradece en silencio.", effects:{reputacion:-2,salud:7,vida:6,carrera:1}}
+        ]
+      },
+      {
+        id:"cyber", minYear:1, tags:["Medios","Community Manager","Content Creator","RRSS","all"],
+        title:"Modo Cyber Day",
+        text:"Tres noches de monitoreo. Durante el día también trabajas. Te dicen que habrá pizza, como si fuera un sistema de compensación.",
+        quote:"“Es solo esta vez.” — Lo dijeron el año pasado.",
+        options:[
+          {text:"Aceptar todo para demostrar compromiso.", consequence:"El Cyber funciona. Tú también, pero apenas.", effects:{carrera:7,reputacion:6,dinero:1,salud:-20,vida:-18,riesgo:4}},
+          {text:"Pedir turnos, descansos y compensación.", consequence:"Se organizan turnos. Descubren una tecnología revolucionaria llamada planificación.", effects:{carrera:4,reputacion:4,salud:5,vida:4}},
+          {text:"Dejar alertas configuradas y dormir.", consequence:"Nada explota. Nadie te felicita por evitar que explote.", effects:{portafolio:2,salud:7,vida:6,reputacion:-1}}
+        ]
+      },
+      {
+        id:"pitch", minYear:1, tags:["all"],
+        title:"Licitación sin presupuesto",
+        text:"La agencia quiere ganar una cuenta grande. El pitch requiere dos semanas de trabajo extra y no hay garantía de ganar ni de recuperar las horas.",
+        quote:"“Si ganamos, esto nos sirve a todos.”",
+        options:[
+          {text:"Sumarte y darlo todo.", consequence:"La presentación queda impecable. La agencia gana, pero el cliente exige bajar los honorarios.", effects:{carrera:10,reputacion:8,portafolio:8,salud:-16,vida:-16}},
+          {text:"Participar, pero pedir compensación por las horas.", consequence:"Te llaman intenso. Meses después usan tu propuesta como política interna.", effects:{carrera:5,reputacion:4,dinero:4,salud:1}},
+          {text:"No trabajar gratis.", consequence:"No te invitan al brindis. Tampoco perdiste dos fines de semana.", effects:{salud:8,vida:10,reputacion:-3,carrera:-1}}
+        ]
+      },
+      {
+        id:"low-salary", minYear:1, tags:["all"],
+        title:"Sueldo junior, responsabilidades senior",
+        text:"Tu jefatura te ofrece asumir una nueva cuenta. No incluye aumento, pero sí “visibilidad”.",
+        quote:"La visibilidad no paga el arriendo, pero aparentemente inspira.",
+        options:[
+          {text:"Aceptar por experiencia.", consequence:"Aprendes rápido y te conviertes en la solución oficial para todo.", effects:{carrera:8,portafolio:6,salud:-10,vida:-8,dinero:-2}},
+          {text:"Negociar sueldo, carga y objetivos.", consequence:"Obtienes un aumento pequeño y una promesa grande.", effects:{carrera:6,dinero:8,reputacion:4,salud:2}, salary:90000},
+          {text:"Rechazar y empezar a buscar otra agencia.", consequence:"Tu LinkedIn revive. También tu esperanza.", effects:{carrera:3,salud:5,vida:3}, flag:"jobSearch"}
+        ]
+      },
+      {
+        id:"three-jobs", minYear:2, tags:["Community Manager","Content Creator","RRSS","Motion","Redactor"],
+        title:"Tres cargos, un sueldo",
+        text:"Ahora debes crear la idea, escribir, grabar, editar, publicar y aparecer en cámara. Oficialmente tu cargo no cambió.",
+        quote:"“Es una oportunidad para mostrar tu versatilidad.”",
+        options:[
+          {text:"Hacerlo para mejorar el portafolio.", consequence:"Tu portafolio crece. Tu descripción de cargo también, pero solo en la práctica.", effects:{portafolio:10,carrera:5,salud:-14,vida:-10}},
+          {text:"Pedir redefinición de cargo y aumento.", consequence:"Te dan un título nuevo y parte del aumento solicitado.", effects:{carrera:8,dinero:7,reputacion:3}, salary:100000},
+          {text:"Cumplir solo con lo contratado.", consequence:"Descubren que contratar a más personas era una opción.", effects:{salud:8,vida:6,reputacion:-2}}
+        ]
+      },
+      {
+        id:"afteroffice", minYear:1, tags:["all"],
+        title:"Afteroffice con asistencia emocionalmente obligatoria",
+        text:"Después de una semana agotadora, el equipo sale. Existe presión para beber o consumir para integrarte y seguir el ritmo.",
+        quote:"“Relájate, es parte de la cultura.”",
+        sensitive:true,
+        options:[
+          {text:"Ir, compartir un rato y poner límites.", consequence:"Conversas, haces contactos y vuelves a casa sin hipotecar el día siguiente.", effects:{reputacion:3,vida:2,salud:2,riesgo:-1}},
+          {text:"Consumir para no quedar fuera.", consequence:"Por unas horas encajas. Después llegan el gasto, el cansancio y una decisión que puede repetirse.", effects:{reputacion:4,vida:-7,salud:-10,dinero:-4,riesgo:14}},
+          {text:"No ir y descansar.", consequence:"Te pierdes algunos chismes. Recuperas sueño, que también era información importante.", effects:{salud:9,vida:6,reputacion:-1,riesgo:-2}}
+        ]
+      },
+      {
+        id:"stay-awake", minYear:2, tags:["all"],
+        title:"Necesitas seguir despierto",
+        text:"Llevas dos noches trabajando. Alguien te ofrece una sustancia para continuar. La entrega es mañana y tu cuerpo ya cerró sesión.",
+        quote:"Ninguna campaña vale convertir una emergencia en rutina.",
+        sensitive:true,
+        options:[
+          {text:"Aceptar para terminar.", consequence:"Entregas a tiempo, pero aumenta el riesgo de repetir el patrón. El costo aparece después.", effects:{carrera:5,reputacion:3,salud:-18,vida:-8,riesgo:20}},
+          {text:"Detenerte, informar y descansar.", consequence:"La entrega se mueve unas horas. El mundo publicitario continúa girando.", effects:{salud:12,vida:5,reputacion:-2,riesgo:-3}},
+          {text:"Pedir apoyo y redistribuir el trabajo.", consequence:"El equipo divide la carga. La heroicidad individual pierde frente a una planilla con responsables.", effects:{carrera:4,reputacion:5,salud:7,vida:3,riesgo:-4}}
+        ]
+      },
+      {
+        id:"client-hates", minYear:1, tags:["Cuentas","Community Manager","Redactor","Content Creator","RRSS","Branding","Dirección de Arte"],
+        title:"El cliente odia la campaña",
+        text:"Trabajaste durante semanas. La presentación dura cinco minutos antes de escuchar la frase que paraliza cualquier sala.",
+        quote:"“No me mata.”",
+        options:[
+          {text:"Defender la estrategia con datos y objetivos.", consequence:"No aprueban todo, pero rescatan la idea central. Sobrevives a la reunión.", effects:{reputacion:8,carrera:7,portafolio:5,salud:-3}},
+          {text:"Cambiar todo sin discutir.", consequence:"El cliente queda conforme. La campaña pierde cualquier rasgo reconocible.", effects:{reputacion:4,portafolio:-6,salud:-6}},
+          {text:"Culpar a otra área.", consequence:"La reunión termina. La confianza del equipo también.", effects:{reputacion:-10,carrera:-4,vida:-3}}
+        ]
+      },
+      {
+        id:"viral", minYear:2, tags:["Community Manager","Redactor","Content Creator","RRSS","Motion","all"],
+        title:"La campaña se hace viral",
+        text:"Una pieza supera todas las expectativas. El cliente pregunta si pueden hacer exactamente lo mismo todas las semanas.",
+        quote:"El algoritmo te sonrió una vez y ahora eres responsable de repetir un milagro.",
+        options:[
+          {text:"Pedir reconocimiento y usar el caso en tu portafolio.", consequence:"Tu nombre aparece en el caso y empiezan a llegar mensajes de reclutadores.", effects:{carrera:12,reputacion:12,portafolio:14,dinero:4}, flag:"viral"},
+          {text:"Celebrar y seguir trabajando.", consequence:"La agencia publica el logro. Tu nombre está en la tercera foto del carrusel interno.", effects:{reputacion:7,portafolio:8,carrera:4}},
+          {text:"Prometer que el próximo será más viral.", consequence:"La promesa queda registrada en una minuta. Mala suerte.", effects:{reputacion:3,carrera:2,salud:-8}}
+        ]
+      },
+      {
+        id:"social-crisis", minYear:1, tags:["Community Manager","Cuentas","Content Creator","RRSS"],
+        title:"Crisis en redes",
+        text:"Se publica una pieza equivocada y comienza a circular. Hay capturas. Muchas capturas.",
+        quote:"Internet perdona. Pero primero hace un hilo.",
+        options:[
+          {text:"Informar, pausar y activar protocolo.", consequence:"La respuesta es rápida y ordenada. La crisis dura menos que la reunión para analizarla.", effects:{reputacion:10,carrera:8,salud:-4}},
+          {text:"Borrar sin avisar.", consequence:"Desaparece el post, no las capturas.", effects:{reputacion:-10,carrera:-5,salud:-7}},
+          {text:"Culpar a quien aprobó.", consequence:"Técnicamente tienes razón. Estratégicamente te quedaste sin aliados.", effects:{reputacion:-8,vida:-3,carrera:-2}}
+        ]
+      },
+      {
+        id:"award", minYear:3, tags:["Redactor","Content Creator","RRSS","Branding","Motion","Dirección de Arte","Cuentas","all"],
+        title:"Premio sin bono",
+        text:"La campaña gana un premio. La agencia celebra con una publicación corporativa y una copa de espumante.",
+        quote:"Tu sueldo permanece conceptualmente intacto.",
+        options:[
+          {text:"Actualizar el portafolio y escuchar ofertas.", consequence:"El trofeo no paga cuentas, pero abre puertas.", effects:{carrera:12,reputacion:10,portafolio:12,dinero:3}, flag:"award"},
+          {text:"Pedir un bono o aumento.", consequence:"No hay bono, pero logras un ajuste y una conversación incómodamente necesaria.", effects:{carrera:7,dinero:9,reputacion:3}, salary:120000},
+          {text:"Celebrar y no pedir nada.", consequence:"Te llevas una foto con el premio. La inscripción la pagó el cliente.", effects:{reputacion:5,portafolio:7}}
+        ]
+      },
+      {
+        id:"account-loss", minYear:3, tags:["all"],
+        title:"La agencia pierde su cuenta principal",
+        text:"La noticia llega en una reunión llamada “Actualización de negocio”. Nadie usa la palabra despido hasta el minuto doce.",
+        quote:"El ambiente está raro porque el Excel también.",
+        options:[
+          {text:"Aceptar una reubicación interna.", consequence:"Sobrevives al recorte y heredas dos cuentas que nadie quería.", effects:{carrera:3,salud:-8,vida:-5}},
+          {text:"Negociar salida y buscar otra agencia.", consequence:"Sales con tiempo para ordenar tu portafolio y tu rabia.", effects:{dinero:4,salud:3,carrera:4}, flag:"jobSearch"},
+          {text:"Convertirte en freelance.", consequence:"Ahora eres creativo, cuentas, finanzas, cobranzas y soporte técnico.", effects:{carrera:5,dinero:-3,salud:-2,vida:4}, flag:"freelance"}
+        ]
+      },
+      {
+        id:"competitor", minYear:3, tags:["all"],
+        title:"Oferta de una agencia con fama peligrosa",
+        text:"Te ofrecen más dinero y un cargo mejor. También conoces a tres personas que renunciaron ahí en menos de un año.",
+        quote:"El sueldo sube. Las ojeras vienen incluidas.",
+        options:[
+          {text:"Aceptar por el sueldo.", consequence:"El cargo mejora. El calendario deja de respetar fines de semana.", effects:{carrera:10,dinero:14,salud:-13,vida:-12}, salary:250000, workplace:"Agencia grande"},
+          {text:"Preguntar por horarios, equipo y beneficios.", consequence:"La mitad de las respuestas llegan en lenguaje corporativo. Negocias mejores condiciones.", effects:{carrera:6,dinero:8,salud:2}, salary:150000},
+          {text:"Rechazar y seguir buscando.", consequence:"No ganas más todavía, pero tampoco entras a una advertencia de LinkedIn.", effects:{salud:5,vida:4,carrera:2}}
+        ]
+      },
+      {
+        id:"client-side", minYear:4, tags:["all"],
+        title:"La oferta del lado del cliente",
+        text:"Una marca te ofrece mejor sueldo, horarios más estables y una sola empresa que aprender. Ahora tú podrías enviar el brief.",
+        quote:"La paz también puede sentirse sospechosa.",
+        options:[
+          {text:"Aceptar la oferta.", consequence:"Duermes más. A veces extrañas el caos, hasta que alguien agenda una reunión a las 8:30.", effects:{dinero:14,salud:12,vida:12,carrera:6}, salary:280000, flag:"clientSide", workplace:"Equipo interno de marca"},
+          {text:"Quedarte en agencia por crecimiento creativo.", consequence:"Sigues construyendo casos y acumulando pestañas abiertas.", effects:{carrera:8,portafolio:8,salud:-5,vida:-4}},
+          {text:"Usar la oferta para negociar.", consequence:"La agencia mejora tu sueldo y promete revisar tu carga. Una de las dos cosas ocurre.", effects:{dinero:10,carrera:6}, salary:180000}
+        ]
+      },
+      {
+        id:"burnout", minYear:3, tags:["all"],
+        title:"Tu cuerpo envía un brief",
+        text:"Insomnio, irritabilidad, ansiedad y errores simples. No es falta de pasión: llevas demasiado tiempo funcionando sin descanso.",
+        quote:"El burnout no se resuelve con una charla motivacional ni con pizza.",
+        sensitive:true,
+        options:[
+          {text:"Pedir vacaciones y ayuda profesional.", consequence:"La carrera no termina. Empieza una recuperación que también requiere trabajo.", effects:{salud:22,vida:14,riesgo:-10,carrera:-1}, flag:"recovery"},
+          {text:"Seguir como si nada.", consequence:"Tu rendimiento baja y cualquier problema pequeño se vuelve enorme.", effects:{salud:-22,vida:-13,reputacion:-5,riesgo:7}},
+          {text:"Renunciar sin otro trabajo.", consequence:"Pierdes estabilidad, pero recuperas tiempo para pensar qué quieres hacer.", effects:{dinero:-12,salud:14,vida:12,carrera:-3}, flag:"freelance"}
+        ]
+      },
+      {
+        id:"accounts-promise", minYear:1, tags:["Cuentas"],
+        title:"Prometiste sin preguntar",
+        text:"Para evitar un silencio incómodo, le dijiste al cliente que el equipo podía entregar mañana. El equipo se entera por una minuta.",
+        quote:"Cuentas abrió la boca. Creatividad abrió LinkedIn.",
+        options:[
+          {text:"Admitir el error y renegociar.", consequence:"La confianza tarda, pero vuelve. El plazo también cambia.", effects:{reputacion:4,carrera:3,salud:2}},
+          {text:"Presionar al equipo para cumplir.", consequence:"Entregan. Tu reputación con el cliente sube y con el equipo se desploma.", effects:{reputacion:6,carrera:4,vida:-8,salud:-6}},
+          {text:"Decir que fue un malentendido.", consequence:"La minuta existe. Mala elección de enemigo.", effects:{reputacion:-8,carrera:-5}}
+        ]
+      },
+      {
+        id:"creative-trend", minYear:1, tags:["Community Manager","Content Creator","Redactor","RRSS"],
+        title:"La tendencia dura seis horas",
+        text:"Detectas un trend perfecto para la marca. El proceso de aprobación normalmente toma cuatro días.",
+        quote:"La cultura digital se mueve rápido. El correo de aprobación, no.",
+        options:[
+          {text:"Producir una versión rápida y pedir aprobación inmediata.", consequence:"Sale a tiempo y funciona. Todos dicen que siempre confiaron.", effects:{portafolio:9,reputacion:8,carrera:6,salud:-4}},
+          {text:"Seguir el proceso completo.", consequence:"La pieza se aprueba cuando el trend ya aparece en presentaciones de marketing.", effects:{reputacion:2,portafolio:-2}},
+          {text:"Publicar sin aprobación.", consequence:"Funciona, pero la conversación interna dura más que el trend.", effects:{portafolio:8,reputacion:-4,carrera:2,salud:-3}}
+        ]
+      },
+      {
+        id:"media-budget", minYear:1, tags:["Medios"],
+        title:"Presupuesto mal cargado",
+        text:"Una campaña está gastando más rápido de lo previsto. Quedan pocas horas antes de superar el monto.",
+        quote:"El dashboard se puso rojo antes que tu cara.",
+        options:[
+          {text:"Pausar, informar y corregir.", consequence:"El problema se controla. Tu transparencia evita una crisis mayor.", effects:{reputacion:9,carrera:8,salud:-3}},
+          {text:"Esperar a ver si se estabiliza.", consequence:"No se estabiliza. Las métricas sí quedan inolvidables.", effects:{reputacion:-12,dinero:-4,carrera:-6,salud:-7}},
+          {text:"Mover presupuesto desde otra campaña sin avisar.", consequence:"Solucionas un problema creando otro con mejor segmentación.", effects:{reputacion:-7,carrera:-3}}
+        ]
+      },
+      {
+        id:"media-implementation-launch", minYear:1, tags:["Medios"],
+        title:"La campaña debería estar activa hace 20 minutos",
+        text:"El cliente confirmó presupuesto, fechas y piezas. Cuando vas a implementar, descubres que faltan accesos y una de las plataformas todavía no tiene método de pago.",
+        quote:"“Pero estaba todo listo, ¿o no?”",
+        options:[
+          {text:"Levantar el bloqueo, documentarlo y activar apenas estén los accesos.", consequence:"La campaña parte tarde, pero queda claro qué faltaba y quién debía resolverlo.", effects:{carrera:7,reputacion:8,salud:-3}},
+          {text:"Implementar solo en las plataformas que sí están listas.", consequence:"Parte parte de la inversión y evitas perder todo el día, aunque el mix queda incompleto.", effects:{carrera:5,reputacion:4,portafolio:3}},
+          {text:"Decir que está activa y ganar tiempo.", consequence:"El dashboard no sabe mentir. El cliente tampoco olvida el pantallazo.", effects:{reputacion:-12,carrera:-8,salud:-6}}
+        ]
+      },
+      {
+        id:"media-budget-allocation", minYear:1, tags:["Medios"],
+        title:"El presupuesto no alcanza para todo",
+        text:"El cliente quiere Meta, Google, TikTok, YouTube y programática con un presupuesto que apenas alcanza para dos canales.",
+        quote:"Cinco plataformas. Un presupuesto. Mucha fe.",
+        options:[
+          {text:"Priorizar los canales según objetivo y audiencia.", consequence:"El plan queda menos vistoso, pero tiene lógica y suficiente inversión por canal.", effects:{carrera:8,reputacion:8,portafolio:5}},
+          {text:"Dividir el presupuesto entre todos para que aparezcan en la presentación.", consequence:"Todos los canales existen. Ninguno aprende lo suficiente.", effects:{reputacion:2,carrera:-3,dinero:-2}},
+          {text:"Pedir más presupuesto antes de implementar.", consequence:"El cliente no aumenta todo, pero acepta concentrar la inversión.", effects:{reputacion:6,carrera:5,salud:2}}
+        ]
+      },
+      {
+        id:"media-underpacing", minYear:1, tags:["Medios"],
+        title:"La campaña está gastando demasiado lento",
+        text:"Van cinco días y solo se ha consumido una parte mínima del presupuesto. El cliente pregunta por qué todavía no se ve la inversión.",
+        quote:"El presupuesto está aprobado. La plataforma aparentemente no se enteró.",
+        options:[
+          {text:"Revisar puja, audiencia, límites y configuración antes de tocar presupuesto.", consequence:"Encuentras una restricción que estaba frenando la entrega y corriges sin destruir el aprendizaje.", effects:{carrera:9,reputacion:7,portafolio:4}},
+          {text:"Subir fuerte las pujas y ampliar todo de inmediato.", consequence:"La campaña empieza a gastar. También suben los costos.", effects:{reputacion:2,dinero:-4,carrera:1}},
+          {text:"Esperar unos días más sin cambiar nada.", consequence:"El underpacing se convierte en una explicación incómoda en el reporte semanal.", effects:{reputacion:-7,carrera:-4,salud:-4}}
+        ]
+      },
+      {
+        id:"media-overpacing", minYear:1, tags:["Medios"],
+        title:"A este ritmo te quedas sin presupuesto antes de fin de mes",
+        text:"La campaña está rindiendo, pero la inversión diaria supera lo planificado y amenaza con consumir todo antes de la fecha de término.",
+        quote:"Buen rendimiento. Mala aritmética.",
+        options:[
+          {text:"Recalcular pacing y ajustar presupuestos diarios.", consequence:"Mantienes presencia hasta fin de mes sin apagar una campaña que funciona.", effects:{carrera:9,reputacion:8,dinero:3}},
+          {text:"Dejarla correr porque está performando bien.", consequence:"Los resultados son buenos hasta que el presupuesto llega exactamente a cero.", effects:{portafolio:5,reputacion:-5,carrera:-3}},
+          {text:"Pausar de golpe varios conjuntos.", consequence:"Controlas el gasto, pero alteras el aprendizaje y pierdes continuidad.", effects:{reputacion:-2,carrera:1,salud:-2}}
+        ]
+      },
+      {
+        id:"media-report-mismatch", minYear:1, tags:["Medios"],
+        title:"Los números del reporte no calzan",
+        text:"Meta muestra una cifra, GA4 otra y el e-commerce una tercera. La reunión es en 40 minutos.",
+        quote:"Tres plataformas. Tres verdades. Una sola PPT.",
+        options:[
+          {text:"Explicar las diferencias de atribución y reportar cada fuente con contexto.", consequence:"No inventas una cifra mágica. El cliente entiende por qué los sistemas no miden exactamente lo mismo.", effects:{carrera:10,reputacion:10,portafolio:4}},
+          {text:"Elegir el número más alto y usarlo.", consequence:"La presentación se ve excelente hasta que alguien pregunta de dónde salió.", effects:{reputacion:-10,carrera:-6,salud:-4}},
+          {text:"Promediar las tres cifras.", consequence:"Creas una métrica nueva que no existe en ninguna plataforma.", effects:{reputacion:-8,carrera:-7}}
+        ]
+      },
+      {
+        id:"media-tracking-pixel", minYear:1, tags:["Medios"],
+        title:"El pixel dejó de registrar conversiones",
+        text:"Las ventas siguen entrando, pero la plataforma reporta casi cero conversiones desde ayer.",
+        quote:"La campaña no murió. El tracking quizás sí.",
+        options:[
+          {text:"Validar eventos, etiquetado y cambios del sitio antes de optimizar.", consequence:"Detectas un problema de medición y evitas tomar decisiones sobre datos rotos.", effects:{carrera:10,reputacion:9,portafolio:5}},
+          {text:"Bajar presupuesto porque la campaña parece rendir mal.", consequence:"Reduces inversión justo cuando el problema no era de performance.", effects:{reputacion:-6,carrera:-5,dinero:-3}},
+          {text:"Duplicar campañas para ver si vuelve a medir.", consequence:"Ahora tienes el mismo problema multiplicado por dos.", effects:{carrera:-8,reputacion:-5,salud:-5}}
+        ]
+      },
+      {
+        id:"media-utm", minYear:1, tags:["Medios"],
+        title:"Se lanzó sin UTM",
+        text:"La campaña lleva horas activa y el tráfico está llegando sin el etiquetado que necesitabas para analizarlo después.",
+        quote:"La inversión existe. La trazabilidad decidió no participar.",
+        options:[
+          {text:"Corregir URLs, documentar el período afectado y avisar.", consequence:"Pierdes parte de la lectura inicial, pero recuperas la medición rápidamente.", effects:{carrera:7,reputacion:6,salud:-2}},
+          {text:"No decir nada y arreglarlo en silencio.", consequence:"Funciona hasta que el reporte pregunta por las primeras horas.", effects:{reputacion:-5,carrera:-3}},
+          {text:"Dejarlo así porque la plataforma igual muestra resultados.", consequence:"El reporte multicanal se vuelve una arqueología digital.", effects:{portafolio:-4,reputacion:-7,carrera:-5}}
+        ]
+      },
+      {
+        id:"media-cpa-rise", minYear:2, tags:["Medios"],
+        title:"El CPA se disparó",
+        text:"La campaña llevaba semanas estable y de pronto el costo por adquisición sube con fuerza.",
+        quote:"Ayer eras especialista. Hoy el algoritmo quiere conversar.",
+        options:[
+          {text:"Revisar audiencias, frecuencia, creatividades, competencia y funnel antes de optimizar.", consequence:"Encuentras señales de saturación y haces ajustes con criterio.", effects:{carrera:10,reputacion:9,portafolio:6}},
+          {text:"Cambiar puja, audiencia, presupuesto y anuncios al mismo tiempo.", consequence:"Ya no sabes qué cambio mejoró o empeoró el resultado.", effects:{carrera:-5,reputacion:-3,salud:-4}},
+          {text:"Esperar porque seguramente se corrige solo.", consequence:"No se corrige solo. Ahora también tienes una semana más cara.", effects:{reputacion:-8,carrera:-5,dinero:-4}}
+        ]
+      },
+      {
+        id:"media-high-ctr-low-sales", minYear:2, tags:["Medios"],
+        title:"Muchos clics, pocas ventas",
+        text:"El CTR es bueno, el CPC está controlado y aun así casi nadie compra.",
+        quote:"El anuncio cumplió. El problema quizás vive después del clic.",
+        options:[
+          {text:"Revisar landing, velocidad, oferta y pasos de conversión con el cliente.", consequence:"Descubres una fricción en el sitio y dejas de culpar a medios por todo el funnel.", effects:{carrera:9,reputacion:9,portafolio:5}},
+          {text:"Seguir optimizando anuncios aunque el tráfico ya responde.", consequence:"El CPC mejora un poco. Las ventas siguen sin aparecer.", effects:{carrera:1,reputacion:-4,dinero:-3}},
+          {text:"Cambiar el objetivo a tráfico para mostrar mejores números.", consequence:"El reporte se ve más bonito. El negocio vende exactamente lo mismo.", effects:{reputacion:-9,carrera:-7}}
+        ]
+      },
+      {
+        id:"media-frequency", minYear:2, tags:["Medios"],
+        title:"La misma persona vio el anuncio 14 veces",
+        text:"La frecuencia sube cada día y el alcance incremental prácticamente se detuvo.",
+        quote:"La marca ya no está generando recuerdo. Está apareciendo en los sueños.",
+        options:[
+          {text:"Controlar frecuencia, ampliar audiencia y rotar activos.", consequence:"Recuperas alcance y reduces saturación sin apagar todo.", effects:{carrera:8,reputacion:7,portafolio:5}},
+          {text:"Mantener porque todavía hay impresiones baratas.", consequence:"El CPM sigue bonito mientras la audiencia empieza a ignorarte.", effects:{reputacion:-4,carrera:-3}},
+          {text:"Duplicar el conjunto con la misma audiencia.", consequence:"Consigues competir contra ti mismo con notable eficiencia.", effects:{carrera:-8,dinero:-5,reputacion:-6}}
+        ]
+      },
+      {
+        id:"media-investment-reconciliation", minYear:2, tags:["Medios"],
+        title:"La inversión de plataforma no coincide con Finanzas",
+        text:"Tu reporte dice una cifra, la orden de compra otra y Finanzas necesita cerrar el mes hoy.",
+        quote:"Nada une más a una agencia que buscar una diferencia de $37.842.",
+        options:[
+          {text:"Conciliar plataforma, fee, impuestos, OC y período de facturación.", consequence:"Encuentras la diferencia y dejas una metodología para el próximo cierre.", effects:{carrera:10,reputacion:8,dinero:5,salud:-3}},
+          {text:"Ajustar manualmente el Excel hasta que dé.", consequence:"Da. Nadie sabe por qué. El problema volverá el próximo mes.", effects:{reputacion:-5,carrera:-4}},
+          {text:"Mandarlo a Finanzas y decir que es tema de ellos.", consequence:"Vuelve a ti con copia a más personas.", effects:{reputacion:-7,carrera:-4,salud:-5}}
+        ]
+      },
+      {
+        id:"media-wrong-geo", minYear:2, tags:["Medios"],
+        title:"La campaña estaba segmentada a todo Chile",
+        text:"La promoción era válida solo para Santiago, pero parte de la inversión se fue a regiones.",
+        quote:"Cobertura nacional. Promoción local. Excelente combinación.",
+        options:[
+          {text:"Pausar, corregir geografía, cuantificar el impacto e informar.", consequence:"Asumes el error y limitas la pérdida antes de que crezca.", effects:{carrera:7,reputacion:5,dinero:-3,salud:-4}},
+          {text:"Corregir sin avisar.", consequence:"La campaña mejora, pero el desglose geográfico sigue existiendo.", effects:{reputacion:-4,carrera:-2}},
+          {text:"Esperar a que termine y omitir el desglose.", consequence:"El cliente pide exactamente ese dato en la siguiente reunión.", effects:{reputacion:-10,carrera:-7,salud:-4}}
+        ]
+      },
+      {
+        id:"media-client-impressions", minYear:2, tags:["Medios"],
+        title:"El cliente quiere un millón de impresiones",
+        text:"El objetivo de negocio es generar ventas, pero el cliente insiste en que la campaña debe llegar a un número enorme de impresiones.",
+        quote:"“Necesito que se vea mucho.”",
+        options:[
+          {text:"Explicar la diferencia entre volumen, alcance y resultado de negocio.", consequence:"Reencuadras la conversación y acuerdan KPI principales y secundarios.", effects:{carrera:9,reputacion:9,portafolio:4}},
+          {text:"Optimizar todo a impresiones para cumplir el número.", consequence:"Cumples el KPI solicitado. Las ventas preguntan cuándo les toca.", effects:{reputacion:2,carrera:-4}},
+          {text:"Poner ambas cosas como KPI principal.", consequence:"El reporte termina tratando de demostrar dos objetivos que compiten entre sí.", effects:{carrera:-3,reputacion:-3}}
+        ]
+      },
+      {
+        id:"media-cyber-hourly", minYear:2, tags:["Medios"],
+        title:"Cyber: reporte cada una hora",
+        text:"Además de monitorear inversión y performance, el cliente pide un reporte actualizado cada 60 minutos durante toda la jornada.",
+        quote:"Optimizar o actualizar la PPT. Debes elegir tu batalla.",
+        options:[
+          {text:"Automatizar el tablero y fijar horarios de revisión críticos.", consequence:"El cliente obtiene visibilidad y tú conservas tiempo para optimizar.", effects:{carrera:10,reputacion:10,salud:2,vida:1}},
+          {text:"Actualizar manualmente cada hora.", consequence:"El reporte queda impecable. La campaña se optimiza cuando sobra tiempo.", effects:{reputacion:5,carrera:2,salud:-14,vida:-10}},
+          {text:"No reportar hasta el final del día.", consequence:"Puedes optimizar, pero el cliente pasa el día preguntando qué está pasando.", effects:{carrera:4,reputacion:-7,salud:-4}}
+        ]
+      },
+      {
+        id:"media-card-declined", minYear:2, tags:["Medios"],
+        title:"La tarjeta fue rechazada",
+        text:"Una plataforma detuvo campañas por un problema de pago justo durante una promoción importante.",
+        quote:"La estrategia era always on. La tarjeta decidió que no.",
+        options:[
+          {text:"Escalar pago, avisar impacto y priorizar canales que siguen activos.", consequence:"Recuperas continuidad y dejas trazabilidad del tiempo perdido.", effects:{carrera:8,reputacion:7,salud:-4}},
+          {text:"Esperar a que Administración lo resuelva.", consequence:"Administración lo resuelve. Varias horas después.", effects:{reputacion:-5,carrera:-3}},
+          {text:"Mover todo el presupuesto de emergencia a otra plataforma.", consequence:"Recuperas volumen, pero cambias el mix sin tiempo para evaluar.", effects:{carrera:3,reputacion:1,dinero:-3}}
+        ]
+      },
+      {
+        id:"media-learning-phase", minYear:3, tags:["Medios"],
+        title:"El cliente quiere cambios todos los días",
+        text:"La campaña está en fase de aprendizaje, pero cada mañana llega una nueva instrucción para cambiar presupuesto, audiencia o estructura.",
+        quote:"El algoritmo está aprendiendo. El cliente está impaciente.",
+        options:[
+          {text:"Definir una ventana mínima de aprendizaje y criterios para intervenir.", consequence:"Reducen cambios impulsivos y empiezas a comparar datos con períodos razonables.", effects:{carrera:10,reputacion:8,portafolio:5}},
+          {text:"Aplicar cada cambio apenas llega.", consequence:"La campaña reinicia aprendizaje con una disciplina admirable.", effects:{reputacion:3,carrera:-5,salud:-6}},
+          {text:"Ignorar solicitudes hasta que el algoritmo termine.", consequence:"Técnicamente proteges la campaña. Políticamente creas otro problema.", effects:{carrera:4,reputacion:-6}}
+        ]
+      },
+      {
+        id:"media-brand-performance", minYear:3, tags:["Medios"],
+        title:"Branding o performance",
+        text:"El presupuesto se redujo y ahora debes recomendar cuánto mantener en construcción de marca y cuánto mover a conversión.",
+        quote:"Todo el funnel quiere presupuesto. El Excel dice que no.",
+        options:[
+          {text:"Proponer distribución según objetivo, ventana temporal y evidencia histórica.", consequence:"No prometes una fórmula universal y justificas cada peso.", effects:{carrera:10,reputacion:10,portafolio:6}},
+          {text:"Mover todo a performance porque es más fácil demostrar resultados.", consequence:"El corto plazo mejora, pero desaparece parte de la cobertura de marca.", effects:{carrera:4,reputacion:3,portafolio:2}},
+          {text:"Mantener el mix anterior aunque el presupuesto haya cambiado.", consequence:"El plan conserva la proporción y pierde masa crítica en ambos objetivos.", effects:{carrera:-4,reputacion:-3}}
+        ]
+      },
+      {
+        id:"media-roas-pressure", minYear:3, tags:["Medios"],
+        title:"El ROAS bajó y todos miran a Medios",
+        text:"Ventas cayeron esta semana. La inversión está estable, pero el cliente quiere recuperar el ROAS inmediatamente.",
+        quote:"Cuando todo funciona es el negocio. Cuando baja, es la pauta.",
+        options:[
+          {text:"Separar efecto de inversión, precio, stock, promoción y conversión del sitio.", consequence:"La conversación deja de reducir todo el negocio a una sola plataforma.", effects:{carrera:10,reputacion:9,portafolio:5}},
+          {text:"Bajar inversión para proteger el ROAS.", consequence:"El indicador mejora parcialmente porque también reduces escala.", effects:{reputacion:3,carrera:2,dinero:2}},
+          {text:"Aumentar presupuesto esperando vender más.", consequence:"Escalas un problema que todavía no entiendes.", effects:{reputacion:-7,carrera:-6,dinero:-6}}
+        ]
+      },
+      {
+        id:"media-report-friday", minYear:1, tags:["Medios"],
+        title:"El reporte llegó el viernes a las 18:20",
+        text:"El cliente necesita resultados, aprendizajes y próximos pasos antes del lunes. Los datos todavía no están consolidados.",
+        quote:"“Es solo bajar los numeritos.”",
+        options:[
+          {text:"Entregar un corte preliminar y dejar el análisis completo para el lunes.", consequence:"Respondes a la urgencia sin inventar conclusiones con datos incompletos.", effects:{carrera:7,reputacion:7,salud:3,vida:4}},
+          {text:"Quedarte hasta terminar el reporte completo.", consequence:"El cliente recibe todo. Tu viernes desaparece en una tabla dinámica.", effects:{reputacion:7,carrera:5,salud:-12,vida:-14,riesgo:2}},
+          {text:"Mandar solo screenshots de plataforma.", consequence:"Hay números. El análisis deberá llegar en una vida posterior.", effects:{reputacion:-5,carrera:-4}}
+        ]
+      },
+      {
+        id:"media-forecast", minYear:3, tags:["Medios"],
+        title:"Te piden proyectar resultados exactos",
+        text:"Antes de lanzar, el cliente quiere saber exactamente cuántas ventas obtendrá con el presupuesto aprobado.",
+        quote:"Pronóstico, no profecía.",
+        options:[
+          {text:"Entregar escenarios con supuestos, rangos y benchmark histórico.", consequence:"Das una proyección útil sin fingir certeza donde no existe.", effects:{carrera:10,reputacion:10,portafolio:5}},
+          {text:"Dar un número exacto para cerrar la reunión.", consequence:"Ese número se convierte inmediatamente en compromiso contractual emocional.", effects:{reputacion:2,carrera:-4,salud:-5}},
+          {text:"Negarte a proyectar cualquier cosa.", consequence:"Evitas prometer de más, pero pierdes la oportunidad de orientar la inversión.", effects:{carrera:2,reputacion:-3}}
+        ]
+      },
+      {
+        id:"media-optimization-weekend", minYear:2, tags:["Medios"],
+        title:"La campaña necesita optimización el fin de semana",
+        text:"Una promoción importante corre sábado y domingo. El equipo no definió turnos, pero alguien tiene que revisar gasto y resultados.",
+        quote:"Always on no significa persona always on.",
+        options:[
+          {text:"Proponer turnos, alertas y umbrales de intervención antes del fin de semana.", consequence:"La campaña queda cubierta sin convertir a una persona en centro de monitoreo 48 horas.", effects:{carrera:9,reputacion:8,salud:5,vida:4}},
+          {text:"Revisar tú solo todo el fin de semana.", consequence:"Nada se cae. Tu descanso sí.", effects:{reputacion:6,carrera:5,salud:-15,vida:-16,riesgo:3}},
+          {text:"No revisar porque no está en tu horario.", consequence:"El límite es válido, pero el equipo descubre tarde que faltaba un protocolo.", effects:{salud:8,vida:9,reputacion:-4,carrera:-2}}
+        ]
+      },
+      {
+        id:"media-metric-vanity", minYear:2, tags:["Medios"],
+        title:"El reporte tiene 47 métricas",
+        text:"Hay CPM, CPC, CTR, alcance, frecuencia, reproducciones, interacción, sesiones, conversiones y muchas cifras más. Nadie sabe cuál importa.",
+        quote:"Si todo es KPI, nada es KPI.",
+        options:[
+          {text:"Reducir el reporte a objetivos, KPI clave, aprendizajes y acciones.", consequence:"La presentación se hace más corta y la conversación más útil.", effects:{carrera:9,reputacion:9,portafolio:5}},
+          {text:"Mantener todo para demostrar trabajo.", consequence:"El cliente recibe 38 slides y pregunta solo cuánto vendió.", effects:{reputacion:2,carrera:-2,salud:-4}},
+          {text:"Destacar las métricas que mejor se ven ese mes.", consequence:"El reporte siempre parece positivo y cada mes usa una definición distinta de éxito.", effects:{reputacion:-8,carrera:-6}}
+        ]
+      },
+      {
+        id:"media-agency-fee", minYear:4, tags:["Medios"],
+        title:"Hay que recortar inversión, pero no expectativas",
+        text:"El cliente reduce presupuesto de medios un 30% y mantiene exactamente los mismos objetivos del mes anterior.",
+        quote:"Menos inversión. Mismo resultado. Más optimismo.",
+        options:[
+          {text:"Reforecast y mostrar qué resultado es razonable con el nuevo monto.", consequence:"La conversación se vuelve incómoda, pero matemáticamente posible.", effects:{carrera:10,reputacion:9,portafolio:5}},
+          {text:"Aceptar los mismos KPI y tratar de optimizar más.", consequence:"Tal vez mejoras eficiencia, pero quedas comprometido con una meta que no controlas.", effects:{carrera:3,reputacion:2,salud:-8}},
+          {text:"Concentrar todo en el canal más eficiente sin explicar el trade-off.", consequence:"El rendimiento mejora, pero sacrificas cobertura y aprendizaje de otros canales.", effects:{carrera:4,reputacion:-2}}
+        ]
+      },
+      {
+        id:"design-logo", minYear:1, tags:["RRSS","Branding","Dirección de Arte"],
+        title:"Haz el logo más grande",
+        text:"La composición funciona. El cliente quiere que el logo ocupe el espacio donde actualmente está la idea.",
+        quote:"“Que se note más la marca.”",
+        options:[
+          {text:"Explicar jerarquía visual y proponer una alternativa.", consequence:"El logo crece un poco. La pieza conserva dignidad.", effects:{reputacion:6,portafolio:6,carrera:4}},
+          {text:"Agrandarlo hasta que deje de preguntar.", consequence:"La marca se nota. Todo lo demás deja de existir.", effects:{reputacion:3,portafolio:-6,salud:-2}},
+          {text:"Enviar dos versiones y que elija.", consequence:"Elige la más grande. Al menos quedó por escrito.", effects:{reputacion:2,portafolio:-2}}
+        ]
+      },
+      {
+        id:"motion-render", minYear:1, tags:["Motion"],
+        title:"El render es para mañana",
+        text:"Te piden animación 3D, edición, musicalización y subtítulos. El material llega incompleto.",
+        quote:"“No debería tomar tanto, ya está diseñado.”",
+        options:[
+          {text:"Hacer una versión viable con los recursos disponibles.", consequence:"La pieza cumple y el computador sobrevive.", effects:{reputacion:7,portafolio:7,carrera:5,salud:-5}},
+          {text:"Aceptar todo y renderizar de noche.", consequence:"La entrega sale. Tú conoces todas las horas del amanecer.", effects:{portafolio:10,reputacion:6,salud:-16,vida:-12,riesgo:3}},
+          {text:"Pedir material completo antes de comenzar.", consequence:"El plazo se mueve porque la física sigue vigente.", effects:{salud:5,reputacion:2,carrera:2}}
+        ]
+      },
+      {
+        id:"freelance-payment", minYear:2, tags:["freelance"],
+        title:"El cliente freelance no paga",
+        text:"La factura venció hace 45 días. El cliente responde tus correos con “lo reviso”.",
+        quote:"Tu trabajo fue urgente. Tu pago, contemplativo.",
+        options:[
+          {text:"Suspender entregas y formalizar cobranza.", consequence:"El pago aparece cuando el proyecto deja de avanzar mágicamente.", effects:{dinero:12,reputacion:3,salud:4}, salary:80000},
+          {text:"Seguir trabajando para no perder al cliente.", consequence:"No pierdes al cliente. Pierdes liquidez.", effects:{dinero:-12,salud:-8,vida:-5}},
+          {text:"Cobrar por adelantado desde ahora.", consequence:"Pierdes prospectos que no pensaban pagar. Excelente filtro.", effects:{dinero:7,carrera:5,reputacion:3}}
+        ]
+      },
+      {
+        id:"manager-choice", minYear:6, tags:["all"],
+        title:"Te conviertes en jefatura",
+        text:"Ahora decides cómo trabaja el equipo. Puedes repetir lo que sufriste o demostrar que otra forma era posible.",
+        quote:"El poder revela si aprendiste algo del calendario compartido.",
+        options:[
+          {text:"Planificar, proteger horarios y dar crédito.", consequence:"El equipo funciona mejor y tu reputación crece sin gritos ni sacrificios rituales.", effects:{carrera:12,reputacion:15,salud:5,vida:5}},
+          {text:"Exigir lo mismo que te exigieron a ti.", consequence:"Las entregas salen. La gente también, pero de la agencia.", effects:{carrera:6,reputacion:-12,salud:-6}},
+          {text:"Evitar decisiones difíciles.", consequence:"Eres buena persona, pero el caos queda sin dirección.", effects:{reputacion:-4,carrera:-3,salud:-4}}
+        ]
+      }
+    ];
+
+    function showScreen(id){
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function openInfo(){document.getElementById('infoModal').classList.add('active')}
+    function closeInfo(){document.getElementById('infoModal').classList.remove('active')}
+
+    function clearSelected(container){
+      container.querySelectorAll('.choice-card').forEach(b=>b.classList.remove('selected'));
+    }
+
+    function selectProfession(btn){
+      const profession = btn.dataset.value;
+      state.profession = profession;
+      state.area = "";
+      state.track = "";
+      state.experienceLevel = null;
+      state.experienceLabel = "";
+      state.experienceYears = 0;
+      state.startExperienceYears = 0;
+      state.selectedAgency = "";
+      state.selectedAgencyTier = "";
+      state.showAllStartingAgencies = false;
+      clearSelected(document.getElementById('professionChoices'));
+      btn.classList.add('selected');
+
+      const areaField = document.getElementById('areaField');
+      const areaChoices = document.getElementById('areaChoices');
+      areaChoices.innerHTML = "";
+
+      professionAreas[profession].forEach(item=>{
+        const b=document.createElement('button');
+        b.className='choice-card';
+        b.dataset.value=item.value;
+        b.innerHTML=`<strong>${item.value}</strong><span>${item.desc}</span>`;
+        b.onclick=()=>selectArea(b);
+        areaChoices.appendChild(b);
+      });
+      areaField.classList.remove('hidden');
+      document.getElementById('subareaField').classList.add('hidden');
+      document.getElementById('experienceField').classList.add('hidden');
+      document.getElementById('agencyField').classList.add('hidden');
+    }
+
+    function selectArea(btn){
+      state.area = btn.dataset.value;
+      state.track = "";
+      state.experienceLevel = null;
+      state.experienceLabel = "";
+      state.experienceYears = 0;
+      state.startExperienceYears = 0;
+      state.selectedAgency = "";
+      state.selectedAgencyTier = "";
+      state.showAllStartingAgencies = false;
+      clearSelected(document.getElementById('areaChoices'));
+      btn.classList.add('selected');
+
+      if(subareas[state.area]){
+        const field=document.getElementById('subareaField');
+        const choices=document.getElementById('subareaChoices');
+        choices.innerHTML="";
+        subareas[state.area].forEach(item=>{
+          const b=document.createElement('button');
+          b.className='choice-card';
+          b.dataset.value=item.value;
+          b.innerHTML=`<strong>${item.value}</strong><span>${item.desc}</span>`;
+          b.onclick=()=>selectSubarea(b);
+          choices.appendChild(b);
+        });
+        field.classList.remove('hidden');
+      }else{
+        state.track=state.area;
+        document.getElementById('subareaField').classList.add('hidden');
+        showExperienceChoices();
+      }
+    }
+
+    function selectSubarea(btn){
+      state.track=btn.dataset.value;
+      state.selectedAgency="";
+      state.selectedAgencyTier="";
+      clearSelected(document.getElementById('subareaChoices'));
+      btn.classList.add('selected');
+      showExperienceChoices();
+    }
+
+    function showExperienceChoices(){
+      state.experienceLevel=null;
+      state.experienceLabel="";
+      state.experienceYears=0;
+      state.startExperienceYears=0;
+      state.selectedAgency="";
+      state.selectedAgencyTier="";
+      state.showAllStartingAgencies=false;
+
+      const choices=document.getElementById("experienceChoices");
+      const help=document.getElementById("experienceHelp");
+      choices.innerHTML="";
+
+      const profiles=getExperienceProfiles();
+      const roleName=designerTracks.includes(state.track) ? "Diseño" : state.track;
+      help.textContent=`Elige el punto de partida para tu carrera en ${roleName}. Los rangos definirán tu cargo, sueldo simulado y agencias disponibles.`;
+
+      profiles.forEach((profile,index)=>{
+        const btn=document.createElement("button");
+        btn.className="choice-card";
+        btn.dataset.level=String(index);
+        btn.innerHTML=`
+          <strong>${profile.label}</strong>
+          <span>${profile.years}. ${experienceFlavor(profile.label)}</span>
+        `;
+        btn.onclick=()=>selectExperience(btn);
+        choices.appendChild(btn);
+      });
+
+      document.getElementById("experienceField").classList.remove("hidden");
+      document.getElementById("agencyField").classList.add("hidden");
+    }
+
+    function experienceFlavor(label){
+      if(label.includes("Práctica")) return "Todo parece una oportunidad hasta que te piden resolverlo solo.";
+      if(label.includes("Jr")) return "Ya entendiste que final_final no suele ser la versión final.";
+      if(label.includes("Mid")) return "Resuelves sin preguntar tres veces, por eso ahora te llegan más problemas.";
+      if(label.includes("Senior")) return "La experiencia te dio criterio y una tolerancia limitada a los briefs vacíos.";
+      if(label.includes("Supervisor") || label==="SMM") return "Ahora respondes por tu trabajo y por el de otras personas.";
+      if(label.includes("Head") || label.includes("Director")) return "Tomas decisiones grandes y recibes audios todavía más largos.";
+      return "Tu experiencia cambia las oportunidades y también el nivel de presión.";
+    }
+
+    function selectExperience(btn){
+      state.experienceLevel=Number(btn.dataset.level);
+      const profile=getExperienceProfiles()[state.experienceLevel];
+      state.experienceLabel=profile.label;
+      state.experienceYears=profile.startYears;
+      state.startExperienceYears=profile.startYears;
+      state.selectedAgency="";
+      state.selectedAgencyTier="";
+      state.showAllStartingAgencies=false;
+      clearSelected(document.getElementById("experienceChoices"));
+      btn.classList.add("selected");
+      renderStartingAgencies();
+    }
+
+    function eligibleStartingAgencies(){
+      if(state.experienceLevel===null) return [];
+      return Object.values(agencyPools)
+        .flat()
+        .filter(agency=>agency.minLevel<=currentMarketLevel())
+        .sort((a,b)=>{
+          const recommendedTier=currentMarketLevel()===0?"boutique":currentMarketLevel()===1?"independent":"global";
+          const recommendedA=(a.tier===recommendedTier)?0:1;
+          const recommendedB=(b.tier===recommendedTier)?0:1;
+          if(recommendedA!==recommendedB) return recommendedA-recommendedB;
+          return a.name.localeCompare(b.name,"es");
+        });
+    }
+
+    function showAllStartingAgencies(){
+      state.showAllStartingAgencies=true;
+      renderStartingAgencies();
+    }
+
+    function renderStartingAgencies(){
+      const field=document.getElementById("agencyField");
+      const choices=document.getElementById("agencyChoices");
+      const help=document.getElementById("agencyHelp");
+      const showAllBtn=document.getElementById("showAllAgenciesBtn");
+      choices.innerHTML="";
+
+      const profile=getExperienceProfiles()[state.experienceLevel];
+      const allEligible=eligibleStartingAgencies();
+      const visible=state.showAllStartingAgencies ? allEligible : allEligible.slice(0,12);
+
+      help.innerHTML=`<strong>${profile.label} · ${profile.years}</strong><br>${profile.intro}
+        <br><span style="font-size:.8rem">La disponibilidad es una mecánica del juego y no representa requisitos reales de contratación.</span>`;
+
+      visible.forEach(agency=>{
+        const meta=agencyTierMeta[agency.tier];
+        const recommendedTier=currentMarketLevel()===0?"boutique":currentMarketLevel()===1?"independent":"global";
+        const isRecommended=agency.tier===recommendedTier;
+        const btn=document.createElement("button");
+        btn.className="choice-card";
+        btn.dataset.agency=agency.name;
+        btn.dataset.tier=agency.tier;
+
+        const tierBonus=meta.startSalary||0;
+        const projectedSalary=profile.baseSalary+tierBonus;
+        const badge=isRecommended ? "Recomendada para tu nivel" : "También disponible";
+
+        btn.innerHTML=`
+          <strong>${agency.name}</strong>
+          <span>${meta.label}. ${meta.copy}</span>
+          <span style="display:block;margin-top:8px;color:var(--accent);font-weight:850">${badge}</span>
+          <span style="display:block;margin-top:5px">Sueldo inicial simulado: ${formatMoney(projectedSalary)}</span>
+        `;
+        btn.onclick=()=>selectStartingAgency(btn);
+        choices.appendChild(btn);
+      });
+
+      if(allEligible.length>visible.length){
+        showAllBtn.classList.remove("hidden");
+        showAllBtn.textContent=`Ver las ${allEligible.length} agencias disponibles`;
+      }else{
+        showAllBtn.classList.add("hidden");
+      }
+
+      field.classList.remove("hidden");
+    }
+
+    function selectStartingAgency(btn){
+      state.selectedAgency=btn.dataset.agency;
+      state.selectedAgencyTier=btn.dataset.tier;
+      clearSelected(document.getElementById("agencyChoices"));
+      btn.classList.add("selected");
+    }
+
+    function startGame(){
+      state.name=(document.getElementById('playerName').value||"Profesional sin brief").trim();
+      if(!state.profession || !state.area || !state.track || state.experienceLevel===null || !state.selectedAgency || !state.selectedAgencyTier){
+        alert("Completa carrera, especialidad, experiencia y agencia inicial antes de firmar el contrato.");
+        return;
+      }
+
+      const experience=getExperienceProfiles()[state.experienceLevel];
+      const startMeta=agencyTierMeta[state.selectedAgencyTier];
+
+      state.salary=experience.baseSalary;
+      if(experience.startYears>=1){
+        state.salary+=startMeta.startSalary||0;
+      }
+
+      state.roleIndex=experience.roleIndex;
+      state.questionInYear=1;
+      state.completedYears=0;
+      state.experienceYears=experience.startYears;
+      state.startExperienceYears=experience.startYears;
+      state.year=experience.careerYear;
+      state.maxYears=state.year+11;
+      state.workplace=state.selectedAgency;
+      state.agencyTier=state.selectedAgencyTier;
+
+      Object.entries(experience.statEffects||{}).forEach(([key,value])=>{
+        state.stats[key]=(state.stats[key]||0)+value;
+      });
+      Object.entries(startMeta.startEffects||{}).forEach(([key,value])=>{
+        state.stats[key]=(state.stats[key]||0)+value;
+      });
+      clampStats();
+
+      showScreen('game');
+      addHistory(`Inicio · ${state.experienceLabel} en ${state.workplace} como ${currentRole()}.`);
+      renderProfile();
+      loadEvent();
+    }
+
+    function tierLabel(tier){
+      if(tier==="brand") return "Equipo interno de marca";
+      if(tier==="freelance") return "Independiente / freelance";
+      return agencyTierMeta[tier]?.label || "Trayectoria independiente";
+    }
+
+    function currentMarketLevel(){
+      if(state.experienceYears>=7) return 3;
+      if(state.experienceYears>=3) return 2;
+      if(state.experienceYears>=1) return 1;
+      return 0;
+    }
+
+    function pickAgency(tier){
+      const marketLevel=currentMarketLevel();
+      const eligible=(agencyPools[tier]||[]).filter(a=>a.minLevel<=marketLevel);
+      const list=eligible.filter(a=>a.name!==state.workplace);
+      const source=list.length?list:eligible.length?eligible:agencyPools[tier];
+      return source[Math.floor(Math.random()*source.length)];
+    }
+
+    function randomBetween(min,max){
+      return min + Math.random()*(max-min);
+    }
+
+    function currentRole(){
+      const ladder=roleLadders[state.track]||["Junior","Profesional","Senior","Líder","Director"];
+      return ladder[Math.min(state.roleIndex,ladder.length-1)];
+    }
+
+    function formatMoney(v){
+      return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.max(0,Math.round(v)));
+    }
+
+    function renderProfile(){
+      document.getElementById('avatar').textContent=(state.name[0]||"P").toUpperCase();
+      document.getElementById('profileName').textContent=state.name;
+      document.getElementById('profileRole').textContent=`${currentRole()} · ${formatExperienceYears(state.experienceYears)}`;
+      document.getElementById('salaryValue').textContent=formatMoney(state.salary);
+      document.getElementById('workplaceValue').textContent=state.workplace;
+      document.getElementById('agencyTierValue').textContent=tierLabel(state.agencyTier);
+      const salaryStage=document.getElementById('salaryStageValue');
+      if(state.experienceYears<1){
+        salaryStage.textContent="Práctica · al terminar, base junior aprox. $600.000";
+      }else{
+        salaryStage.textContent="Sueldo con progresión anual desde el Año 2";
+      }
+
+      const statsEl=document.getElementById('stats');
+      statsEl.innerHTML="";
+      Object.entries(state.stats).forEach(([key,val])=>{
+        const meta=statsMeta[key];
+        const wrap=document.createElement('div');
+        wrap.innerHTML=`
+          <div class="stat-head"><span>${meta.icon} ${meta.label}</span><span>${Math.round(val)}/100</span></div>
+          <div class="bar ${meta.danger?'danger':''}"><i style="width:${Math.max(0,Math.min(100,val))}%"></i></div>
+        `;
+        statsEl.appendChild(wrap);
+      });
+    }
+
+    function addHistory(text){
+      state.history.unshift(text);
+      const list=document.getElementById('timelineList');
+      list.innerHTML="";
+      state.history.slice(0,16).forEach(item=>{
+        const div=document.createElement('div');
+        div.className='timeline-item';
+        div.textContent=item;
+        list.appendChild(div);
+      });
+    }
+
+    function validEvents(){
+      let pool=[];
+
+      if(state.track==="Medios"){
+        pool=events.filter(e=>e.tags.includes("Medios"));
+      }else{
+        const dedicated=trackSpecificEvents[state.track] || [];
+        const exactLegacy=events.filter(e=>
+          e.tags.includes(state.track) &&
+          !e.tags.includes("all")
+        );
+        pool=[...dedicated,...exactLegacy];
+      }
+
+      return pool.filter(e=>{
+        const notUsed=!state.usedEvents.includes(e.id);
+        return e.minYear<=state.year && notUsed;
+      });
+    }
+
+    function renderDecisionProgress(){
+      const current=state.questionInYear;
+      document.getElementById("decisionProgressLabel").textContent=`Decisión ${current} de ${state.questionsPerYear}`;
+      document.querySelectorAll("#decisionProgress .decision-dot").forEach((dot,index)=>{
+        dot.classList.remove("active","done");
+        const position=index+1;
+        if(position<current) dot.classList.add("done");
+        if(position===current) dot.classList.add("active");
+      });
+    }
+
+    function loadEvent(){
+      document.getElementById('consequence').classList.remove('active');
+      const optionsEl=document.getElementById('options');
+      optionsEl.innerHTML="";
+      renderDecisionProgress();
+
+      // Priorizar evento de burnout o consumo cuando corresponda.
+      let pool=validEvents();
+      let chosen=null;
+
+      if(state.track!=="Medios" && state.stats.salud<35){
+        chosen=pool.find(e=>e.id==="burnout");
+      }
+      if(state.track!=="Medios" && !chosen && state.stats.riesgo>45){
+        chosen=pool.find(e=>e.id==="burnout") || pool.find(e=>e.id==="afteroffice");
+      }
+      if(!chosen){
+        if(pool.length===0){
+          state.usedEvents=[];
+          pool=validEvents();
+        }
+        chosen=pool[Math.floor(Math.random()*pool.length)];
+      }
+
+      state.currentEvent=chosen;
+      state.usedEvents.push(chosen.id);
+
+      document.getElementById('eventKicker').textContent=`AÑO ${state.year} · DECISIÓN ${state.questionInYear} DE ${state.questionsPerYear} · ${state.workplace.toUpperCase()}`;
+      document.getElementById('yearPill').textContent=`Año ${state.year} · ${state.questionInYear}/${state.questionsPerYear}`;
+      document.getElementById('eventTitle').textContent=chosen.title;
+      document.getElementById('eventText').textContent=chosen.text;
+      document.getElementById('eventQuote').textContent=chosen.quote;
+
+      chosen.options.forEach((opt,idx)=>{
+        const b=document.createElement('button');
+        b.className='option-btn';
+        b.innerHTML=`${String.fromCharCode(65+idx)}. ${opt.text}`;
+        b.onclick=()=>chooseOption(opt);
+        optionsEl.appendChild(b);
+      });
+    }
+
+    function clampStats(){
+      Object.keys(state.stats).forEach(k=>{
+        state.stats[k]=Math.max(0,Math.min(100,state.stats[k]));
+      });
+    }
+
+    function chooseOption(opt){
+      document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+      Object.entries(opt.effects||{}).forEach(([k,v])=>{
+        state.stats[k]=(state.stats[k]||0)+v;
+      });
+      if(opt.salary) state.salary+=opt.salary;
+      if(opt.workplace){
+        if(opt.workplace==="Agencia grande"){
+          const destination=pickAgency("global");
+          state.workplace=destination.name;
+          state.agencyTier="global";
+        }else{
+          state.workplace=opt.workplace;
+        }
+      }
+      if(opt.flag){
+        state.flags[opt.flag]=true;
+        if(opt.flag==="freelance"){
+          state.workplace="Freelance";
+          state.agencyTier="freelance";
+        }
+        if(opt.flag==="clientSide"){
+          state.workplace="Equipo interno de marca";
+          state.agencyTier="brand";
+        }
+      }
+
+      clampStats();
+      const event=state.currentEvent;
+      document.getElementById('consequenceTitle').textContent=event.sensitive ? "Consecuencia real" : "Lo que pasó";
+      document.getElementById('consequenceText').textContent=opt.consequence;
+
+      const chips=document.getElementById('effectChips');
+      chips.innerHTML="";
+      Object.entries(opt.effects||{}).forEach(([k,v])=>{
+        const c=document.createElement('span');
+        c.className=`chip ${v>0?'good':v<0?'bad':'warn'}`;
+        c.textContent=`${statsMeta[k]?.label||k}: ${v>0?'+':''}${v}`;
+        chips.appendChild(c);
+      });
+      if(opt.salary){
+        const c=document.createElement('span');
+        c.className='chip good';
+        c.textContent=`Sueldo: +${formatMoney(opt.salary)}`;
+        chips.appendChild(c);
+      }
+
+      addHistory(`Año ${state.year} · Decisión ${state.questionInYear}/${state.questionsPerYear} · ${event.title}: ${opt.text}`);
+      renderProfile();
+
+      const nextBtn=document.getElementById("consequenceNextBtn");
+      if(state.questionInYear<state.questionsPerYear){
+        nextBtn.textContent=`Ir a la decisión ${state.questionInYear+1} de ${state.questionsPerYear}`;
+      }else{
+        nextBtn.textContent="Revisar 2 ofertas y cerrar el año";
+      }
+
+      document.getElementById('consequence').classList.add('active');
+    }
+
+    function proceedAfterDecision(){
+      if(state.questionInYear<state.questionsPerYear){
+        state.questionInYear++;
+        loadEvent();
+        window.scrollTo({top:0,behavior:"smooth"});
+        return;
+      }
+      openAgencyDecision();
+    }
+
+    function applyAnnualSalaryProgression(){
+      const previous=state.salary;
+      const justFinishedPractice=state.startExperienceYears<1 && state.completedYears===0;
+
+      if(justFinishedPractice){
+        state.salary=Math.max(state.salary,600000);
+        addHistory(`Fin de práctica · Pasas a contrato junior con sueldo simulado de ${formatMoney(state.salary)}.`);
+        return;
+      }
+
+      // Desde el segundo año de carrera, siempre existe crecimiento salarial base.
+      // Es una mecánica del simulador, no una tabla salarial real.
+      const years=Math.max(1,state.experienceYears);
+      let growthRate=0.07;
+
+      if(years>=3) growthRate=0.08;
+      if(years>=5) growthRate=0.09;
+      if(years>=7) growthRate=0.10;
+      if(years>=9) growthRate=0.11;
+
+      const minimumIncrease=years<3 ? 45000 : years<5 ? 65000 : years<7 ? 85000 : 110000;
+      const increase=Math.max(minimumIncrease,Math.round(state.salary*growthRate));
+      state.salary+=increase;
+
+      addHistory(`Progresión salarial · ${formatMoney(previous)} → ${formatMoney(state.salary)}.`);
+    }
+
+    function annualReview(){
+      const score=(state.stats.carrera+state.stats.reputacion+state.stats.portafolio)/3;
+      const ladder=roleLadders[state.track]||[];
+      const thresholds=getRoleThresholds();
+      const nextRoleIndex=state.roleIndex+1;
+      const requiredYears=thresholds[nextRoleIndex] ?? Infinity;
+      const canBePromoted=state.roleIndex<ladder.length-1 && state.experienceYears>=requiredYears;
+      let note="";
+
+      if(score>62 && canBePromoted && Math.random()<0.55){
+        state.roleIndex++;
+        const promotionIncrease=110000 + state.roleIndex*30000;
+        state.salary+=promotionIncrease;
+        state.stats.carrera+=5;
+        note=`Ascendiste a ${currentRole()} y sumaste ${formatMoney(promotionIncrease)} por promoción.`;
+      } else {
+        const nextRole=ladder[nextRoleIndex];
+        if(nextRole && state.experienceYears<requiredYears){
+          note=`Sigues en ${currentRole()}. Para avanzar a ${nextRole}, el juego exige al menos ${requiredYears} años de experiencia.`;
+        }else{
+          note="La evaluación anual concluyó que debes seguir consolidándote en el cargo.";
+        }
+      }
+
+      if(state.stats.salud<20){
+        state.stats.reputacion-=4;
+        state.stats.carrera-=3;
+      }
+      if(state.stats.riesgo>65){
+        state.stats.salud-=8;
+        state.stats.vida-=7;
+        note+=" El consumo de riesgo empezó a afectar tu desempeño y tus relaciones.";
+      }
+      clampStats();
+      addHistory(`Cierre año ${state.year} · ${note}`);
+    }
+
+    function openAgencyDecision(){
+      const marketLevel=currentMarketLevel();
+      let eligible=Object.values(agencyPools)
+        .flat()
+        .filter(agency=>agency.minLevel<=marketLevel && agency.name!==state.workplace);
+
+      if(eligible.length<2){
+        eligible=Object.values(agencyPools)
+          .flat()
+          .filter(agency=>agency.name!==state.workplace);
+      }
+
+      const shuffled=[...eligible].sort(()=>Math.random()-.5);
+      const selected=[];
+      for(const agency of shuffled){
+        if(!selected.some(item=>item.name===agency.name)){
+          selected.push(agency);
+        }
+        if(selected.length===2) break;
+      }
+
+      const offers=selected.map(agency=>{
+        const meta=agencyTierMeta[agency.tier];
+        const pct=randomBetween(meta.raise[0],meta.raise[1]);
+        return {agency:agency.name,tier:agency.tier,pct};
+      });
+      state.pendingAgencyOffers=offers;
+
+      document.getElementById("agencyModalTitle").textContent=`Año ${state.year}: ¿te quedas en ${state.workplace} o cambias?`;
+      document.getElementById("agencyModalCopy").textContent=
+        state.flags.jobSearch
+          ? "Ya habías decidido mirar el mercado. Revisa dos ofertas o quédate un año más donde estás."
+          : "Terminaste las tres decisiones del año. Ahora puedes elegir entre dos agencias o quedarte donde estás.";
+
+      const holder=document.getElementById("agencyOffers");
+      holder.innerHTML="";
+      offers.forEach((offer,index)=>{
+        const meta=agencyTierMeta[offer.tier];
+        const projected=Math.round(state.salary*(1+offer.pct));
+        const btn=document.createElement("button");
+        btn.className="agency-offer";
+        btn.innerHTML=`
+          <strong><span style="color:var(--text);margin:0">Oferta ${index+1}: ${offer.agency}</span><span style="color:var(--accent);margin:0">${meta.label}</span></strong>
+          <span>${meta.copy}</span>
+          <small>Sueldo simulado: ${formatMoney(projected)} · aumento aprox. ${Math.round(offer.pct*100)}%</small>
+        `;
+        btn.onclick=()=>acceptAgencyOffer(index);
+        holder.appendChild(btn);
+      });
+      document.getElementById("agencyModal").classList.add("active");
+    }
+
+    function acceptAgencyOffer(index){
+      const offer=state.pendingAgencyOffers[index];
+      if(!offer) return;
+      const previous=state.workplace;
+      const meta=agencyTierMeta[offer.tier];
+
+      state.workplace=offer.agency;
+      state.agencyTier=offer.tier;
+      state.salary=Math.round(state.salary*(1+offer.pct));
+      Object.entries(meta.effects).forEach(([k,v])=>state.stats[k]=(state.stats[k]||0)+v);
+      state.flags.jobSearch=false;
+      clampStats();
+      addHistory(`Año ${state.year} · Dejaste ${previous} y te fuiste a ${offer.agency} (${meta.label}).`);
+      document.getElementById("agencyModal").classList.remove("active");
+      completeYear();
+    }
+
+    function chooseToStay(){
+      state.stats.reputacion+=1;
+      state.stats.salud+=1;
+      state.flags.jobSearch=false;
+      clampStats();
+      addHistory(`Año ${state.year} · Decidiste seguir en ${state.workplace}.`);
+      document.getElementById("agencyModal").classList.remove("active");
+      completeYear();
+    }
+
+    function completeYear(){
+      applyAnnualSalaryProgression();
+      state.completedYears+=1;
+      state.experienceYears+=1;
+      annualReview();
+      state.year++;
+      state.questionInYear=1;
+      renderProfile();
+
+      if(shouldEnd()){
+        finishGame();
+        return;
+      }
+      loadEvent();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function shouldEnd(){
+      if(state.year>state.maxYears) return true;
+      if(state.stats.salud<=0) return true;
+      if(state.stats.riesgo>=100) return true;
+      return false;
+    }
+
+    function determineResult(){
+      const s=state.stats;
+      const role=currentRole();
+
+      if(s.riesgo>=80){
+        return {
+          title:"La carrera te pasó la cuenta",
+          copy:"El consumo dejó de ser una salida ocasional y comenzó a controlar decisiones, relaciones y trabajo. Este final no es una condena: reconocerlo y buscar apoyo puede cambiar la historia."
+        };
+      }
+      if(s.salud<=15){
+        return {
+          title:"Burnout total",
+          copy:"La carrera avanzó, pero tu cuerpo y tu mente dejaron de aceptar nuevos briefs. No fue falta de talento: sostuviste demasiado durante demasiado tiempo."
+        };
+      }
+      if(state.flags.clientSide){
+        return {
+          title:"Te fuiste al lado del cliente",
+          copy:"Tienes mejor horario, una sola marca y ahora eres tú quien dice “solo necesito un cambio pequeño”. Al menos duermes más."
+        };
+      }
+      if(state.flags.freelance && s.dinero>55 && s.salud>45){
+        return {
+          title:"Freelance legendario",
+          copy:"Lograste independencia y una cartera estable. También descubriste que eras creativo, cuentas, finanzas, cobranzas y soporte técnico."
+        };
+      }
+      const ladder=roleLadders[state.track]||[];
+      if(state.roleIndex>=ladder.length-1 && ladder.length>2 && s.reputacion>70){
+        return {
+          title:`${role}`,
+          copy:"Llegaste a dirigir. La verdadera victoria fue no convertirte en la jefatura que te prometiste nunca ser."
+        };
+      }
+      if(s.vida>70 && s.salud>70){
+        return {
+          title:"Sobreviviente de agencia",
+          copy:"No sacrificaste toda tu vida por el cargo. Conservaste relaciones, descanso y criterio. Puede que este sea el mejor final."
+        };
+      }
+      if(state.flags.award && s.portafolio>75){
+        return {
+          title:"Nombre de festival",
+          copy:"Tu portafolio abre puertas y tus campañas circulan en presentaciones. El premio ayudó, pero tus decisiones sostuvieron la carrera."
+        };
+      }
+      if(s.carrera<35 && s.salud>55){
+        return {
+          title:"Dejaste la publicidad a tiempo",
+          copy:"Salir del rubro no fue fracasar. Convertiste tus habilidades en otra vida profesional antes de que la industria decidiera por ti."
+        };
+      }
+      return {
+        title:"Profesional todoterreno",
+        copy:"Hiciste más cargos de los que decía tu contrato, sobreviviste a cambios pequeños y todavía sabes distinguir una urgencia real de una mala planificación."
+      };
+    }
+
+    function finishGame(){
+      state.result=determineResult();
+      document.getElementById('resultTitle').textContent=state.result.title;
+      document.getElementById('resultCopy').textContent=state.result.copy;
+      document.getElementById('careerSummary').innerHTML=`
+        <p><strong>${state.name}</strong></p>
+        <p>${state.profession} · ${state.track}</p>
+        <p>Inicio: ${state.experienceLabel} · ${formatExperienceYears(state.startExperienceYears)}</p>
+        <p>Cargo final: ${currentRole()} · ${formatExperienceYears(state.experienceYears)}</p>
+        <p>${state.workplace} · ${tierLabel(state.agencyTier)}</p>
+        <p>Sueldo final: <strong>${formatMoney(state.salary)}</strong></p>
+        <p>Años jugados: <strong>12</strong></p>
+        <p>Decisiones laborales: <strong>36</strong></p>
+      `;
+      const fs=document.getElementById('finalStats');
+      fs.innerHTML=Object.entries(state.stats).map(([k,v])=>`
+        <p>${statsMeta[k].icon} ${statsMeta[k].label}: <strong>${Math.round(v)}/100</strong></p>
+      `).join("");
+      showScreen('result');
+    }
+
+    function generateCard(){
+      const canvas=document.getElementById('shareCanvas');
+      const ctx=canvas.getContext('2d');
+      const w=canvas.width,h=canvas.height;
+
+      const grad=ctx.createLinearGradient(0,0,w,h);
+      grad.addColorStop(0,"#171724");
+      grad.addColorStop(.55,"#0c0c12");
+      grad.addColorStop(1,"#221443");
+      ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+
+      ctx.fillStyle="#b8ff42";
+      ctx.fillRect(70,70,190,18);
+
+      ctx.fillStyle="#f5f5f7";
+      ctx.font="900 44px Arial";
+      ctx.fillText("VIDA DE AGENCIA",70,145);
+
+      ctx.fillStyle="#a8a8b6";
+      ctx.font="700 26px Arial";
+      ctx.fillText("MI FINAL DE CARRERA",70,195);
+
+      ctx.fillStyle="#f5f5f7";
+      ctx.font="900 88px Arial";
+      wrapText(ctx,state.result.title,70,340,920,102);
+
+      ctx.fillStyle="#d6d6de";
+      ctx.font="34px Arial";
+      wrapText(ctx,state.result.copy,70,590,920,48);
+
+      ctx.fillStyle="#8d6bff";
+      roundRect(ctx,70,875,940,275,30,true,false);
+
+      ctx.fillStyle="#ffffff";
+      ctx.font="800 38px Arial";
+      ctx.fillText(state.name,110,945);
+      ctx.font="30px Arial";
+      ctx.fillText(`${currentRole()} · ${state.workplace}`,110,1000);
+      ctx.fillText(`Salud mental: ${Math.round(state.stats.salud)}/100`,110,1060);
+      ctx.fillText(`Reputación: ${Math.round(state.stats.reputacion)}/100`,560,1060);
+      ctx.fillText(`Sueldo final: ${formatMoney(state.salary)}`,110,1115);
+
+      ctx.fillStyle="#b8ff42";
+      ctx.font="900 30px Arial";
+      ctx.fillText("¿TÚ SOBREVIVIRÍAS AL BRIEF?",70,1265);
+
+      canvas.style.display="block";
+      const link=document.getElementById('downloadLink');
+      link.href=canvas.toDataURL("image/png");
+      document.getElementById('downloadWrap').classList.remove('hidden');
+      canvas.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+
+    function wrapText(ctx,text,x,y,maxWidth,lineHeight){
+      const words=text.split(' ');
+      let line='';
+      for(let n=0;n<words.length;n++){
+        const test=line+words[n]+' ';
+        if(ctx.measureText(test).width>maxWidth && n>0){
+          ctx.fillText(line,x,y);
+          line=words[n]+' ';
+          y+=lineHeight;
+        }else line=test;
+      }
+      ctx.fillText(line,x,y);
+    }
+
+    function roundRect(ctx,x,y,width,height,radius,fill,stroke){
+      if(typeof radius==='number') radius={tl:radius,tr:radius,br:radius,bl:radius};
+      ctx.beginPath();
+      ctx.moveTo(x+radius.tl,y);
+      ctx.lineTo(x+width-radius.tr,y);
+      ctx.quadraticCurveTo(x+width,y,x+width,y+radius.tr);
+      ctx.lineTo(x+width,y+height-radius.br);
+      ctx.quadraticCurveTo(x+width,y+height,x+width-radius.br,y+height);
+      ctx.lineTo(x+radius.bl,y+height);
+      ctx.quadraticCurveTo(x,y+height,x,y+height-radius.bl);
+      ctx.lineTo(x,y+radius.tl);
+      ctx.quadraticCurveTo(x,y,x+radius.tl,y);
+      ctx.closePath();
+      if(fill)ctx.fill();
+      if(stroke)ctx.stroke();
+    }
+
+    async function copyResult(){
+      const text=`Mi final en Vida de Agencia: ${state.result.title}. ${currentRole()} en ${state.workplace} (${tierLabel(state.agencyTier)}). Salud mental ${Math.round(state.stats.salud)}/100, reputación ${Math.round(state.stats.reputacion)}/100.`;
+      try{
+        await navigator.clipboard.writeText(text);
+        alert("Resultado copiado.");
+      }catch(e){
+        prompt("Copia tu resultado:",text);
+      }
+    }
+
+    function restartGame(){
+      location.reload();
+    }
+  </script>
+</body>
+</html>
