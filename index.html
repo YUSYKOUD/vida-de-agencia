@@ -472,6 +472,75 @@
       margin:28px 34px;padding:24px;border:1px dashed #343442;border-radius:18px;color:#9191a0
     }
     #shareCanvas{display:none!important}
+    .award-celebration-modal{
+      position:fixed;inset:0;z-index:60;
+      display:none;place-items:center;padding:22px;
+      background:rgba(4,4,8,.84);
+      backdrop-filter:blur(10px);
+    }
+    .award-celebration-modal.active{display:grid}
+    .award-celebration-card{
+      width:min(620px,100%);
+      text-align:center;
+      border:1px solid #343444;
+      border-radius:28px;
+      padding:34px 30px 30px;
+      background:
+        radial-gradient(circle at 50% 0%,rgba(184,255,66,.14),transparent 34%),
+        radial-gradient(circle at 0% 100%,rgba(141,107,255,.17),transparent 35%),
+        #111118;
+      box-shadow:0 30px 120px rgba(0,0,0,.55);
+      position:relative;
+      overflow:hidden;
+    }
+    .award-celebration-card::after{
+      content:"";
+      position:absolute;right:-55px;top:-55px;
+      width:150px;height:150px;border-radius:50%;
+      border:24px solid rgba(255,255,255,.035);
+      pointer-events:none;
+    }
+    .award-big-icon{
+      width:110px;height:110px;margin:0 auto 18px;
+      border-radius:28px;
+      display:grid;place-items:center;
+      background:linear-gradient(145deg,#20202b,#15151e);
+      border:1px solid #343444;
+      font-size:4.4rem;
+      box-shadow:0 18px 45px rgba(0,0,0,.28);
+    }
+    .award-result-label{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:30px;padding:6px 11px;border-radius:999px;
+      background:var(--accent);color:#0d0d11;
+      font-size:.7rem;font-weight:1000;letter-spacing:.11em;text-transform:uppercase;
+    }
+    .award-result-label.shortlist{
+      background:#8d6bff;color:#fff;
+    }
+    .award-celebration-card h2{
+      font-size:clamp(2rem,6vw,3.6rem);
+      line-height:.92;letter-spacing:-.055em;
+      margin:16px auto 9px;
+      max-width:520px;
+    }
+    .award-celebration-card .award-category{
+      color:var(--accent);
+      font-size:.9rem;font-weight:900;
+      margin:8px 0 4px;
+    }
+    .award-celebration-card .award-detail{
+      color:#bdbdc8;font-size:.9rem;line-height:1.55;
+      max-width:500px;margin:12px auto 0;
+    }
+    .award-celebration-card .award-year{
+      margin-top:14px;color:#717180;font-size:.72rem;font-weight:850;
+      letter-spacing:.08em;text-transform:uppercase;
+    }
+    .award-celebration-card .btn{
+      margin-top:24px;min-width:190px;
+    }
+
     .share-grid{
       display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px
     }
@@ -830,6 +899,18 @@
     </div>
   </div>
 
+  <div id="awardCelebrationModal" class="award-celebration-modal">
+    <div class="award-celebration-card">
+      <div class="award-big-icon" id="awardCelebrationIcon">🏆</div>
+      <div class="award-result-label" id="awardCelebrationLabel">¡GANASTE!</div>
+      <h2 id="awardCelebrationTitle">Premio</h2>
+      <div class="award-category" id="awardCelebrationCategory">Categoría</div>
+      <p class="award-detail" id="awardCelebrationDetail"></p>
+      <div class="award-year" id="awardCelebrationYear"></div>
+      <button class="btn btn-primary" onclick="closeAwardCelebration()">Agregar a mi carrera</button>
+    </div>
+  </div>
+
   <div id="shareModal" class="modal">
     <div class="modal-card">
       <div class="eyebrow">COMPARTE TU CARRERA</div>
@@ -875,6 +956,7 @@
       history: [],
       awards: [],
       attemptedAwards: [],
+      lastAwardResult: null,
       flags: {
         freelance:false,
         clientSide:false,
@@ -2773,6 +2855,81 @@
     }
 
 
+    function simulatedAwardCategory(award){
+      const track=state.track;
+
+      if(award.id==="effie-chile"){
+        if(track==="Medios") return "Efectividad en Medios";
+        if(track==="Cuentas") return "Efectividad de Negocio";
+        if(track==="Community Manager" || track==="Content Creator") return "Engagement / Social";
+        if(track==="Branding") return "Construcción de Marca";
+        return "Efectividad de Campaña";
+      }
+
+      if(award.id==="iab-mixx"){
+        if(track==="Medios") return "Media & Performance";
+        if(track==="Community Manager") return "Social Media";
+        if(track==="Content Creator") return "Content";
+        if(track==="Motion") return "Video Digital";
+        return "Campaña Digital";
+      }
+
+      if(award.id==="premios-crea"){
+        if(track==="Branding") return "Branding & Diseño";
+        if(track==="Dirección de Arte") return "Dirección de Arte";
+        if(track==="Redactor") return "Idea / Redacción";
+        if(track==="Content Creator") return "Contenido";
+        return "Creatividad Integrada";
+      }
+
+      if(award.id==="anda-advertising"){
+        if(track==="Medios") return "Media";
+        if(track==="Cuentas") return "Campaña Integrada";
+        return "Advertising";
+      }
+
+      if(award.id==="best-branding"){
+        return "Branding";
+      }
+
+      if(award.id==="cannes-lions"){
+        if(track==="Medios") return "Media";
+        if(track==="Community Manager" || track==="Content Creator") return "Social & Creator";
+        if(track==="Branding") return "Design";
+        if(track==="Dirección de Arte" || track==="Motion") return "Film / Craft";
+        return "Creative Effectiveness";
+      }
+
+      if(award.id==="el-ojo"){
+        if(track==="Medios") return "Media";
+        if(track==="Branding") return "Diseño";
+        if(track==="Community Manager" || track==="Content Creator") return "Contenido";
+        return "Creatividad";
+      }
+
+      if(award.id==="fiap"){
+        if(track==="Medios") return "Media";
+        if(track==="Branding") return "Diseño";
+        if(track==="Community Manager" || track==="Content Creator") return "Formatos Digitales";
+        return "Ideas";
+      }
+
+      return "Campaña";
+    }
+
+    function awardIconForLevel(award,level){
+      // Emoji visual asociado al premio/reconocimiento dentro del juego.
+      if(award.id==="cannes-lions") return "🦁";
+      if(award.id==="effie-chile") return "🏆";
+      if(award.id==="iab-mixx") return "⚡";
+      if(award.id==="premios-crea") return "✦";
+      if(award.id==="anda-advertising") return "◎";
+      if(award.id==="best-branding") return "◆";
+      if(award.id==="el-ojo") return "👁";
+      if(award.id==="fiap") return "▲";
+      return award.icon || "🏆";
+    }
+
     function awardTrackEligible(award){
       return award.tracks.includes("all") || award.tracks.includes(state.track);
     }
@@ -2873,19 +3030,22 @@
       return levels[0];
     }
 
-    function addCareerAward(award,level,score,year=state.year){
-      if(state.awards.some(item=>item.id===award.id && item.level===level)) return;
+    function addCareerAward(award,level,score,year=state.year,category=simulatedAwardCategory(award)){
+      if(state.awards.some(item=>item.id===award.id && item.level===level && item.year===year)) return;
       state.awards.push({
         id:award.id,
         name:award.name,
         short:award.short,
-        icon:award.icon,
+        icon:awardIconForLevel(award,level),
         level,
+        category,
         score,
-        year
+        year,
+        isShortlist: level==="Shortlist"
       });
       state.flags.award=true;
-      addHistory(`🏆 Año ${year} · ${award.name}: ${level}.`);
+      const symbol=level==="Shortlist" ? "⭐" : "🏆";
+      addHistory(`${symbol} Año ${year} · ${award.name}: ${level} · ${category}.`);
     }
 
     function resolveAwardAttempt(attempt){
@@ -2893,14 +3053,32 @@
       if(!award) return "";
 
       const score=Math.min(100,awardPerformanceScore()+(attempt.bonus||0));
-      const level=awardLevelForScore(award,score);
+      let level=awardLevelForScore(award,score);
+      const category=simulatedAwardCategory(award);
+      const won=Boolean(level);
 
-      if(!level){
-        return ` El caso no alcanzó premio esta vez. Puntaje simulado: ${score}/100.`;
+      // Aunque no alcance metal/reconocimiento, el caso queda como Shortlist.
+      if(!level) level="Shortlist";
+
+      addCareerAward(award,level,score,state.year,category);
+
+      state.lastAwardResult={
+        awardId:award.id,
+        awardName:award.name,
+        short:award.short,
+        icon:awardIconForLevel(award,level),
+        level,
+        category,
+        score,
+        year:state.year,
+        won
+      };
+
+      if(won){
+        return ` 🏆 Ganaste ${award.name}: ${level} en ${category}. Se agregó a tu vitrina de carrera.`;
       }
 
-      addCareerAward(award,level,score);
-      return ` 🏆 Resultado: ${award.name} · ${level}. Se agregó a tu vitrina de carrera.`;
+      return ` ⭐ No ganaste metal, pero quedaste en Shortlist de ${award.name} en ${category}. Este reconocimiento se agregó a tu experiencia.`;
     }
 
     function evaluateProfessionalRecognition(){
@@ -2919,8 +3097,10 @@
         short:"MKTG BEST",
         icon:"★",
         level:category,
+        category:"Reconocimiento profesional",
         score,
-        year:13
+        year:13,
+        isShortlist:false
       });
       addHistory(`★ Año 13 · MKTG BEST: ${category}.`);
     }
@@ -3080,6 +3260,10 @@
       nextBtn.textContent="Ver 2 ofertas y cerrar el año";
 
       document.getElementById('consequence').classList.add('active');
+
+      if(opt.awardAttempt && state.lastAwardResult){
+        setTimeout(()=>showAwardCelebration(state.lastAwardResult),260);
+      }
     }
 
     function proceedAfterDecision(){
@@ -3090,6 +3274,29 @@
         return;
       }
       openAgencyDecision();
+    }
+
+    function showAwardCelebration(result){
+      const modal=document.getElementById("awardCelebrationModal");
+      if(!modal || !result) return;
+
+      document.getElementById("awardCelebrationIcon").textContent=result.icon;
+      document.getElementById("awardCelebrationLabel").textContent=result.won ? "¡GANASTE!" : "SHORTLIST";
+      document.getElementById("awardCelebrationLabel").classList.toggle("shortlist",!result.won);
+      document.getElementById("awardCelebrationTitle").textContent=
+        result.won ? `${result.awardName} · ${result.level}` : `${result.awardName} · Shortlist`;
+      document.getElementById("awardCelebrationCategory").textContent=`Categoría: ${result.category}`;
+      document.getElementById("awardCelebrationDetail").textContent=
+        result.won
+          ? `Tu caso alcanzó ${result.level} con un desempeño simulado de ${result.score}/100. El reconocimiento ya quedó guardado en tu vitrina de carrera.`
+          : `No alcanzaste un premio mayor esta vez, pero tu caso quedó seleccionado en Shortlist con ${result.score}/100. También se suma como reconocimiento a tu experiencia.`;
+      document.getElementById("awardCelebrationYear").textContent=`Año ${result.year} de carrera · resultado simulado`;
+      modal.classList.add("active");
+    }
+
+    function closeAwardCelebration(){
+      document.getElementById("awardCelebrationModal").classList.remove("active");
+      state.lastAwardResult=null;
     }
 
     function applyAnnualSalaryProgression(){
@@ -3407,7 +3614,8 @@
           <span class="award-icon">${award.icon}</span>
           <strong>${award.name}</strong>
           <em>${award.level}</em>
-          <small>Año ${award.year} · desempeño ${award.score}/100</small>
+          <small>${award.category || "Campaña"} · Año ${award.year}</small>
+          <small>Desempeño ${award.score}/100</small>
         `;
         shelf.appendChild(item);
       });
@@ -3509,8 +3717,8 @@
           wrapText(ctx,award.level,x+24,y+72,395,26);
 
           ctx.fillStyle="#737384";
-          ctx.font="17px Arial";
-          ctx.fillText(`Año ${award.year}`,x+24,y+108);
+          ctx.font="16px Arial";
+          ctx.fillText(`${award.category || "Campaña"} · Año ${award.year}`,x+24,y+108);
         });
       }
 
@@ -3564,7 +3772,7 @@
 
     function shareText(){
       const trophyText=state.awards.length
-        ? ` Premios: ${state.awards.map(a=>`${a.short} (${a.level})`).join(", ")}.`
+        ? ` Reconocimientos: ${state.awards.map(a=>`${a.short} (${a.level} · ${a.category || "Campaña"})`).join(", ")}.`
         : "";
       return `Mi carrera en Vida de Agencia terminó como ${currentRole()} en ${state.workplace}. Nivel ${careerOverall()}/100.${trophyText}`;
     }
