@@ -480,18 +480,25 @@
     }
     .award-celebration-modal.active{display:grid}
     .award-celebration-card{
-      width:min(620px,100%);
+      width:min(650px,100%);
       text-align:center;
-      border:1px solid #343444;
-      border-radius:28px;
-      padding:34px 30px 30px;
+      border:1px solid rgba(184,255,66,.35);
+      border-radius:30px;
+      padding:38px 32px 32px;
       background:
-        radial-gradient(circle at 50% 0%,rgba(184,255,66,.14),transparent 34%),
-        radial-gradient(circle at 0% 100%,rgba(141,107,255,.17),transparent 35%),
-        #111118;
-      box-shadow:0 30px 120px rgba(0,0,0,.55);
+        radial-gradient(circle at 50% -10%,rgba(184,255,66,.22),transparent 36%),
+        radial-gradient(circle at 0% 100%,rgba(141,107,255,.22),transparent 38%),
+        linear-gradient(180deg,#16161f,#0d0d13);
+      box-shadow:
+        0 35px 140px rgba(0,0,0,.6),
+        0 0 80px rgba(184,255,66,.08);
       position:relative;
       overflow:hidden;
+      animation:awardPop .38s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes awardPop{
+      from{transform:scale(.88) translateY(18px);opacity:0}
+      to{transform:scale(1) translateY(0);opacity:1}
     }
     .award-celebration-card::after{
       content:"";
@@ -500,6 +507,22 @@
       border:24px solid rgba(255,255,255,.035);
       pointer-events:none;
     }
+    .award-confetti{
+      position:absolute;inset:0;pointer-events:none;overflow:hidden
+    }
+    .award-confetti span{
+      position:absolute;font-size:1.35rem;opacity:.8;
+      animation:floatConfetti 2.6s ease-in-out infinite alternate
+    }
+    .award-confetti span:nth-child(1){left:8%;top:12%}
+    .award-confetti span:nth-child(2){right:10%;top:16%;animation-delay:.3s}
+    .award-confetti span:nth-child(3){left:14%;bottom:14%;animation-delay:.6s}
+    .award-confetti span:nth-child(4){right:12%;bottom:16%;animation-delay:.9s}
+    @keyframes floatConfetti{
+      from{transform:translateY(0) rotate(0deg)}
+      to{transform:translateY(-8px) rotate(12deg)}
+    }
+
     .award-big-icon{
       width:110px;height:110px;margin:0 auto 18px;
       border-radius:28px;
@@ -901,13 +924,16 @@
 
   <div id="awardCelebrationModal" class="award-celebration-modal">
     <div class="award-celebration-card">
+      <div class="award-confetti">
+        <span>✨</span><span>🏆</span><span>🎉</span><span>⭐</span>
+      </div>
       <div class="award-big-icon" id="awardCelebrationIcon">🏆</div>
       <div class="award-result-label" id="awardCelebrationLabel">¡GANASTE!</div>
       <h2 id="awardCelebrationTitle">Premio</h2>
       <div class="award-category" id="awardCelebrationCategory">Categoría</div>
       <p class="award-detail" id="awardCelebrationDetail"></p>
       <div class="award-year" id="awardCelebrationYear"></div>
-      <button class="btn btn-primary" onclick="closeAwardCelebration()">Agregar a mi carrera</button>
+      <button class="btn btn-primary" onclick="closeAwardCelebration()">Guardar en mi vitrina 🏆</button>
     </div>
   </div>
 
@@ -3247,7 +3273,9 @@
         if(latest.year===state.year){
           const c=document.createElement('span');
           c.className='chip good';
-          c.textContent=`🏆 ${latest.short}: ${latest.level}`;
+          c.textContent=latest.isShortlist
+            ? `⭐ ${latest.short}: Shortlist`
+            : `🏆 ${latest.short}: ${latest.level}`;
           chips.appendChild(c);
         }
       }
@@ -3261,7 +3289,7 @@
 
       document.getElementById('consequence').classList.add('active');
 
-      if(opt.awardAttempt && state.lastAwardResult){
+      if(opt.awardAttempt && state.lastAwardResult && state.lastAwardResult.won){
         setTimeout(()=>showAwardCelebration(state.lastAwardResult),260);
       }
     }
@@ -3278,19 +3306,24 @@
 
     function showAwardCelebration(result){
       const modal=document.getElementById("awardCelebrationModal");
-      if(!modal || !result) return;
+      if(!modal || !result || !result.won) return;
 
       document.getElementById("awardCelebrationIcon").textContent=result.icon;
-      document.getElementById("awardCelebrationLabel").textContent=result.won ? "¡GANASTE!" : "SHORTLIST";
-      document.getElementById("awardCelebrationLabel").classList.toggle("shortlist",!result.won);
+      document.getElementById("awardCelebrationLabel").textContent="¡GANASTE!";
+      document.getElementById("awardCelebrationLabel").classList.remove("shortlist");
+
       document.getElementById("awardCelebrationTitle").textContent=
-        result.won ? `${result.awardName} · ${result.level}` : `${result.awardName} · Shortlist`;
-      document.getElementById("awardCelebrationCategory").textContent=`Categoría: ${result.category}`;
+        `${result.awardName} · ${result.level}`;
+
+      document.getElementById("awardCelebrationCategory").textContent=
+        `Categoría: ${result.category}`;
+
       document.getElementById("awardCelebrationDetail").textContent=
-        result.won
-          ? `Tu caso alcanzó ${result.level} con un desempeño simulado de ${result.score}/100. El reconocimiento ya quedó guardado en tu vitrina de carrera.`
-          : `No alcanzaste un premio mayor esta vez, pero tu caso quedó seleccionado en Shortlist con ${result.score}/100. También se suma como reconocimiento a tu experiencia.`;
-      document.getElementById("awardCelebrationYear").textContent=`Año ${result.year} de carrera · resultado simulado`;
+        `¡Tu campaña fue reconocida! Ganaste ${result.level} en ${result.awardName} dentro de la categoría ${result.category}. Este reconocimiento queda agregado permanentemente a tu carrera y aparecerá en tu vitrina final.`;
+
+      document.getElementById("awardCelebrationYear").textContent=
+        `Año ${result.year} de carrera · desempeño simulado ${result.score}/100`;
+
       modal.classList.add("active");
     }
 
