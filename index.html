@@ -746,8 +746,8 @@
         {name:"Briones y Asociados", tier:"boutique", minLevel:0, focus:"integrated"}
       ],
       independent: [
-        {name:"10:10", tier:"independent", minLevel:1, focus:"creative"},
-        {name:"MEAT", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"10:10", tier:"independent", minLevel:0, focus:"integrated"},
+        {name:"MEAT", tier:"independent", minLevel:0, focus:"integrated"},
         {name:"Raya", tier:"independent", minLevel:1, focus:"creative"},
         {name:"Grupo Mass", tier:"independent", minLevel:1, focus:"digital"},
         {name:"Wolf BCPP", tier:"independent", minLevel:1, focus:"creative"},
@@ -2184,6 +2184,8 @@
     }
 
     function agencyFitsTrack(agency){
+      if(agency.name==="MEAT" || agency.name==="10:10") return true;
+
       if(state.track==="Medios"){
         return agency.focus==="media" || agency.focus==="integrated" || agency.focus==="digital";
       }
