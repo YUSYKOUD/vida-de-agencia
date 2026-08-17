@@ -342,14 +342,144 @@
     }
 
     .result-card{max-width:900px;margin:34px auto;padding:32px}
-    .result-badge{display:inline-block;background:var(--accent);color:#0d0d11;border-radius:999px;padding:8px 12px;font-weight:1000}
-    .result-title{font-size:clamp(2.4rem,7vw,5rem);line-height:.92;letter-spacing:-.065em;margin:18px 0}
-    .result-copy{font-size:1.08rem;line-height:1.65;color:#d3d3dc}
-    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
-    .summary-box{background:#111118;border:1px solid var(--line);border-radius:18px;padding:18px}
-    .summary-box h3{margin-top:0}
-    .result-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-    canvas{max-width:100%;border-radius:18px;margin-top:20px;display:none}
+    .result-card{
+      padding:0!important;
+      overflow:hidden;
+      border:1px solid #30303e;
+      background:
+        radial-gradient(circle at 90% 5%,rgba(184,255,66,.12),transparent 25%),
+        radial-gradient(circle at 5% 35%,rgba(141,107,255,.18),transparent 32%),
+        #0b0b11;
+    }
+    .career-final-card{
+      position:relative;
+      padding:34px;
+      min-height:720px;
+      background:
+        linear-gradient(135deg,rgba(141,107,255,.08),transparent 38%),
+        repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0 1px,transparent 1px 13px);
+    }
+    .career-final-card::after{
+      content:"";
+      position:absolute;right:-80px;top:-95px;width:290px;height:290px;border-radius:50%;
+      border:45px solid rgba(184,255,66,.045);pointer-events:none;
+    }
+    .final-topline{
+      display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+      position:relative;z-index:1
+    }
+    .result-badge{
+      display:inline-flex;align-items:center;gap:7px;
+      background:var(--accent);color:#0d0d11;border-radius:999px;
+      padding:8px 12px;font-weight:1000;font-size:.74rem;letter-spacing:.06em
+    }
+    .career-rank{
+      text-align:right
+    }
+    .career-rank small{
+      display:block;color:#777789;font-weight:900;font-size:.65rem;letter-spacing:.12em
+    }
+    .career-rank strong{
+      display:block;font-size:3.6rem;line-height:.9;color:#fff;letter-spacing:-.08em
+    }
+    .final-person{
+      margin-top:42px;max-width:860px;position:relative;z-index:1
+    }
+    .final-person .overline{
+      color:#8d6bff;font-size:.75rem;font-weight:950;letter-spacing:.15em;text-transform:uppercase
+    }
+    .result-title{
+      font-size:clamp(3rem,7vw,6.2rem);line-height:.85;
+      letter-spacing:-.075em;margin:12px 0 16px;max-width:900px
+    }
+    .result-copy{
+      font-size:1.02rem;line-height:1.58;color:#c9c9d3;max-width:820px
+    }
+    .final-metrics{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:28px
+    }
+    .final-metric{
+      min-height:102px;border:1px solid #2b2b38;background:#111119;border-radius:17px;padding:14px
+    }
+    .final-metric small{
+      display:block;color:#6f6f7f;font-size:.62rem;font-weight:950;
+      letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px
+    }
+    .final-metric strong{
+      display:block;font-size:1.13rem;line-height:1.15
+    }
+    .award-showcase{
+      margin-top:28px;border-top:1px solid #2a2a36;padding-top:22px
+    }
+    .award-showcase-head{
+      display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:13px
+    }
+    .award-showcase-head h3{
+      margin:0;font-size:1.05rem
+    }
+    .award-showcase-head span{
+      font-size:.69rem;color:#727281
+    }
+    .award-shelf{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px
+    }
+    .award-trophy{
+      min-height:150px;border-radius:18px;padding:15px;
+      background:linear-gradient(150deg,#171721,#111118);
+      border:1px solid #2e2e3c;position:relative;overflow:hidden
+    }
+    .award-trophy::after{
+      content:"";position:absolute;right:-28px;bottom:-42px;width:95px;height:95px;
+      border-radius:50%;background:rgba(184,255,66,.055)
+    }
+    .award-icon{font-size:1.7rem;display:block;margin-bottom:16px}
+    .award-trophy strong{display:block;font-size:.9rem;line-height:1.18}
+    .award-trophy em{
+      display:block;color:var(--accent);font-size:.72rem;font-style:normal;font-weight:900;margin-top:6px
+    }
+    .award-trophy small{
+      display:block;color:#6e6e7b;font-size:.65rem;margin-top:7px
+    }
+    .award-empty{
+      grid-column:1/-1;border:1px dashed #30303f;border-radius:17px;
+      padding:20px;color:#767685;font-size:.82rem
+    }
+    .result-lower{
+      display:grid;grid-template-columns:1.3fr .7fr;gap:12px;margin-top:22px
+    }
+    .summary-box{
+      background:#111118;border:1px solid #282835;border-radius:18px;padding:18px
+    }
+    .summary-box h3{
+      margin:0 0 12px;font-size:.85rem;color:#888899;text-transform:uppercase;letter-spacing:.1em
+    }
+    .summary-box p{margin:7px 0;color:#cfcfd8;font-size:.82rem}
+    .result-actions{
+      display:flex;flex-wrap:wrap;gap:10px;padding:20px 34px 30px;
+      border-top:1px solid #252532;background:#0d0d13
+    }
+    .result-actions .btn{min-width:160px}
+    .btn-share{
+      background:linear-gradient(135deg,#b8ff42,#7dffb0);color:#0d0d11
+    }
+    .btn-ghost{
+      background:transparent;color:#b9b9c4;border:1px solid #30303e
+    }
+    .discarded-card{
+      display:none!important
+    }
+    .discard-message{
+      margin:28px 34px;padding:24px;border:1px dashed #343442;border-radius:18px;color:#9191a0
+    }
+    #shareCanvas{display:none!important}
+    .share-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px
+    }
+    .share-network{
+      border:1px solid #30303e;background:#12121a;color:white;border-radius:15px;
+      padding:15px 12px;font-weight:850;text-align:center
+    }
+    .share-network span{display:block;font-size:1.3rem;margin-bottom:5px}
 
     .modal{
       position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:20px;z-index:30;
@@ -387,6 +517,9 @@
       .player-meta strong{font-size:1.05rem}
       .hero-card{padding:28px}
       .hero{min-height:auto}
+      .final-metrics{grid-template-columns:repeat(2,1fr)}
+      .award-shelf{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .result-lower{grid-template-columns:1fr}
     }
     @media (max-width:620px){
       .app{padding:14px}
@@ -396,6 +529,10 @@
       .game-card{padding:20px}
       h1{font-size:3.6rem}
       .year-row{flex-direction:column}
+      .career-final-card{padding:24px 20px}
+      .result-actions{padding:18px 20px 24px}
+      .award-shelf{grid-template-columns:1fr}
+      .share-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -419,8 +556,8 @@
             <div class="eyebrow">ELIGE · SOBREVIVE · ENTREGA</div>
             <h1>Sobrevive al brief.</h1>
             <p class="hero-copy">
-              Empieza desde el cargo que elijas, enfrenta una decisión clave por año y descubre si terminas dirigiendo campañas,
-              cobrando facturas freelance, trabajando para una marca o abandonando el rubro con tu salud mental intacta.
+              Empieza desde el cargo que elijas, enfrenta una decisión clave por año, cambia de agencia y construye una carrera
+              que puede terminar con premios, reconocimientos, dirección de equipos o una salida completamente distinta del rubro.
             </p>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="showScreen('setup')">Comenzar carrera</button>
@@ -592,30 +729,71 @@
 
       <section id="result" class="screen">
         <div class="result-card">
-          <span class="result-badge">FIN DE CARRERA</span>
-          <h2 class="result-title" id="resultTitle"></h2>
-          <p class="result-copy" id="resultCopy"></p>
+          <div class="career-final-card" id="careerFinalCard">
+            <div class="final-topline">
+              <span class="result-badge">🏆 FIN DE CARRERA</span>
+              <div class="career-rank">
+                <small>NIVEL FINAL</small>
+                <strong id="finalOverall">00</strong>
+              </div>
+            </div>
 
-          <div class="result-grid">
-            <div class="summary-box">
-              <h3>Resumen profesional</h3>
-              <div id="careerSummary"></div>
+            <div class="final-person">
+              <div class="overline" id="finalTrackLabel">PUBLICIDAD · CARRERA</div>
+              <h2 class="result-title" id="resultTitle"></h2>
+              <p class="result-copy" id="resultCopy"></p>
             </div>
-            <div class="summary-box">
-              <h3>Indicadores finales</h3>
-              <div id="finalStats"></div>
+
+            <div class="final-metrics">
+              <div class="final-metric">
+                <small>Profesional</small>
+                <strong id="finalPersonName">—</strong>
+              </div>
+              <div class="final-metric">
+                <small>Cargo final</small>
+                <strong id="finalRoleName">—</strong>
+              </div>
+              <div class="final-metric">
+                <small>Última agencia</small>
+                <strong id="finalAgencyName">—</strong>
+              </div>
+              <div class="final-metric">
+                <small>Sueldo final</small>
+                <strong id="finalSalaryBig">—</strong>
+              </div>
             </div>
+
+            <section class="award-showcase">
+              <div class="award-showcase-head">
+                <h3>🏆 Vitrina de premios y reconocimientos</h3>
+                <span>Resultados simulados · nombres de premios reales</span>
+              </div>
+              <div class="award-shelf" id="awardShelf"></div>
+            </section>
+
+            <div class="result-lower">
+              <div class="summary-box">
+                <h3>Trayectoria</h3>
+                <div id="careerSummary"></div>
+              </div>
+              <div class="summary-box">
+                <h3>Indicadores finales</h3>
+                <div id="finalStats"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="discardMessage" class="discard-message hidden">
+            Tarjeta descartada. Tu partida terminó, pero puedes volver al inicio y crear otra carrera.
           </div>
 
           <div class="result-actions">
-            <button class="btn btn-primary" onclick="generateCard()">Crear tarjeta compartible</button>
-            <button class="btn btn-secondary" onclick="copyResult()">Copiar resultado</button>
-            <button class="btn btn-secondary" onclick="restartGame()">Volver a jugar</button>
+            <button class="btn btn-ghost" onclick="discardCareerCard()">Descartar</button>
+            <button class="btn btn-share" onclick="openShareModal()">Compartir en redes sociales</button>
+            <button class="btn btn-secondary" onclick="restartGame()">Volver al inicio</button>
           </div>
+
           <canvas id="shareCanvas" width="1080" height="1350"></canvas>
-          <div id="downloadWrap" class="result-actions hidden">
-            <a id="downloadLink" class="btn btn-primary" download="mi-carrera-publicitaria.png">Descargar tarjeta</a>
-          </div>
         </div>
       </section>
     </main>
@@ -628,7 +806,8 @@
         El juego usa humor para mostrar condiciones reconocibles: urgencias permanentes, sueldos bajos,
         cargos acumulados, licitaciones gratuitas, jornadas extensas, presión social y desgaste.
         El consumo problemático nunca entrega una ventaja sostenible: puede empeorar la salud, el dinero,
-        las relaciones y la carrera.
+        las relaciones y la carrera. Los festivales y premios que aparecen usan nombres reales de la industria,
+        pero nominaciones, resultados y trofeos obtenidos dentro del simulador son completamente ficticios.
       </p>
       <button class="btn btn-primary" onclick="closeInfo()">Entendido, igual entro a agencia</button>
     </div>
@@ -648,6 +827,22 @@
         Catálogo ampliado con referencias de Cámara de Empresas Creativas de Chile, Effie Chile y Asociación de Agencias de Medios.
         La lista busca representar ampliamente el mercado, pero no pretende ser un registro oficial exhaustivo. Los sueldos, niveles y ofertas son ficticios.
       </p>
+    </div>
+  </div>
+
+  <div id="shareModal" class="modal">
+    <div class="modal-card">
+      <div class="eyebrow">COMPARTE TU CARRERA</div>
+      <h3>¿Dónde quieres mostrar tu vitrina?</h3>
+      <p>
+        La tarjeta incluye tu cargo final, agencia, nivel y premios simulados obtenidos durante la partida.
+      </p>
+      <div class="share-grid">
+        <button class="share-network" onclick="shareInstagram()"><span>📸</span>Instagram</button>
+        <button class="share-network" onclick="shareWhatsApp()"><span>💬</span>WhatsApp</button>
+        <button class="share-network" onclick="shareLinkedIn()"><span>💼</span>LinkedIn</button>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="closeShareModal()">Cerrar</button>
     </div>
   </div>
 
@@ -678,6 +873,8 @@
       roleIndex: 0,
       usedEvents: [],
       history: [],
+      awards: [],
+      attemptedAwards: [],
       flags: {
         freelance:false,
         clientSide:false,
@@ -704,6 +901,115 @@
     // minLevel controla el desbloqueo narrativo dentro del simulador:
     // 0 = recién egresado, 1 = junior, 2 = semi senior, 3 = senior.
     // No representa requisitos reales de contratación.
+
+    // Premios y festivales reales de la industria.
+    // El resultado dentro del juego es completamente simulado.
+    const awardCatalog = [
+      {
+        id:"effie-chile",
+        name:"Effie Awards Chile",
+        short:"EFFIE",
+        icon:"🏆",
+        minYear:3,
+        minScore:58,
+        prestige:3,
+        tracks:["all"],
+        description:"La agencia quiere inscribir uno de tus casos por su efectividad y resultados.",
+        levels:["Finalista","Bronce","Plata","Oro","Gran Effie"]
+      },
+      {
+        id:"iab-mixx",
+        name:"IAB MIXX Chile",
+        short:"MIXX",
+        icon:"⚡",
+        minYear:3,
+        minScore:57,
+        prestige:3,
+        tracks:["Community Manager","Content Creator","Medios","RRSS","Motion","Dirección de Arte","Redactor"],
+        description:"Tu caso digital tiene resultados y el equipo propone llevarlo al IAB MIXX Chile.",
+        levels:["Finalista","Ganador","Best in Show"]
+      },
+      {
+        id:"premios-crea",
+        name:"Premios CREA",
+        short:"CREA",
+        icon:"✦",
+        minYear:3,
+        minScore:60,
+        prestige:3,
+        tracks:["Cuentas","Community Manager","Content Creator","Redactor","RRSS","Branding","Motion","Dirección de Arte"],
+        description:"La agencia cree que la idea tiene potencial creativo y quiere competir en Premios CREA.",
+        levels:["Finalista","Ganador","Gran Reconocimiento"]
+      },
+      {
+        id:"anda-advertising",
+        name:"ANDA Advertising Awards",
+        short:"ANDA",
+        icon:"◎",
+        minYear:4,
+        minScore:62,
+        prestige:3,
+        tracks:["all"],
+        description:"La campaña logró una conexión fuerte con las personas y aparece como candidata a un reconocimiento ANDA.",
+        levels:["Finalista","Reconocimiento ANDA"]
+      },
+      {
+        id:"best-branding",
+        name:"Best Branding Awards Chile",
+        short:"BBA",
+        icon:"◆",
+        minYear:4,
+        minScore:62,
+        prestige:3,
+        tracks:["Branding","Dirección de Arte","Redactor","Cuentas"],
+        description:"El proyecto de marca tiene estrategia, identidad e impacto suficiente para entrar a Best Branding Awards Chile.",
+        levels:["Finalista","BrandWinner","Best of the Year"]
+      },
+      {
+        id:"cannes-lions",
+        name:"Cannes Lions",
+        short:"LIONS",
+        icon:"🦁",
+        minYear:6,
+        minScore:76,
+        prestige:5,
+        tracks:["all"],
+        description:"Un caso empieza a circular internamente con una frase peligrosa: “esto podría ir a Cannes”.",
+        levels:["Shortlist","Bronze Lion","Silver Lion","Gold Lion","Grand Prix"]
+      },
+      {
+        id:"el-ojo",
+        name:"El Ojo de Iberoamérica",
+        short:"EL OJO",
+        icon:"👁",
+        minYear:5,
+        minScore:69,
+        prestige:4,
+        tracks:["all"],
+        description:"La campaña podría representar a Chile en uno de los festivales creativos más relevantes de Iberoamérica.",
+        levels:["Finalista","Bronce","Plata","Oro","Gran Ojo"]
+      },
+      {
+        id:"fiap",
+        name:"FIAP",
+        short:"FIAP",
+        icon:"▲",
+        minYear:5,
+        minScore:68,
+        prestige:4,
+        tracks:["all"],
+        description:"El equipo quiere inscribir la campaña al Festival Iberoamericano de la Creatividad.",
+        levels:["Finalista","Bronce","Plata","Oro","Gran Sol"]
+      }
+    ];
+
+    const professionalRecognition = {
+      id:"mktg-best",
+      name:"MKTG BEST",
+      short:"MKTG BEST",
+      icon:"★"
+    };
+
     const agencyPools = {
       boutique: [
         {name:"La Vulca", tier:"boutique", minLevel:0, focus:"creative"},
@@ -2466,14 +2772,168 @@
       });
     }
 
+
+    function awardTrackEligible(award){
+      return award.tracks.includes("all") || award.tracks.includes(state.track);
+    }
+
+    function awardPerformanceScore(){
+      return Math.round(
+        state.stats.carrera*0.28 +
+        state.stats.reputacion*0.27 +
+        state.stats.portafolio*0.32 +
+        state.stats.salud*0.08 +
+        state.stats.vida*0.05
+      );
+    }
+
+    function eligibleAwardOpportunities(){
+      return awardCatalog.filter(award=>
+        award.minYear<=state.year &&
+        awardTrackEligible(award) &&
+        !state.attemptedAwards.includes(award.id)
+      );
+    }
+
+    function shouldShowAwardOpportunity(){
+      if(state.year<3) return false;
+      if(![4,7,10,13].includes(state.year)) return false;
+      if(awardPerformanceScore()<50) return false;
+      return eligibleAwardOpportunities().length>0;
+    }
+
+    function pickAwardOpportunity(){
+      const eligible=eligibleAwardOpportunities();
+      if(!eligible.length) return null;
+
+      // Premios más exigentes empiezan a aparecer más adelante.
+      const sorted=[...eligible].sort((a,b)=>{
+        const aFit=(state.year>=a.minYear ? 1:0) + a.prestige*.1;
+        const bFit=(state.year>=b.minYear ? 1:0) + b.prestige*.1;
+        return bFit-aFit;
+      });
+
+      const top=sorted.slice(0,Math.min(4,sorted.length));
+      return top[Math.floor(Math.random()*top.length)];
+    }
+
+    function buildAwardEvent(award){
+      state.attemptedAwards.push(award.id);
+
+      return {
+        id:`award-opportunity-${award.id}`,
+        minYear:award.minYear,
+        tags:["all"],
+        title:`${award.name}: ¿postulamos el caso?`,
+        text:award.description,
+        quote:`Tu desempeño actual: ${awardPerformanceScore()}/100 · La inscripción no garantiza premio.`,
+        awardOpportunity:true,
+        awardId:award.id,
+        options:[
+          {
+            text:"Postular el caso ahora.",
+            consequence:"El caso entra a competencia. El resultado dependerá de la fortaleza de tu carrera, reputación y portafolio.",
+            effects:{carrera:3,reputacion:2,portafolio:2},
+            awardAttempt:{awardId:award.id,bonus:0}
+          },
+          {
+            text:"Pulir resultados, relato y craft antes de postular.",
+            consequence:"El equipo trabaja mejor el case antes de enviarlo. Pierdes tiempo, pero aumentas tus posibilidades.",
+            effects:{carrera:2,reputacion:2,portafolio:5,salud:-3,vida:-2},
+            awardAttempt:{awardId:award.id,bonus:6}
+          },
+          {
+            text:"No postular este año.",
+            consequence:"La campaña sigue siendo parte de tu carrera, aunque no entre a un festival.",
+            effects:{salud:3,vida:3}
+          }
+        ]
+      };
+    }
+
+    function awardLevelForScore(award,score){
+      const delta=score-award.minScore;
+      const levels=award.levels;
+
+      if(delta<0) return null;
+
+      if(levels.length===2){
+        return delta>=11 ? levels[1] : levels[0];
+      }
+      if(levels.length===3){
+        if(delta>=22) return levels[2];
+        if(delta>=8) return levels[1];
+        return levels[0];
+      }
+
+      if(delta>=28) return levels[Math.min(4,levels.length-1)];
+      if(delta>=19) return levels[Math.min(3,levels.length-1)];
+      if(delta>=11) return levels[Math.min(2,levels.length-1)];
+      if(delta>=5) return levels[Math.min(1,levels.length-1)];
+      return levels[0];
+    }
+
+    function addCareerAward(award,level,score,year=state.year){
+      if(state.awards.some(item=>item.id===award.id && item.level===level)) return;
+      state.awards.push({
+        id:award.id,
+        name:award.name,
+        short:award.short,
+        icon:award.icon,
+        level,
+        score,
+        year
+      });
+      state.flags.award=true;
+      addHistory(`🏆 Año ${year} · ${award.name}: ${level}.`);
+    }
+
+    function resolveAwardAttempt(attempt){
+      const award=awardCatalog.find(item=>item.id===attempt.awardId);
+      if(!award) return "";
+
+      const score=Math.min(100,awardPerformanceScore()+(attempt.bonus||0));
+      const level=awardLevelForScore(award,score);
+
+      if(!level){
+        return ` El caso no alcanzó premio esta vez. Puntaje simulado: ${score}/100.`;
+      }
+
+      addCareerAward(award,level,score);
+      return ` 🏆 Resultado: ${award.name} · ${level}. Se agregó a tu vitrina de carrera.`;
+    }
+
+    function evaluateProfessionalRecognition(){
+      if(state.awards.some(item=>item.id==="mktg-best")) return;
+
+      const score=awardPerformanceScore();
+      if(state.year<13 || score<86 || state.stats.reputacion<80) return;
+
+      let category="Profesional de Creatividad";
+      if(state.track==="Medios") category="Profesional de Agencia de Medios";
+      if(state.track==="Cuentas") category="Directivo/a de Agencia de Publicidad";
+
+      state.awards.push({
+        id:"mktg-best",
+        name:"MKTG BEST",
+        short:"MKTG BEST",
+        icon:"★",
+        level:category,
+        score,
+        year:13
+      });
+      addHistory(`★ Año 13 · MKTG BEST: ${category}.`);
+    }
+
     function validEvents(){
       let pool=[];
 
       if(state.track==="Medios"){
-        pool=events.filter(e=>e.tags.includes("Medios"));
+        pool=events.filter(e=>e.id!=="award" && e.tags.includes("Medios"));
       }else{
         const dedicated=trackSpecificEvents[state.track] || [];
         const exactLegacy=events.filter(e=>
+          e.id!=="award" &&
           e.tags.includes(state.track) &&
           !e.tags.includes("all")
         );
@@ -2507,7 +2967,12 @@
       let pool=validEvents();
       let chosen=null;
 
-      if(state.track!=="Medios" && state.stats.salud<35){
+      if(shouldShowAwardOpportunity()){
+        const award=pickAwardOpportunity();
+        if(award) chosen=buildAwardEvent(award);
+      }
+
+      if(!chosen && state.track!=="Medios" && state.stats.salud<35){
         chosen=pool.find(e=>e.id==="burnout");
       }
       if(state.track!=="Medios" && !chosen && state.stats.riesgo>45){
@@ -2574,8 +3039,14 @@
 
       clampStats();
       const event=state.currentEvent;
-      document.getElementById('consequenceTitle').textContent=event.sensitive ? "Consecuencia real" : "Lo que pasó";
-      document.getElementById('consequenceText').textContent=opt.consequence;
+      document.getElementById('consequenceTitle').textContent=event.awardOpportunity ? "Resultado de la postulación" : (event.sensitive ? "Consecuencia real" : "Lo que pasó");
+      let consequenceCopy=opt.consequence;
+
+      if(opt.awardAttempt){
+        consequenceCopy+=resolveAwardAttempt(opt.awardAttempt);
+      }
+
+      document.getElementById('consequenceText').textContent=consequenceCopy;
 
       const chips=document.getElementById('effectChips');
       chips.innerHTML="";
@@ -2590,6 +3061,15 @@
         c.className='chip good';
         c.textContent=`Sueldo: +${formatMoney(opt.salary)}`;
         chips.appendChild(c);
+      }
+      if(opt.awardAttempt && state.awards.length){
+        const latest=state.awards[state.awards.length-1];
+        if(latest.year===state.year){
+          const c=document.createElement('span');
+          c.className='chip good';
+          c.textContent=`🏆 ${latest.short}: ${latest.level}`;
+          chips.appendChild(c);
+        }
       }
 
       addHistory(`Año ${state.year} · ${event.title}: ${opt.text}`);
@@ -2875,24 +3355,62 @@
     }
 
     function finishGame(){
+      evaluateProfessionalRecognition();
       state.result=determineResult();
+
       document.getElementById('resultTitle').textContent=state.result.title;
       document.getElementById('resultCopy').textContent=state.result.copy;
+      document.getElementById('finalOverall').textContent=careerOverall();
+      document.getElementById('finalTrackLabel').textContent=`${state.profession} · ${state.track}`;
+      document.getElementById('finalPersonName').textContent=state.name;
+      document.getElementById('finalRoleName').textContent=currentRole();
+      document.getElementById('finalAgencyName').textContent=state.workplace;
+      document.getElementById('finalSalaryBig').textContent=formatMoney(state.salary);
+
       document.getElementById('careerSummary').innerHTML=`
-        <p><strong>${state.name}</strong></p>
-        <p>${state.profession} · ${state.track}</p>
+        <p><strong>${state.name}</strong> · ${state.profession} / ${state.track}</p>
         <p>Inicio: ${state.experienceLabel} · Año ${state.careerStartYear}</p>
-        <p>Cargo final: ${currentRole()} · Año ${state.year}</p>
-        <p>${state.workplace} · ${tierLabel(state.agencyTier)}</p>
-        <p>Sueldo final: <strong>${formatMoney(state.salary)}</strong></p>
+        <p>Cargo final: <strong>${currentRole()}</strong> · Año ${state.year}</p>
+        <p>Última agencia: <strong>${state.workplace}</strong></p>
         <p>Años jugados: <strong>${Math.max(1,state.year-state.careerStartYear+1)}</strong></p>
-        <p>Decisiones laborales: <strong>${Math.max(1,state.year-state.careerStartYear+1)}</strong></p>
+        <p>Premios / reconocimientos: <strong>${state.awards.length}</strong></p>
       `;
+
       const fs=document.getElementById('finalStats');
-      fs.innerHTML=Object.entries(state.stats).map(([k,v])=>`
-        <p>${statsMeta[k].icon} ${statsMeta[k].label}: <strong>${Math.round(v)}/100</strong></p>
+      const finalKeys=["carrera","reputacion","portafolio","salud","vida"];
+      fs.innerHTML=finalKeys.map(k=>`
+        <p>${statsMeta[k].icon} ${statsMeta[k].label}: <strong>${Math.round(state.stats[k])}/100</strong></p>
       `).join("");
+
+      renderAwardShelf();
       showScreen('result');
+    }
+
+    function renderAwardShelf(){
+      const shelf=document.getElementById("awardShelf");
+      if(!shelf) return;
+      shelf.innerHTML="";
+
+      if(!state.awards.length){
+        shelf.innerHTML=`
+          <div class="award-empty">
+            Tu vitrina quedó vacía esta vez. Los festivales aparecen como oportunidades durante la carrera y se desbloquean según desempeño.
+          </div>
+        `;
+        return;
+      }
+
+      state.awards.forEach(award=>{
+        const item=document.createElement("article");
+        item.className="award-trophy";
+        item.innerHTML=`
+          <span class="award-icon">${award.icon}</span>
+          <strong>${award.name}</strong>
+          <em>${award.level}</em>
+          <small>Año ${award.year} · desempeño ${award.score}/100</small>
+        `;
+        shelf.appendChild(item);
+      });
     }
 
     function generateCard(){
@@ -2901,51 +3419,116 @@
       const w=canvas.width,h=canvas.height;
 
       const grad=ctx.createLinearGradient(0,0,w,h);
-      grad.addColorStop(0,"#171724");
-      grad.addColorStop(.55,"#0c0c12");
-      grad.addColorStop(1,"#221443");
-      ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+      grad.addColorStop(0,"#171725");
+      grad.addColorStop(.48,"#09090e");
+      grad.addColorStop(1,"#29184f");
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,0,w,h);
+
+      // Decorative shapes.
+      ctx.globalAlpha=.16;
+      ctx.strokeStyle="#b8ff42";
+      ctx.lineWidth=38;
+      ctx.beginPath();
+      ctx.arc(980,90,175,0,Math.PI*2);
+      ctx.stroke();
+      ctx.globalAlpha=1;
 
       ctx.fillStyle="#b8ff42";
-      ctx.fillRect(70,70,190,18);
+      roundRect(ctx,65,62,225,45,22,true,false);
+      ctx.fillStyle="#0b0b10";
+      ctx.font="900 20px Arial";
+      ctx.fillText("FIN DE CARRERA",92,92);
 
+      ctx.fillStyle="#85859a";
+      ctx.font="800 19px Arial";
+      ctx.fillText("VIDA DE AGENCIA · CAREER CARD",65,152);
+
+      ctx.fillStyle="#f6f6f8";
+      ctx.font="900 68px Arial";
+      wrapText(ctx,state.name,65,245,790,76);
+
+      ctx.fillStyle="#9b8cff";
+      ctx.font="900 27px Arial";
+      ctx.fillText(`${state.profession.toUpperCase()} · ${state.track.toUpperCase()}`,65,330);
+
+      ctx.fillStyle="#f6f6f8";
+      ctx.font="900 45px Arial";
+      wrapText(ctx,currentRole(),65,410,780,54);
+
+      ctx.textAlign="right";
+      ctx.fillStyle="#ffffff";
+      ctx.font="900 108px Arial";
+      ctx.fillText(String(careerOverall()),1015,248);
+      ctx.fillStyle="#7b7b8c";
+      ctx.font="900 18px Arial";
+      ctx.fillText("NIVEL FINAL",1015,278);
+      ctx.textAlign="left";
+
+      // Career outcome.
+      ctx.fillStyle="#111119";
+      roundRect(ctx,65,480,950,160,26,true,false);
+      ctx.fillStyle="#6e6e80";
+      ctx.font="800 18px Arial";
+      ctx.fillText("RESULTADO DE CARRERA",95,522);
       ctx.fillStyle="#f5f5f7";
-      ctx.font="900 44px Arial";
-      ctx.fillText("VIDA DE AGENCIA",70,145);
+      ctx.font="900 39px Arial";
+      wrapText(ctx,state.result.title,95,574,860,45);
+      ctx.fillStyle="#bdbdca";
+      ctx.font="24px Arial";
+      ctx.fillText(`${state.workplace} · ${formatMoney(state.salary)}`,95,616);
 
-      ctx.fillStyle="#a8a8b6";
-      ctx.font="700 26px Arial";
-      ctx.fillText("MI FINAL DE CARRERA",70,195);
+      // Awards shelf.
+      ctx.fillStyle="#7b7b8c";
+      ctx.font="900 19px Arial";
+      ctx.fillText("VITRINA DE PREMIOS",65,710);
 
-      ctx.fillStyle="#f5f5f7";
-      ctx.font="900 88px Arial";
-      wrapText(ctx,state.result.title,70,340,920,102);
+      const awards=state.awards.slice(0,6);
+      if(!awards.length){
+        ctx.fillStyle="#171720";
+        roundRect(ctx,65,740,950,130,22,true,false);
+        ctx.fillStyle="#777789";
+        ctx.font="25px Arial";
+        ctx.fillText("Sin premios simulados en esta carrera.",95,817);
+      }else{
+        awards.forEach((award,index)=>{
+          const col=index%2;
+          const row=Math.floor(index/2);
+          const x=65+col*480;
+          const y=740+row*150;
 
-      ctx.fillStyle="#d6d6de";
-      ctx.font="34px Arial";
-      wrapText(ctx,state.result.copy,70,590,920,48);
+          ctx.fillStyle="#171720";
+          roundRect(ctx,x,y,455,130,20,true,false);
+
+          ctx.fillStyle="#b8ff42";
+          ctx.font="900 23px Arial";
+          ctx.fillText(`${award.icon} ${award.short}`,x+24,y+38);
+
+          ctx.fillStyle="#f5f5f7";
+          ctx.font="800 22px Arial";
+          wrapText(ctx,award.level,x+24,y+72,395,26);
+
+          ctx.fillStyle="#737384";
+          ctx.font="17px Arial";
+          ctx.fillText(`Año ${award.year}`,x+24,y+108);
+        });
+      }
+
+      const shelfBottom=awards.length ? 740 + Math.ceil(awards.length/2)*150 : 890;
 
       ctx.fillStyle="#8d6bff";
-      roundRect(ctx,70,875,940,275,30,true,false);
-
+      roundRect(ctx,65,Math.min(1190,shelfBottom+25),950,90,22,true,false);
       ctx.fillStyle="#ffffff";
-      ctx.font="800 38px Arial";
-      ctx.fillText(state.name,110,945);
-      ctx.font="30px Arial";
-      ctx.fillText(`${currentRole()} · ${state.workplace}`,110,1000);
-      ctx.fillText(`Salud mental: ${Math.round(state.stats.salud)}/100`,110,1060);
-      ctx.fillText(`Reputación: ${Math.round(state.stats.reputacion)}/100`,560,1060);
-      ctx.fillText(`Sueldo final: ${formatMoney(state.salary)}`,110,1115);
+      ctx.font="900 23px Arial";
+      ctx.fillText(`CARRERA ${Math.round(state.stats.carrera)}/100`,95,Math.min(1245,shelfBottom+80));
+      ctx.fillText(`REPUTACIÓN ${Math.round(state.stats.reputacion)}/100`,380,Math.min(1245,shelfBottom+80));
+      ctx.fillText(`PORTAFOLIO ${Math.round(state.stats.portafolio)}/100`,705,Math.min(1245,shelfBottom+80));
 
       ctx.fillStyle="#b8ff42";
-      ctx.font="900 30px Arial";
-      ctx.fillText("¿TÚ SOBREVIVIRÍAS AL BRIEF?",70,1265);
+      ctx.font="900 23px Arial";
+      ctx.fillText("VIDA DE AGENCIA",65,1310);
 
-      canvas.style.display="block";
-      const link=document.getElementById('downloadLink');
-      link.href=canvas.toDataURL("image/png");
-      document.getElementById('downloadWrap').classList.remove('hidden');
-      canvas.scrollIntoView({behavior:'smooth',block:'center'});
+      return canvas;
     }
 
     function wrapText(ctx,text,x,y,maxWidth,lineHeight){
@@ -2979,14 +3562,68 @@
       if(stroke)ctx.stroke();
     }
 
-    async function copyResult(){
-      const text=`Mi final en Vida de Agencia: ${state.result.title}. ${currentRole()} en ${state.workplace} (${tierLabel(state.agencyTier)}). Salud mental ${Math.round(state.stats.salud)}/100, reputación ${Math.round(state.stats.reputacion)}/100.`;
-      try{
-        await navigator.clipboard.writeText(text);
-        alert("Resultado copiado.");
-      }catch(e){
-        prompt("Copia tu resultado:",text);
+    function shareText(){
+      const trophyText=state.awards.length
+        ? ` Premios: ${state.awards.map(a=>`${a.short} (${a.level})`).join(", ")}.`
+        : "";
+      return `Mi carrera en Vida de Agencia terminó como ${currentRole()} en ${state.workplace}. Nivel ${careerOverall()}/100.${trophyText}`;
+    }
+
+    function openShareModal(){
+      document.getElementById("shareModal").classList.add("active");
+    }
+
+    function closeShareModal(){
+      document.getElementById("shareModal").classList.remove("active");
+    }
+
+    function canvasToBlob(canvas){
+      return new Promise(resolve=>canvas.toBlob(resolve,"image/png",1));
+    }
+
+    async function shareInstagram(){
+      const canvas=generateCard();
+      const blob=await canvasToBlob(canvas);
+      const file=new File([blob],"vida-de-agencia-carrera.png",{type:"image/png"});
+      const text=shareText();
+
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({
+            files:[file],
+            title:"Mi carrera en Vida de Agencia",
+            text
+          });
+          return;
+        }catch(e){
+          if(e.name==="AbortError") return;
+        }
       }
+
+      const link=document.createElement("a");
+      link.href=URL.createObjectURL(blob);
+      link.download="vida-de-agencia-carrera.png";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      alert("La tarjeta se descargó como imagen. Puedes subirla a Instagram.");
+    }
+
+    function shareWhatsApp(){
+      const text=encodeURIComponent(shareText());
+      window.open(`https://wa.me/?text=${text}`,"_blank","noopener,noreferrer");
+    }
+
+    async function shareLinkedIn(){
+      const text=shareText();
+      try{ await navigator.clipboard.writeText(text); }catch(e){}
+      window.open("https://www.linkedin.com/feed/","_blank","noopener,noreferrer");
+      alert("Copiamos el resumen de tu carrera para que puedas pegarlo en LinkedIn.");
+    }
+
+    function discardCareerCard(){
+      document.getElementById("careerFinalCard").classList.add("discarded-card");
+      document.getElementById("discardMessage").classList.remove("hidden");
+      closeShareModal();
     }
 
     function restartGame(){
