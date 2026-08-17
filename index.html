@@ -34,7 +34,7 @@
 
     button, input, select{font:inherit}
     button{cursor:pointer}
-    .app{max-width:1180px;margin:0 auto;padding:24px}
+    .app{max-width:1480px;margin:0 auto;padding:18px 22px}
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:16px;
       margin-bottom:18px;
@@ -121,94 +121,222 @@
     .hidden{display:none!important}
     .setup-footer{display:flex;justify-content:flex-end;margin-top:26px}
 
-    .game-layout{
+    .career-layout{
+      min-height:calc(100vh - 92px);
       display:grid;
-      grid-template-columns:330px minmax(0,1fr);
-      grid-template-areas:"profile decisions";
-      gap:18px;
-      align-items:start;
+      grid-template-columns:minmax(470px,.92fr) minmax(560px,1.28fr);
+      border:1px solid #20202a;
+      border-radius:24px;
+      overflow:hidden;
+      background:#0d0d13;
+      box-shadow:0 28px 90px rgba(0,0,0,.32);
     }
-    .game-card{
-      grid-area:decisions;
-      padding:26px;
-      min-height:630px;
-    }
-    .side-card{
-      grid-area:profile;
-      padding:20px;
-      height:max-content;
-      position:sticky;
-      top:18px;
+    .career-left{
+      min-width:0;
+      border-right:1px solid #24242f;
       background:
-        linear-gradient(180deg,rgba(141,107,255,.10),rgba(255,255,255,.018)),
-        var(--panel);
+        radial-gradient(circle at 8% 0%,rgba(141,107,255,.09),transparent 30%),
+        #0d0d13;
+    }
+    .player-dashboard{
+      padding:22px 24px 18px;
+      border-bottom:1px solid #23232e;
+    }
+    .player-summary{
+      display:grid;
+      grid-template-columns:84px minmax(0,1fr) auto;
+      align-items:start;
+      gap:18px;
+    }
+    .overall-box{
+      width:84px;height:84px;border-radius:18px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background:linear-gradient(150deg,#8d6bff,#5f41d8);
+      box-shadow:0 16px 36px rgba(141,107,255,.18);
+    }
+    .overall-box small{
+      font-size:.63rem;font-weight:900;letter-spacing:.13em;color:rgba(255,255,255,.72)
+    }
+    .overall-box strong{
+      font-size:2.35rem;line-height:.95;letter-spacing:-.06em
+    }
+    .player-identity{min-width:0}
+    .identity-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .identity-line .avatar{
+      width:32px;height:32px;border-radius:10px;font-size:.9rem
+    }
+    .player-identity h3{
+      margin:0;font-size:1.2rem;letter-spacing:-.03em
+    }
+    .player-identity p{
+      margin:6px 0 0;color:var(--muted);font-size:.88rem;line-height:1.35
+    }
+    .player-meta{
+      text-align:right;min-width:125px
+    }
+    .player-meta small{
+      display:block;color:#777787;font-size:.65rem;font-weight:850;letter-spacing:.09em;text-transform:uppercase
+    }
+    .player-meta strong{
+      display:block;font-size:1.35rem;letter-spacing:-.04em;margin:2px 0 10px
+    }
+    .dashboard-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:0;
+      margin-top:20px;
+      border-top:1px solid #20202b;
+      border-bottom:1px solid #20202b;
+    }
+    .mini-stat{
+      padding:13px 10px;text-align:center;border-right:1px solid #20202b
+    }
+    .mini-stat:nth-child(3n){border-right:none}
+    .mini-stat:nth-child(n+4){border-top:1px solid #20202b}
+    .mini-stat small{
+      display:block;color:#6e6e7c;font-size:.61rem;font-weight:900;
+      letter-spacing:.11em;text-transform:uppercase;margin-bottom:4px
+    }
+    .mini-stat strong{font-size:.98rem}
+    .game-card{
+      border:none!important;
+      border-radius:0!important;
+      box-shadow:none!important;
+      background:transparent!important;
+      padding:24px 26px 30px;
+      min-height:430px;
     }
     .year-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
     .year-pill{
-      background:var(--accent);color:#0b0b10;border-radius:999px;padding:8px 12px;
-      font-size:.8rem;font-weight:1000;white-space:nowrap;
+      background:linear-gradient(135deg,#b8ff42,#8dff59);color:#0b0b10;
+      border-radius:999px;padding:7px 11px;font-size:.74rem;font-weight:1000;white-space:nowrap;
     }
-    .decision-progress{
-      display:flex;align-items:center;gap:9px;margin:18px 0 8px;
-      padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#111118;
+    .decision-progress{display:none!important}
+    .event-kicker{
+      color:#8070f1;font-size:.7rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase
     }
-    .decision-progress strong{font-size:.82rem;margin-right:auto}
-    .decision-dot{
-      width:11px;height:11px;border-radius:999px;background:#353545;
-      box-shadow:0 0 0 1px #48485c inset;
+    .game-card h2{
+      font-size:1.8rem!important;letter-spacing:-.045em!important;margin:5px 0 8px!important
     }
-    .decision-dot.active{background:var(--accent);box-shadow:0 0 0 4px rgba(184,255,66,.10)}
-    .decision-dot.done{background:var(--accent-2)}
-    .event-kicker{color:var(--accent-2);font-size:.78rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
-    .event-text{color:#d8d8df;line-height:1.65;font-size:1.02rem}
+    .event-text{color:#c9c9d3;line-height:1.55;font-size:.96rem}
     .quote{
-      padding:16px 18px;border-left:4px solid var(--accent-2);background:#111118;
-      border-radius:0 14px 14px 0;color:#ededf2;margin:18px 0;
+      padding:13px 15px;border-left:3px solid #765ce8;background:#111118;
+      border-radius:0 11px 11px 0;color:#e8e8ee;margin:15px 0;
+      font-size:.88rem;
     }
-    .options{display:grid;gap:11px;margin-top:22px}
+    .options{display:grid;gap:9px;margin-top:17px}
     .option-btn{
-      text-align:left;border:1px solid var(--line);background:#181821;color:var(--text);
-      border-radius:16px;padding:16px 17px;line-height:1.45;font-weight:700;
+      text-align:left;border:1px solid #282834;background:#15151d;color:var(--text);
+      border-radius:13px;padding:13px 14px;line-height:1.38;font-weight:720;font-size:.9rem;
     }
-    .option-btn:hover{border-color:var(--accent-2);background:#20202d}
+    .option-btn:hover{border-color:#755fe5;background:#1b1b27}
     .consequence{
-      display:none;margin-top:20px;padding:18px;border-radius:18px;
-      background:linear-gradient(135deg,rgba(141,107,255,.13),rgba(184,255,66,.06));
-      border:1px solid #39394b;
+      display:none;margin-top:16px;padding:15px;border-radius:14px;
+      background:#12121a;border:1px solid #2d2d3b;
     }
     .consequence.active{display:block}
-    .consequence h3{margin:0 0 8px}
-    .effect-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-    .chip{font-size:.8rem;border-radius:999px;padding:7px 10px;background:#222230;border:1px solid #353548}
+    .consequence h3{margin:0 0 7px;font-size:1rem}
+    .consequence p{font-size:.88rem;line-height:1.5;color:#cfcfd8}
+    .effect-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+    .chip{font-size:.7rem;border-radius:999px;padding:6px 8px;background:#20202b;border:1px solid #323242}
     .chip.good{color:var(--good)}
     .chip.bad{color:#ff8ca1}
     .chip.warn{color:var(--warning)}
-    .next-wrap{display:flex;justify-content:flex-end;margin-top:16px}
+    .next-wrap{display:flex;justify-content:flex-end;margin-top:13px}
+    .career-left-note{
+      padding:0 26px 22px;color:#686878;font-size:.66rem;line-height:1.45
+    }
 
-    .profile{
-      display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line);
+    .career-board{
+      min-width:0;
+      background:#101016;
+      padding:14px 16px 18px;
+      overflow:hidden;
     }
-    .avatar{
-      width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--accent-2),#ef64ff);
-      display:grid;place-items:center;font-size:1.25rem;font-weight:1000;
+    .career-board-title{
+      display:flex;align-items:center;justify-content:space-between;
+      min-height:44px;border-bottom:1px solid #252530;padding:0 7px 10px
     }
-    .profile h3{margin:0;font-size:1rem}
-    .profile p{margin:3px 0 0;color:var(--muted);font-size:.86rem}
-    .salary{
-      margin:16px 0;padding:14px;border-radius:16px;background:#101016;border:1px solid var(--line);
+    .career-board-title strong{
+      font-size:.85rem;letter-spacing:.12em;text-transform:uppercase
     }
-    .salary small{color:var(--muted)}
-    .salary strong{display:block;font-size:1.28rem;margin-top:4px}
-    .stats{display:grid;gap:12px}
-    .stat-head{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px}
-    .stat-head span:last-child{color:var(--muted)}
-    .bar{height:9px;background:#282836;border-radius:999px;overflow:hidden}
-    .bar > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent-2),var(--accent));width:50%}
-    .bar.danger > i{background:linear-gradient(90deg,#ffcf4a,var(--danger))}
-    .timeline{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
-    .timeline h4{margin:0 0 10px}
-    .timeline-list{display:grid;gap:8px;max-height:210px;overflow:auto;padding-right:4px}
-    .timeline-item{font-size:.78rem;color:#c8c8d2;padding:9px 10px;background:#111118;border-radius:10px}
+    .career-board-title span{font-size:.72rem;color:#737380}
+    .career-table-head,.career-row{
+      display:grid;
+      grid-template-columns:58px minmax(150px,1.25fr) minmax(125px,1fr) 92px;
+      align-items:center;gap:8px;
+    }
+    .career-table-head{
+      padding:10px 8px 7px;color:#5c5c69;font-size:.62rem;font-weight:900;
+      letter-spacing:.1em;text-transform:uppercase
+    }
+    .career-rows{
+      max-height:calc(100vh - 245px);
+      overflow:auto;
+      scrollbar-width:thin;
+      padding-right:3px;
+    }
+    .career-row{
+      min-height:38px;padding:7px 8px;border-radius:9px;
+      color:#646471;font-size:.78rem;border:1px solid transparent
+    }
+    .career-row:nth-child(odd){background:rgba(255,255,255,.012)}
+    .career-row.current{
+      color:#f7f7fa;background:#1e1e29;border-color:#30303e
+    }
+    .career-row.current .year-cell{
+      background:linear-gradient(135deg,#8d6bff,#684fd2);color:white
+    }
+    .career-row.past{color:#b9b9c4}
+    .career-row.future{opacity:.34}
+    .year-cell{
+      width:34px;height:24px;border-radius:7px;display:grid;place-items:center;
+      font-weight:950;font-size:.71rem
+    }
+    .agency-cell{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .role-cell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .salary-cell{text-align:right;font-weight:800;white-space:nowrap}
+    .career-milestones{
+      border-top:1px solid #24242f;margin-top:12px;padding:13px 8px 0
+    }
+    .career-milestones h4{
+      margin:0 0 8px;font-size:.7rem;color:#777786;letter-spacing:.1em;text-transform:uppercase
+    }
+    .timeline-list{
+      display:flex;gap:6px;overflow:auto;padding-bottom:4px;scrollbar-width:thin
+    }
+    .timeline-item{
+      flex:0 0 auto;max-width:250px;font-size:.66rem;color:#aaaab6;
+      padding:7px 9px;background:#15151d;border:1px solid #252532;border-radius:8px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+    }
+
+    #agencyModal{
+      left:0;right:auto;width:46vw;min-width:520px;
+      background:rgba(5,5,9,.88);
+      place-items:center;
+      padding:24px;
+    }
+    #agencyModal .modal-card{
+      width:min(650px,100%);max-width:none;
+      background:#111118;border-radius:18px;padding:22px;
+    }
+    #agencyModal .agency-offers{
+      grid-template-columns:1fr 1fr;gap:10px
+    }
+    #agencyModal .agency-offer{
+      min-height:150px;border-radius:14px;padding:14px;background:#171720
+    }
+    #agencyModal .agency-offer strong{
+      display:block;font-size:.94rem
+    }
+    #agencyModal .agency-offer strong span{
+      display:block!important;margin:0 0 5px!important
+    }
+    #agencyModal .agency-offer small{
+      font-size:.71rem;line-height:1.35
+    }
+
     .disclaimer{
       margin-top:14px;color:#8e8e9e;font-size:.72rem;line-height:1.45;
     }
@@ -248,13 +376,15 @@
 
     @media (max-width:900px){
       .hero,.result-grid{grid-template-columns:1fr}
-      .game-layout{
-        grid-template-columns:1fr;
-        grid-template-areas:
-          "profile"
-          "decisions";
-      }
-      .side-card{position:static}
+      .career-layout{grid-template-columns:1fr}
+      .career-left{border-right:none;border-bottom:1px solid #24242f}
+      .career-board{min-height:500px}
+      .career-rows{max-height:520px}
+      #agencyModal{width:100%;min-width:0;right:0}
+      #agencyModal .agency-offers{grid-template-columns:1fr}
+      .player-summary{grid-template-columns:72px 1fr}
+      .player-meta{grid-column:1/-1;text-align:left;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .player-meta strong{font-size:1.05rem}
       .hero-card{padding:28px}
       .hero{min-height:auto}
     }
@@ -289,7 +419,7 @@
             <div class="eyebrow">ELIGE · SOBREVIVE · ENTREGA</div>
             <h1>Sobrevive al brief.</h1>
             <p class="hero-copy">
-              Empieza desde el cargo que elijas, enfrenta tres decisiones por año y descubre si terminas dirigiendo campañas,
+              Empieza desde el cargo que elijas, enfrenta una decisión clave por año y descubre si terminas dirigiendo campañas,
               cobrando facturas freelance, trabajando para una marca o abandonando el rubro con tu salud mental intacta.
             </p>
             <div class="hero-actions">
@@ -373,62 +503,89 @@
       </section>
 
       <section id="game" class="screen">
-        <div class="game-layout">
-          <article class="game-card">
-            <div class="eyebrow" style="margin-bottom:10px">DECISIONES DEL AÑO</div>
-            <div class="year-row">
-              <div>
-                <div class="event-kicker" id="eventKicker">AÑO 1 · AGENCIA</div>
-                <h2 id="eventTitle">Tu primer día</h2>
-              </div>
-              <div class="year-pill" id="yearPill">Año 1</div>
-            </div>
-            <div class="decision-progress" id="decisionProgress">
-              <strong id="decisionProgressLabel">Decisión 1 de 3</strong>
-              <i class="decision-dot active"></i>
-              <i class="decision-dot"></i>
-              <i class="decision-dot"></i>
-            </div>
-            <p class="event-text" id="eventText"></p>
-            <div class="quote" id="eventQuote"></div>
-            <div class="options" id="options"></div>
+        <div class="career-layout">
+          <div class="career-left">
+            <section class="player-dashboard">
+              <div class="player-summary">
+                <div class="overall-box">
+                  <small>NIVEL</small>
+                  <strong id="overallValue">50</strong>
+                </div>
 
-            <div class="consequence" id="consequence">
-              <h3 id="consequenceTitle">Consecuencia</h3>
-              <p id="consequenceText"></p>
-              <div class="effect-chips" id="effectChips"></div>
-              <div class="next-wrap">
-                <button id="consequenceNextBtn" class="btn btn-primary" onclick="proceedAfterDecision()">Siguiente decisión</button>
-              </div>
-            </div>
-          </article>
+                <div class="player-identity">
+                  <div class="identity-line">
+                    <div class="avatar" id="avatar">P</div>
+                    <h3 id="profileName">Publicista</h3>
+                  </div>
+                  <p id="profileRole">Práctica</p>
+                  <p>
+                    <strong id="workplaceValue" style="color:#f2f2f5">Agencia inicial</strong>
+                    · <span id="agencyTierValue">Boutique / independiente</span>
+                  </p>
+                </div>
 
-          <aside class="side-card">
-            <div class="eyebrow" style="margin-bottom:14px">TU ESTADO ACTUAL</div>
-            <div class="profile">
-              <div class="avatar" id="avatar">P</div>
-              <div>
-                <h3 id="profileName">Publicista</h3>
-                <p id="profileRole">Junior</p>
+                <div class="player-meta">
+                  <small>Año de carrera</small>
+                  <strong id="careerYearValue">1</strong>
+                  <small>Sueldo simulado</small>
+                  <strong id="salaryValue">$280.000</strong>
+                  <small id="salaryStageValue" style="text-transform:none;letter-spacing:0;color:#81818f">Etapa inicial</small>
+                </div>
               </div>
+
+              <div class="dashboard-stats" id="stats"></div>
+            </section>
+
+            <article class="game-card">
+              <div class="eyebrow" style="margin-bottom:8px">DECISIÓN DEL AÑO</div>
+              <div class="year-row">
+                <div>
+                  <div class="event-kicker" id="eventKicker">AÑO 1 · AGENCIA</div>
+                  <h2 id="eventTitle">Tu primer día</h2>
+                </div>
+                <div class="year-pill" id="yearPill">Año 1</div>
+              </div>
+
+              <div class="decision-progress" id="decisionProgress">
+                <strong id="decisionProgressLabel">Decisión del año</strong>
+              </div>
+
+              <p class="event-text" id="eventText"></p>
+              <div class="quote" id="eventQuote"></div>
+              <div class="options" id="options"></div>
+
+              <div class="consequence" id="consequence">
+                <h3 id="consequenceTitle">Consecuencia</h3>
+                <p id="consequenceText"></p>
+                <div class="effect-chips" id="effectChips"></div>
+                <div class="next-wrap">
+                  <button id="consequenceNextBtn" class="btn btn-primary" onclick="proceedAfterDecision()">Ver ofertas y cerrar el año</button>
+                </div>
+              </div>
+            </article>
+
+            <div class="career-left-note">
+              Los nombres de agencias son referencias reales del mercado chileno. Los sueldos, ofertas, niveles y consecuencias son simulaciones del juego y no describen condiciones laborales reales de esas empresas.
             </div>
-            <div class="salary">
-              <small>Sueldo simulado</small>
-              <strong id="salaryValue">$650.000</strong>
-              <small id="workplaceValue">Agencia inicial</small>
-              <small id="agencyTierValue" style="display:block;margin-top:4px;color:var(--accent-2)">Boutique / independiente</small>
-              <small id="salaryStageValue" style="display:block;margin-top:5px;color:var(--muted)">Progresión anual activa</small>
+          </div>
+
+          <aside class="career-board">
+            <div class="career-board-title">
+              <strong>Trayectoria profesional</strong>
+              <span id="careerBoardStatus">Eligiendo tu camino...</span>
             </div>
-            <div class="stats" id="stats"></div>
-            <div class="timeline">
-              <h4>Tu historial</h4>
+            <div class="career-table-head">
+              <span>Año</span>
+              <span>Agencia</span>
+              <span>Cargo</span>
+              <span style="text-align:right">Sueldo</span>
+            </div>
+            <div class="career-rows" id="careerRows"></div>
+
+            <div class="career-milestones">
+              <h4>Últimos hitos</h4>
               <div class="timeline-list" id="timelineList"></div>
             </div>
-            <p class="disclaimer">
-              Esta experiencia es ficción inspirada en situaciones frecuentes del rubro. No romantiza la explotación,
-              el burnout ni el consumo problemático. Los nombres de agencias son referencias reales del mercado;
-              los niveles de acceso, sueldos, efectos y condiciones del juego son ficticios y no describen a esas empresas.
-            </p>
           </aside>
         </div>
       </section>
@@ -488,8 +645,8 @@
       <div id="agencyOffers" class="agency-offers"></div>
       <button class="btn btn-secondary" style="width:100%" onclick="chooseToStay()">Opción 3: quedarme en mi agencia actual</button>
       <p class="agency-source">
-        Los nombres se incorporan como referencias del ecosistema publicitario chileno a partir de rankings, finalistas y jurados Effie Chile 2024–2025.
-        Los niveles de experiencia, categorías, aumentos y consecuencias son mecánicas ficticias, no requisitos ni evaluaciones laborales de las agencias.
+        Catálogo ampliado con referencias de Cámara de Empresas Creativas de Chile, Effie Chile y Asociación de Agencias de Medios.
+        La lista busca representar ampliamente el mercado, pero no pretende ser un registro oficial exhaustivo. Los sueldos, niveles y ofertas son ficticios.
       </p>
     </div>
   </div>
@@ -510,9 +667,11 @@
       year: 1,
       maxYears: 12,
       questionInYear: 1,
-      questionsPerYear: 3,
+      questionsPerYear: 1,
       salary: 650000,
       completedYears: 0,
+      careerStartYear: 1,
+      careerRows: [],
       workplace: "",
       agencyTier: "boutique",
       pendingAgencyOffers: [],
@@ -547,62 +706,96 @@
     // No representa requisitos reales de contratación.
     const agencyPools = {
       boutique: [
-        {name:"La Vulca", tier:"boutique", minLevel:0},
-        {name:"BOND", tier:"boutique", minLevel:0},
-        {name:"Berlín", tier:"boutique", minLevel:0},
-        {name:"Puer.to", tier:"boutique", minLevel:0},
-        {name:"FRI", tier:"boutique", minLevel:0},
-        {name:"Redon", tier:"boutique", minLevel:0},
-        {name:"LOCA Santiago", tier:"boutique", minLevel:0},
-        {name:"La Firma", tier:"boutique", minLevel:0},
-        {name:"MODO1984", tier:"boutique", minLevel:0},
-        {name:"Thrive", tier:"boutique", minLevel:0},
-        {name:"Kinderlab", tier:"boutique", minLevel:0},
-        {name:"Dale Publicidad", tier:"boutique", minLevel:0},
-        {name:"Jelly", tier:"boutique", minLevel:0},
-        {name:"Barlovento", tier:"boutique", minLevel:0},
-        {name:"Buena Suerte", tier:"boutique", minLevel:0},
-        {name:"Estudio B", tier:"boutique", minLevel:0},
-        {name:"Propalta", tier:"boutique", minLevel:0},
-        {name:"Walkers", tier:"boutique", minLevel:0},
-        {name:"Bla!", tier:"boutique", minLevel:0},
-        {name:"Mkzeta", tier:"boutique", minLevel:0}
+        {name:"La Vulca", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"BOND", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Berlín", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Puer.to", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"FRI", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Redon", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"LOCA Santiago", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Firma07", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Eighteen", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"MODO1984", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Thrive", tier:"boutique", minLevel:0, focus:"digital"},
+        {name:"Kinderlab", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Dale Publicidad", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Jelly", tier:"boutique", minLevel:0, focus:"digital"},
+        {name:"Buena Suerte", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Estudio B", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Agencia Opendor", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Buentipo", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Promored", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Want Digital", tier:"boutique", minLevel:0, focus:"digital"},
+        {name:"Not Media", tier:"boutique", minLevel:0, focus:"digital"},
+        {name:"Cabeza", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Corpo Comunicaciones", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Pedro Juan y Diego", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Rubik Deep Thinking", tier:"boutique", minLevel:0, focus:"strategy"},
+        {name:"Agencia Land", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Agencia Espinaca", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Inbrax", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Sábado", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Pasto Seco", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Jenaro", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Agencia Playa", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"Cebra", tier:"boutique", minLevel:0, focus:"digital"},
+        {name:"Metrix", tier:"boutique", minLevel:0, focus:"media"},
+        {name:"Agencia Quiroga", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Aldea Santiago", tier:"boutique", minLevel:0, focus:"creative"},
+        {name:"CBR Comunicación", tier:"boutique", minLevel:0, focus:"integrated"},
+        {name:"Briones y Asociados", tier:"boutique", minLevel:0, focus:"integrated"}
       ],
       independent: [
-        {name:"10:10", tier:"independent", minLevel:1},
-        {name:"MEAT", tier:"independent", minLevel:1},
-        {name:"Raya", tier:"independent", minLevel:1},
-        {name:"Grupo Mass", tier:"independent", minLevel:1},
-        {name:"Wolf BCPP", tier:"independent", minLevel:1},
-        {name:"Porta", tier:"independent", minLevel:1},
-        {name:"Groenlandia", tier:"independent", minLevel:1},
-        {name:"Moov Media Group", tier:"independent", minLevel:1},
-        {name:"BPN Chile", tier:"independent", minLevel:1},
-        {name:"Rebold Chile", tier:"independent", minLevel:1},
-        {name:"Mosst", tier:"independent", minLevel:1},
-        {name:"SimpleWorks Marketing", tier:"independent", minLevel:1},
-        {name:"La Familia", tier:"independent", minLevel:1},
-        {name:"Strong", tier:"independent", minLevel:1},
-        {name:"ALTA Comunicación", tier:"independent", minLevel:1}
+        {name:"10:10", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"MEAT", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Raya", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Grupo Mass", tier:"independent", minLevel:1, focus:"digital"},
+        {name:"Wolf BCPP", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Porta", tier:"independent", minLevel:1, focus:"integrated"},
+        {name:"Groenlandia", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Moov Media Group", tier:"independent", minLevel:1, focus:"media"},
+        {name:"BPN Chile", tier:"independent", minLevel:1, focus:"media"},
+        {name:"Rebold Chile", tier:"independent", minLevel:1, focus:"digital"},
+        {name:"La Familia", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"ALTA Comunicación", tier:"independent", minLevel:1, focus:"integrated"},
+        {name:"DYU", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Nexoplay TV", tier:"independent", minLevel:1, focus:"digital"},
+        {name:"Bestión", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Frisbi Marketing", tier:"independent", minLevel:1, focus:"digital"},
+        {name:"Punk Robot", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"Ultravioleta", tier:"independent", minLevel:1, focus:"creative"},
+        {name:"GyT Group", tier:"independent", minLevel:1, focus:"integrated"},
+        {name:"Poston Works", tier:"independent", minLevel:1, focus:"digital"}
       ],
       global: [
-        {name:"BBDO Chile", tier:"global", minLevel:2},
-        {name:"VML Chile", tier:"global", minLevel:2},
-        {name:"McCann Santiago", tier:"global", minLevel:2},
-        {name:"DDB Chile", tier:"global", minLevel:2},
-        {name:"Ogilvy Chile", tier:"global", minLevel:2},
-        {name:"Initiative", tier:"global", minLevel:2},
-        {name:"Hearts & Science", tier:"global", minLevel:2},
-        {name:"Havas Chile", tier:"global", minLevel:2},
-        {name:"Cheil Chile", tier:"global", minLevel:2},
-        {name:"OMD Chile", tier:"global", minLevel:2},
-        {name:"Publicis Groupe Chile", tier:"global", minLevel:2},
-        {name:"UM Chile", tier:"global", minLevel:2},
-        {name:"KINESSO Chile", tier:"global", minLevel:2},
-        {name:"WPP Media Chile", tier:"global", minLevel:2},
-        {name:"MRM Chile", tier:"global", minLevel:2},
-        {name:"Zenith Chile", tier:"global", minLevel:2},
-        {name:"Arena Media Chile", tier:"global", minLevel:2}
+        {name:"Accenture Song", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"BBDO Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"VML Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"McCann Santiago", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"DDB Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"Ogilvy Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"Cheil Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"Publicis Groupe Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"Digitas Chile", tier:"global", minLevel:2, focus:"digital"},
+        {name:"MRM Chile", tier:"global", minLevel:2, focus:"digital"},
+        {name:"Havas Chile", tier:"global", minLevel:2, focus:"integrated"},
+        {name:"Initiative", tier:"global", minLevel:2, focus:"media"},
+        {name:"Hearts & Science", tier:"global", minLevel:2, focus:"media"},
+        {name:"OMD Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"PHD Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"UM Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"KINESSO Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Mindshare Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Wavemaker Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"EssenceMediacom Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Starcom Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Zenith Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Arena Media Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Carat Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Dentsu X Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Havas Media Group", tier:"global", minLevel:2, focus:"media"},
+        {name:"WPP Media Chile", tier:"global", minLevel:2, focus:"media"},
+        {name:"Publicis Media Chile", tier:"global", minLevel:2, focus:"media"}
       ]
     };
 
@@ -667,27 +860,27 @@
     const agencyTierMeta = {
       boutique: {
         label:"Boutique / independiente",
-        copy:"Equipos más compactos, funciones amplias y mayor cercanía con los proyectos.",
+        copy:"Equipo compacto y responsabilidades amplias.",
         startSalary:0,
-        startEffects:{portafolio:4,salud:3,vida:2},
-        raise:[0.04,0.10],
-        effects:{carrera:3,reputacion:2,portafolio:6,salud:2,vida:1}
+        startEffects:{portafolio:3,salud:2,vida:2},
+        raise:[0.015,0.035],
+        effects:{carrera:2,reputacion:2,portafolio:3,salud:1}
       },
       independent: {
-        label:"Independiente consolidada",
-        copy:"Más exposición, cuentas de mayor escala y espacio para especializarte.",
-        startSalary:90000,
-        startEffects:{carrera:4,reputacion:3,salud:-2},
-        raise:[0.10,0.18],
-        effects:{carrera:6,reputacion:6,portafolio:5,salud:-2,vida:-1}
+        label:"Agencia consolidada",
+        copy:"Más exposición y cuentas de mayor escala.",
+        startSalary:30000,
+        startEffects:{carrera:3,reputacion:2},
+        raise:[0.025,0.05],
+        effects:{carrera:4,reputacion:3,portafolio:3,salud:-1}
       },
       global: {
-        label:"Red global / gran agencia",
-        copy:"Procesos regionales, marcas grandes y mayor visibilidad dentro de la industria.",
-        startSalary:170000,
-        startEffects:{carrera:7,reputacion:5,salud:-5,vida:-3},
-        raise:[0.18,0.28],
-        effects:{carrera:9,reputacion:9,portafolio:6,salud:-4,vida:-3}
+        label:"Red / gran agencia",
+        copy:"Mayor escala, procesos regionales y marcas grandes.",
+        startSalary:60000,
+        startEffects:{carrera:4,reputacion:4,salud:-2},
+        raise:[0.035,0.065],
+        effects:{carrera:5,reputacion:5,portafolio:3,salud:-2,vida:-1}
       }
     };
 
@@ -1990,11 +2183,18 @@
       renderStartingAgencies();
     }
 
+    function agencyFitsTrack(agency){
+      if(state.track==="Medios"){
+        return agency.focus==="media" || agency.focus==="integrated" || agency.focus==="digital";
+      }
+      return agency.focus!=="media" || agency.focus==="integrated";
+    }
+
     function eligibleStartingAgencies(){
       if(state.experienceLevel===null) return [];
       return Object.values(agencyPools)
         .flat()
-        .filter(agency=>agency.minLevel<=currentMarketLevel())
+        .filter(agency=>agency.minLevel<=currentMarketLevel() && agencyFitsTrack(agency))
         .sort((a,b)=>{
           const recommendedTier=currentMarketLevel()===0?"boutique":currentMarketLevel()===1?"independent":"global";
           const recommendedA=(a.tier===recommendedTier)?0:1;
@@ -2032,7 +2232,7 @@
         btn.dataset.agency=agency.name;
         btn.dataset.tier=agency.tier;
 
-        const tierBonus=meta.startSalary||0;
+        const tierBonus=profile.startYears>=1 ? (meta.startSalary||0) : 0;
         const projectedSalary=profile.baseSalary+tierBonus;
         const badge=isRecommended ? "Recomendada para tu nivel" : "También disponible";
 
@@ -2084,7 +2284,9 @@
       state.experienceYears=experience.startYears;
       state.startExperienceYears=experience.startYears;
       state.year=experience.careerYear;
+      state.careerStartYear=state.year;
       state.maxYears=state.year+11;
+      state.careerRows=[];
       state.workplace=state.selectedAgency;
       state.agencyTier=state.selectedAgencyTier;
 
@@ -2098,6 +2300,7 @@
 
       showScreen('game');
       addHistory(`Inicio · ${state.experienceLabel} en ${state.workplace} como ${currentRole()}.`);
+      recordCareerSnapshot(state.year);
       renderProfile();
       loadEvent();
     }
@@ -2117,7 +2320,7 @@
 
     function pickAgency(tier){
       const marketLevel=currentMarketLevel();
-      const eligible=(agencyPools[tier]||[]).filter(a=>a.minLevel<=marketLevel);
+      const eligible=(agencyPools[tier]||[]).filter(a=>a.minLevel<=marketLevel && agencyFitsTrack(a));
       const list=eligible.filter(a=>a.name!==state.workplace);
       const source=list.length?list:eligible.length?eligible:agencyPools[tier];
       return source[Math.floor(Math.random()*source.length)];
@@ -2136,6 +2339,56 @@
       return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.max(0,Math.round(v)));
     }
 
+    function careerOverall(){
+      const raw=(state.stats.carrera+state.stats.reputacion+state.stats.portafolio+state.stats.salud)/4;
+      return Math.max(1,Math.min(99,Math.round(raw)));
+    }
+
+    function recordCareerSnapshot(year){
+      const snapshot={
+        year,
+        agency:state.workplace,
+        role:currentRole(),
+        salary:state.salary
+      };
+      const index=state.careerRows.findIndex(row=>row.year===year);
+      if(index>=0) state.careerRows[index]=snapshot;
+      else state.careerRows.push(snapshot);
+      state.careerRows.sort((a,b)=>a.year-b.year);
+    }
+
+    function renderCareerBoard(){
+      const holder=document.getElementById("careerRows");
+      if(!holder) return;
+
+      const start=state.careerStartYear || state.year;
+      const end=state.maxYears || (start+11);
+      holder.innerHTML="";
+
+      for(let year=start; year<=end; year++){
+        const data=state.careerRows.find(row=>row.year===year);
+        const row=document.createElement("div");
+        row.className="career-row";
+
+        if(year<state.year) row.classList.add("past");
+        else if(year===state.year) row.classList.add("current");
+        else row.classList.add("future");
+
+        row.innerHTML=`
+          <div class="year-cell">${year}</div>
+          <div class="agency-cell">${data ? data.agency : "—"}</div>
+          <div class="role-cell">${data ? data.role : ""}</div>
+          <div class="salary-cell">${data ? formatMoney(data.salary) : ""}</div>
+        `;
+        holder.appendChild(row);
+      }
+
+      const status=document.getElementById("careerBoardStatus");
+      if(status){
+        status.textContent=`${currentRole()} · ${state.workplace}`;
+      }
+    }
+
     function renderProfile(){
       document.getElementById('avatar').textContent=(state.name[0]||"P").toUpperCase();
       document.getElementById('profileName').textContent=state.name;
@@ -2143,31 +2396,37 @@
       document.getElementById('salaryValue').textContent=formatMoney(state.salary);
       document.getElementById('workplaceValue').textContent=state.workplace;
       document.getElementById('agencyTierValue').textContent=tierLabel(state.agencyTier);
+      document.getElementById('overallValue').textContent=careerOverall();
+      document.getElementById('careerYearValue').textContent=state.year;
+
       const salaryStage=document.getElementById('salaryStageValue');
       if(state.experienceYears<1){
-        salaryStage.textContent="Práctica · al terminar, base junior aprox. $600.000";
+        salaryStage.textContent="Práctica · luego aprox. $600.000";
       }else{
-        salaryStage.textContent="Sueldo con progresión anual desde el Año 2";
+        salaryStage.textContent="Ajustes anuales graduales";
       }
 
       const statsEl=document.getElementById('stats');
+      const compactKeys=["carrera","reputacion","portafolio","dinero","salud","vida"];
       statsEl.innerHTML="";
-      Object.entries(state.stats).forEach(([key,val])=>{
+      compactKeys.forEach(key=>{
+        const val=state.stats[key];
         const meta=statsMeta[key];
         const wrap=document.createElement('div');
-        wrap.innerHTML=`
-          <div class="stat-head"><span>${meta.icon} ${meta.label}</span><span>${Math.round(val)}/100</span></div>
-          <div class="bar ${meta.danger?'danger':''}"><i style="width:${Math.max(0,Math.min(100,val))}%"></i></div>
-        `;
+        wrap.className="mini-stat";
+        wrap.innerHTML=`<small>${meta.label}</small><strong>${Math.round(val)}</strong>`;
         statsEl.appendChild(wrap);
       });
+
+      renderCareerBoard();
     }
 
     function addHistory(text){
       state.history.unshift(text);
       const list=document.getElementById('timelineList');
+      if(!list) return;
       list.innerHTML="";
-      state.history.slice(0,16).forEach(item=>{
+      state.history.slice(0,10).forEach(item=>{
         const div=document.createElement('div');
         div.className='timeline-item';
         div.textContent=item;
@@ -2197,7 +2456,7 @@
 
     function renderDecisionProgress(){
       const current=state.questionInYear;
-      document.getElementById("decisionProgressLabel").textContent=`Decisión ${current} de ${state.questionsPerYear}`;
+      document.getElementById("decisionProgressLabel").textContent="Decisión del año";
       document.querySelectorAll("#decisionProgress .decision-dot").forEach((dot,index)=>{
         dot.classList.remove("active","done");
         const position=index+1;
@@ -2233,8 +2492,8 @@
       state.currentEvent=chosen;
       state.usedEvents.push(chosen.id);
 
-      document.getElementById('eventKicker').textContent=`AÑO ${state.year} · DECISIÓN ${state.questionInYear} DE ${state.questionsPerYear} · ${state.workplace.toUpperCase()}`;
-      document.getElementById('yearPill').textContent=`Año ${state.year} · ${state.questionInYear}/${state.questionsPerYear}`;
+      document.getElementById('eventKicker').textContent=`AÑO ${state.year} · ${state.workplace.toUpperCase()}`;
+      document.getElementById('yearPill').textContent=`Año ${state.year}`;
       document.getElementById('eventTitle').textContent=chosen.title;
       document.getElementById('eventText').textContent=chosen.text;
       document.getElementById('eventQuote').textContent=chosen.quote;
@@ -2301,15 +2560,12 @@
         chips.appendChild(c);
       }
 
-      addHistory(`Año ${state.year} · Decisión ${state.questionInYear}/${state.questionsPerYear} · ${event.title}: ${opt.text}`);
+      addHistory(`Año ${state.year} · ${event.title}: ${opt.text}`);
+      recordCareerSnapshot(state.year);
       renderProfile();
 
       const nextBtn=document.getElementById("consequenceNextBtn");
-      if(state.questionInYear<state.questionsPerYear){
-        nextBtn.textContent=`Ir a la decisión ${state.questionInYear+1} de ${state.questionsPerYear}`;
-      }else{
-        nextBtn.textContent="Revisar 2 ofertas y cerrar el año";
-      }
+      nextBtn.textContent="Ver 2 ofertas y cerrar el año";
 
       document.getElementById('consequence').classList.add('active');
     }
@@ -2329,26 +2585,22 @@
       const justFinishedPractice=state.startExperienceYears<1 && state.completedYears===0;
 
       if(justFinishedPractice){
-        state.salary=Math.max(state.salary,600000);
+        state.salary=600000;
         addHistory(`Fin de práctica · Pasas a contrato junior con sueldo simulado de ${formatMoney(state.salary)}.`);
         return;
       }
 
-      // Desde el segundo año de carrera, siempre existe crecimiento salarial base.
-      // Es una mecánica del simulador, no una tabla salarial real.
       const years=Math.max(1,state.experienceYears);
-      let growthRate=0.07;
+      let growthRate=0.025;
+      if(years>=3) growthRate=0.03;
+      if(years>=5) growthRate=0.035;
+      if(years>=7) growthRate=0.04;
 
-      if(years>=3) growthRate=0.08;
-      if(years>=5) growthRate=0.09;
-      if(years>=7) growthRate=0.10;
-      if(years>=9) growthRate=0.11;
-
-      const minimumIncrease=years<3 ? 45000 : years<5 ? 65000 : years<7 ? 85000 : 110000;
+      const minimumIncrease=years<3 ? 18000 : years<5 ? 25000 : years<7 ? 32000 : 40000;
       const increase=Math.max(minimumIncrease,Math.round(state.salary*growthRate));
       state.salary+=increase;
 
-      addHistory(`Progresión salarial · ${formatMoney(previous)} → ${formatMoney(state.salary)}.`);
+      addHistory(`Ajuste salarial anual · ${formatMoney(previous)} → ${formatMoney(state.salary)}.`);
     }
 
     function annualReview(){
@@ -2362,7 +2614,7 @@
 
       if(score>62 && canBePromoted && Math.random()<0.55){
         state.roleIndex++;
-        const promotionIncrease=110000 + state.roleIndex*30000;
+        const promotionIncrease=45000 + state.roleIndex*12000;
         state.salary+=promotionIncrease;
         state.stats.carrera+=5;
         note=`Ascendiste a ${currentRole()} y sumaste ${formatMoney(promotionIncrease)} por promoción.`;
@@ -2392,12 +2644,12 @@
       const marketLevel=currentMarketLevel();
       let eligible=Object.values(agencyPools)
         .flat()
-        .filter(agency=>agency.minLevel<=marketLevel && agency.name!==state.workplace);
+        .filter(agency=>agency.minLevel<=marketLevel && agency.name!==state.workplace && agencyFitsTrack(agency));
 
       if(eligible.length<2){
         eligible=Object.values(agencyPools)
           .flat()
-          .filter(agency=>agency.name!==state.workplace);
+          .filter(agency=>agency.name!==state.workplace && agencyFitsTrack(agency));
       }
 
       const shuffled=[...eligible].sort(()=>Math.random()-.5);
@@ -2416,11 +2668,11 @@
       });
       state.pendingAgencyOffers=offers;
 
-      document.getElementById("agencyModalTitle").textContent=`Año ${state.year}: ¿te quedas en ${state.workplace} o cambias?`;
+      document.getElementById("agencyModalTitle").textContent=`Ofertas para tu próximo año`;
       document.getElementById("agencyModalCopy").textContent=
         state.flags.jobSearch
           ? "Ya habías decidido mirar el mercado. Revisa dos ofertas o quédate un año más donde estás."
-          : "Terminaste las tres decisiones del año. Ahora puedes elegir entre dos agencias o quedarte donde estás.";
+          : `Dos agencias quieren sumarte. También puedes seguir en ${state.workplace}.`;
 
       const holder=document.getElementById("agencyOffers");
       holder.innerHTML="";
@@ -2474,6 +2726,10 @@
       annualReview();
       state.year++;
       state.questionInYear=1;
+
+      if(state.year<=state.maxYears){
+        recordCareerSnapshot(state.year);
+      }
       renderProfile();
 
       if(shouldEnd()){
@@ -2562,7 +2818,7 @@
         <p>${state.workplace} · ${tierLabel(state.agencyTier)}</p>
         <p>Sueldo final: <strong>${formatMoney(state.salary)}</strong></p>
         <p>Años jugados: <strong>12</strong></p>
-        <p>Decisiones laborales: <strong>36</strong></p>
+        <p>Decisiones laborales: <strong>12</strong></p>
       `;
       const fs=document.getElementById('finalStats');
       fs.innerHTML=Object.entries(state.stats).map(([k,v])=>`
