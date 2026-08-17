@@ -180,6 +180,55 @@
     .player-meta strong{
       display:block;font-size:1.35rem;letter-spacing:-.04em;margin:2px 0 10px
     }
+    .live-awards{
+      margin-top:18px;
+      padding:13px 14px;
+      border:1px solid #252532;
+      border-radius:15px;
+      background:
+        linear-gradient(90deg,rgba(141,107,255,.08),rgba(184,255,66,.035)),
+        #111118;
+    }
+    .live-awards-head{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-bottom:9px;
+    }
+    .live-awards-head strong{
+      font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;color:#8b8b9a
+    }
+    .live-awards-head span{
+      font-size:.65rem;color:#666675
+    }
+    .live-awards-list{
+      display:flex;gap:7px;overflow:auto;padding-bottom:2px;scrollbar-width:thin;
+    }
+    .live-award{
+      flex:0 0 auto;
+      min-width:112px;max-width:160px;
+      border-radius:11px;
+      padding:8px 10px;
+      background:#191922;
+      border:1px solid #2d2d3a;
+      display:flex;align-items:center;gap:8px;
+    }
+    .live-award-icon{
+      font-size:1.22rem;line-height:1
+    }
+    .live-award-copy{
+      min-width:0
+    }
+    .live-award-copy strong{
+      display:block;color:#f2f2f5;font-size:.68rem;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+    }
+    .live-award-copy small{
+      display:block;color:var(--accent);font-size:.6rem;font-weight:850;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px
+    }
+    .live-awards-empty{
+      color:#676776;font-size:.69rem;padding:3px 1px
+    }
+
     .dashboard-stats{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -762,6 +811,16 @@
                 </div>
               </div>
 
+              <div class="live-awards">
+                <div class="live-awards-head">
+                  <strong>🏆 Premios y reconocimientos</strong>
+                  <span id="liveAwardsCount">0 obtenidos</span>
+                </div>
+                <div class="live-awards-list" id="liveAwardsList">
+                  <div class="live-awards-empty">Tu vitrina se irá llenando durante la carrera.</div>
+                </div>
+              </div>
+
               <div class="dashboard-stats" id="stats"></div>
             </section>
 
@@ -1219,31 +1278,31 @@
       "Designer": [
         {label:"Práctica de Diseño", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-5,portafolio:-2,salud:6,vida:6}},
         {label:"Diseñador Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:4,reputacion:3,portafolio:6}},
-        {label:"Diseñador Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:780000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
-        {label:"Diseñador Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:950000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
-        {label:"Supervisor de Arte", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1150000, statEffects:{carrera:28,reputacion:25,portafolio:25,salud:-5,vida:-4}},
-        {label:"Head of Art", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1450000, statEffects:{carrera:36,reputacion:34,portafolio:30,salud:-7,vida:-5}}
+        {label:"Diseñador Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
+        {label:"Diseñador Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
+        {label:"Supervisor de Arte", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1500000, statEffects:{carrera:28,reputacion:25,portafolio:25,salud:-5,vida:-4}},
+        {label:"Head of Art", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1900000, statEffects:{carrera:36,reputacion:34,portafolio:30,salud:-7,vida:-5}}
       ],
       "Community Manager": [
         {label:"Práctica de CM", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
         {label:"CM Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:4,reputacion:4,portafolio:6}},
-        {label:"CM Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:760000, statEffects:{carrera:12,reputacion:11,portafolio:12,salud:-2}},
-        {label:"CM Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:920000, statEffects:{carrera:20,reputacion:19,portafolio:18,salud:-4,vida:-3}},
-        {label:"Social Media Manager", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1100000, statEffects:{carrera:28,reputacion:27,portafolio:22,salud:-5,vida:-4}},
-        {label:"Director Digital", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1450000, statEffects:{carrera:37,reputacion:35,portafolio:28,salud:-7,vida:-5}}
+        {label:"CM Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:12,reputacion:11,portafolio:12,salud:-2}},
+        {label:"CM Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:20,reputacion:19,portafolio:18,salud:-4,vida:-3}},
+        {label:"Social Media Manager", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1500000, statEffects:{carrera:28,reputacion:27,portafolio:22,salud:-5,vida:-4}},
+        {label:"Director Digital", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1900000, statEffects:{carrera:37,reputacion:35,portafolio:28,salud:-7,vida:-5}}
       ],
       "Cuentas": [
         {label:"Práctica de Cuentas", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-3,salud:6,vida:6}},
         {label:"Ejecutivo/a de Cuentas Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:5,reputacion:5,portafolio:4}},
-        {label:"Ejecutivo/a de Cuentas Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:780000, statEffects:{carrera:13,reputacion:13,portafolio:8,salud:-2}},
-        {label:"Ejecutivo/a de Cuentas Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:980000, statEffects:{carrera:20,reputacion:20,portafolio:12,salud:-3,vida:-2}},
-        {label:"Supervisor/a de Cuentas", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1200000, statEffects:{carrera:28,reputacion:27,portafolio:16,salud:-4,vida:-3}},
-        {label:"Director/a de Cuentas", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1550000, statEffects:{carrera:36,reputacion:35,portafolio:20,salud:-6,vida:-5}}
+        {label:"Ejecutivo/a de Cuentas Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:13,reputacion:13,portafolio:8,salud:-2}},
+        {label:"Ejecutivo/a de Cuentas Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:20,reputacion:20,portafolio:12,salud:-3,vida:-2}},
+        {label:"Supervisor/a de Cuentas", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1500000, statEffects:{carrera:28,reputacion:27,portafolio:16,salud:-4,vida:-3}},
+        {label:"Director/a de Cuentas", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1900000, statEffects:{carrera:36,reputacion:35,portafolio:20,salud:-6,vida:-5}}
       ],
       "Content Creator": [
         {label:"Práctica de Content", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
         {label:"Content Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:4,portafolio:8}},
-        {label:"Content Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:2, baseSalary:1250000, statEffects:{carrera:20,reputacion:18,portafolio:22,salud:-4,vida:-3}}
+        {label:"Content Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:2, baseSalary:1500000, statEffects:{carrera:20,reputacion:18,portafolio:22,salud:-4,vida:-3}}
       ],
       "Redactor": [
         {label:"Práctica de Redacción", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
@@ -1258,8 +1317,8 @@
         {label:"Media Planner Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:5,reputacion:5,portafolio:5}},
         {label:"Media Planner Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:13,reputacion:12,portafolio:10,salud:-2}},
         {label:"Media Planner Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:21,reputacion:20,portafolio:15,salud:-4,vida:-3}},
-        {label:"Supervisor/a de Medios", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1250000, statEffects:{carrera:29,reputacion:28,portafolio:20,salud:-5,vida:-4}},
-        {label:"Director/a de Medios", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1600000, statEffects:{carrera:38,reputacion:36,portafolio:24,salud:-7,vida:-5}}
+        {label:"Supervisor/a de Medios", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1500000, statEffects:{carrera:29,reputacion:28,portafolio:20,salud:-5,vida:-4}},
+        {label:"Director/a de Medios", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1900000, statEffects:{carrera:38,reputacion:36,portafolio:24,salud:-7,vida:-5}}
       ]
     };
 
@@ -2694,6 +2753,9 @@
       if(experience.startYears>=1){
         state.salary+=startMeta.startSalary||0;
       }
+      if(usesAutomaticYearProgression()){
+        state.salary=Math.max(state.salary,automaticSalaryFloorForYear(state.year));
+      }
 
       state.roleIndex=experience.roleIndex;
       state.questionInYear=1;
@@ -2785,6 +2847,25 @@
       return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.max(0,Math.round(v)));
     }
 
+    function automaticSalaryFloorForYear(year){
+      if(year>=13) return 1900000;
+      if(year>=6) return 1500000;
+      if(year>=5) return 1000000;
+      if(year>=3) return 800000;
+      if(year>=2) return 600000;
+      return 0;
+    }
+
+    function applyRoleSalaryFloor(){
+      if(!usesAutomaticYearProgression()) return 0;
+      const floor=automaticSalaryFloorForYear(state.year);
+      if(!floor || state.salary>=floor) return 0;
+
+      const increase=floor-state.salary;
+      state.salary=floor;
+      return increase;
+    }
+
     function careerOverall(){
       const raw=(state.stats.carrera+state.stats.reputacion+state.stats.portafolio+state.stats.salud)/4;
       return Math.max(1,Math.min(99,Math.round(raw)));
@@ -2835,6 +2916,34 @@
       }
     }
 
+    function renderLiveAwards(){
+      const list=document.getElementById("liveAwardsList");
+      const count=document.getElementById("liveAwardsCount");
+      if(!list || !count) return;
+
+      count.textContent=`${state.awards.length} ${state.awards.length===1 ? "obtenido" : "obtenidos"}`;
+      list.innerHTML="";
+
+      if(!state.awards.length){
+        list.innerHTML=`<div class="live-awards-empty">Tu vitrina se irá llenando durante la carrera.</div>`;
+        return;
+      }
+
+      state.awards.forEach(award=>{
+        const badge=document.createElement("div");
+        badge.className="live-award";
+        badge.title=`${award.name} · ${award.level} · ${award.category || "Campaña"} · Año ${award.year}`;
+        badge.innerHTML=`
+          <span class="live-award-icon">${award.icon}</span>
+          <span class="live-award-copy">
+            <strong>${award.short}</strong>
+            <small>${award.level}</small>
+          </span>
+        `;
+        list.appendChild(badge);
+      });
+    }
+
     function renderProfile(){
       document.getElementById('avatar').textContent=(state.name[0]||"P").toUpperCase();
       document.getElementById('profileName').textContent=state.name;
@@ -2849,7 +2958,17 @@
       if(state.experienceYears<1){
         salaryStage.textContent="Práctica · luego aprox. $600.000";
       }else{
-        salaryStage.textContent="Ajustes anuales graduales";
+        if(state.year>=13){
+          salaryStage.textContent="Dirección · desde $1.900.000";
+        }else if(state.year>=6){
+          salaryStage.textContent="Liderazgo · desde $1.500.000";
+        }else if(state.year>=5){
+          salaryStage.textContent="Senior · desde $1.000.000";
+        }else if(state.year>=3){
+          salaryStage.textContent="Mid · desde $800.000";
+        }else{
+          salaryStage.textContent="Junior · desde $600.000";
+        }
       }
 
       const statsEl=document.getElementById('stats');
@@ -2865,6 +2984,7 @@
       });
 
       renderCareerBoard();
+      renderLiveAwards();
     }
 
     function addHistory(text){
@@ -3072,6 +3192,7 @@
       state.flags.award=true;
       const symbol=level==="Shortlist" ? "⭐" : "🏆";
       addHistory(`${symbol} Año ${year} · ${award.name}: ${level} · ${category}.`);
+      renderLiveAwards();
     }
 
     function resolveAwardAttempt(attempt){
@@ -3494,22 +3615,13 @@
         const newRole=currentRole();
 
         if(newRole!==previousRole){
-          let roleIncrease=0;
-
-          // Fin de práctica: el sueldo ya fue fijado en $600.000.
-          if(state.year!==2){
-            if(state.year===3) roleIncrease=30000;
-            if(state.year===5) roleIncrease=45000;
-            if(state.year===6) roleIncrease=60000;
-            if(state.year===13) roleIncrease=85000;
-            state.salary+=roleIncrease;
-          }
+          const roleIncrease=applyRoleSalaryFloor();
 
           state.stats.carrera=Math.min(100,state.stats.carrera+5);
           state.stats.reputacion=Math.min(100,state.stats.reputacion+3);
 
           const salaryMessage=roleIncrease>0
-            ? ` y un ajuste adicional de ${formatMoney(roleIncrease)}`
+            ? ` y tu sueldo se ajusta a ${formatMoney(state.salary)}`
             : "";
           addHistory(`Inicio año ${state.year} · Pasas automáticamente de ${previousRole} a ${newRole}${salaryMessage}.`);
         }
