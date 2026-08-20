@@ -160,6 +160,11 @@
     .overall-box strong{
       font-size:2.35rem;line-height:.95;letter-spacing:-.06em
     }
+    .overall-box.initials-box strong{
+      font-size:2rem;
+      letter-spacing:-.045em;
+      text-transform:uppercase;
+    }
     .player-identity{min-width:0}
     .identity-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .identity-line .avatar{
@@ -697,7 +702,7 @@
             <div class="eyebrow">ELIGE · SOBREVIVE · ENTREGA</div>
             <h1>Sobrevive al brief.</h1>
             <p class="hero-copy">
-              Empieza desde el cargo que elijas, enfrenta una decisión clave por año, cambia de agencia y construye una carrera
+              Empieza desde la práctica, enfrenta una decisión clave por año, cambia de agencia y construye una carrera
               que puede terminar con premios, reconocimientos, dirección de equipos o una salida completamente distinta del rubro.
             </p>
             <div class="hero-actions">
@@ -758,13 +763,12 @@
           </div>
 
           <div class="field hidden" id="experienceField">
-            <label>4. ¿Con qué cargo y experiencia comienzas?</label>
-            <p id="experienceHelp" style="color:var(--muted);margin:0 0 12px;line-height:1.5"></p>
-            <div class="choice-grid" id="experienceChoices"></div>
+            <p id="experienceHelp" style="display:none"></p>
+            <div id="experienceChoices" style="display:none"></div>
           </div>
 
           <div class="field hidden" id="agencyField">
-            <label>5. ¿En qué agencia quieres comenzar?</label>
+            <label>4. ¿En qué agencia quieres hacer tu práctica?</label>
             <p id="agencyHelp" style="color:var(--muted);margin:0 0 12px;line-height:1.5"></p>
             <div class="choice-grid" id="agencyChoices"></div>
             <div style="display:flex;justify-content:center;margin-top:14px">
@@ -785,9 +789,8 @@
           <div class="career-left">
             <section class="player-dashboard">
               <div class="player-summary">
-                <div class="overall-box">
-                  <small>NIVEL</small>
-                  <strong id="overallValue">50</strong>
+                <div class="overall-box initials-box">
+                  <strong id="overallValue">PS</strong>
                 </div>
 
                 <div class="player-identity">
@@ -2601,36 +2604,20 @@
     }
 
     function showExperienceChoices(){
-      state.experienceLevel=null;
-      state.experienceLabel="";
-      state.experienceYears=0;
-      state.startExperienceYears=0;
+      state.experienceLevel=0;
+      const practice=getExperienceProfiles()[0];
+
+      state.experienceLabel=practice.label;
+      state.experienceYears=practice.startYears;
+      state.startExperienceYears=practice.startYears;
       state.selectedAgency="";
       state.selectedAgencyTier="";
       state.showAllStartingAgencies=false;
 
-      const choices=document.getElementById("experienceChoices");
-      const help=document.getElementById("experienceHelp");
-      choices.innerHTML="";
+      document.getElementById("experienceField").classList.add("hidden");
 
-      const profiles=getExperienceProfiles();
-      const roleName=designerTracks.includes(state.track) ? "Diseño" : state.track;
-      help.textContent=`Elige el año y cargo desde donde parte tu carrera en ${roleName}. La etapa de liderazgo se mantiene desde el Año 6 al 12 y la dirección se desbloquea en el Año 13.`;
-
-      profiles.forEach((profile,index)=>{
-        const btn=document.createElement("button");
-        btn.className="choice-card";
-        btn.dataset.level=String(index);
-        btn.innerHTML=`
-          <strong>${profile.label}</strong>
-          <span>${profile.years}. ${experienceFlavor(profile.label)}</span>
-        `;
-        btn.onclick=()=>selectExperience(btn);
-        choices.appendChild(btn);
-      });
-
-      document.getElementById("experienceField").classList.remove("hidden");
-      document.getElementById("agencyField").classList.add("hidden");
+      // Todas las carreras comienzan obligatoriamente en práctica.
+      renderStartingAgencies();
     }
 
     function experienceFlavor(label){
@@ -2696,8 +2683,8 @@
       const allEligible=eligibleStartingAgencies();
       const visible=state.showAllStartingAgencies ? allEligible : allEligible.slice(0,12);
 
-      help.innerHTML=`<strong>${profile.label} · ${profile.years}</strong><br>${profile.intro}
-        <br><span style="font-size:.8rem">La disponibilidad es una mecánica del juego y no representa requisitos reales de contratación.</span>`;
+      help.innerHTML=`<strong>${profile.label} · Año 1</strong><br>Todos comienzan su carrera haciendo la práctica en el área elegida.
+        <br><span style="font-size:.8rem">Elige dónde quieres comenzar. La disponibilidad de agencias es una mecánica del juego y no representa requisitos reales de contratación.</span>`;
 
       visible.forEach(agency=>{
         const meta=agencyTierMeta[agency.tier];
@@ -2742,29 +2729,33 @@
     function startGame(){
       state.name=(document.getElementById('playerName').value||"Profesional sin brief").trim();
       if(!state.profession || !state.area || !state.track || state.experienceLevel===null || !state.selectedAgency || !state.selectedAgencyTier){
-        alert("Completa carrera, especialidad, experiencia y agencia inicial antes de firmar el contrato.");
+        alert("Completa carrera, especialidad y agencia de práctica antes de firmar el contrato.");
         return;
       }
 
-      const experience=getExperienceProfiles()[state.experienceLevel];
+      state.experienceLevel=0;
+      const experience=getExperienceProfiles()[0];
+      state.experienceLabel=experience.label;
+      state.experienceYears=experience.startYears;
+      state.startExperienceYears=experience.startYears;
+
       const startMeta=agencyTierMeta[state.selectedAgencyTier];
 
       state.salary=experience.baseSalary;
-      if(experience.startYears>=1){
-        state.salary+=startMeta.startSalary||0;
-      }
+      // La práctica siempre parte con el sueldo de práctica del área.
+      // Los bonos por tipo de agencia comienzan a influir después.
       if(usesAutomaticYearProgression()){
-        state.salary=Math.max(state.salary,automaticSalaryFloorForYear(state.year));
+        state.salary=Math.max(state.salary,automaticSalaryFloorForYear(1));
       }
 
-      state.roleIndex=experience.roleIndex;
+      state.roleIndex=0;
       state.questionInYear=1;
       state.completedYears=0;
-      state.experienceYears=experience.startYears;
-      state.startExperienceYears=experience.startYears;
-      state.year=experience.careerYear;
-      state.careerStartYear=state.year;
-      state.maxYears=usesAutomaticYearProgression() ? 13 : state.year+11;
+      state.experienceYears=0;
+      state.startExperienceYears=0;
+      state.year=1;
+      state.careerStartYear=1;
+      state.maxYears=usesAutomaticYearProgression() ? 13 : 12;
       if(usesAutomaticYearProgression()){
         state.roleIndex=automaticRoleIndexForYear(state.year);
       }
@@ -2944,14 +2935,24 @@
       });
     }
 
+    function initialsFromName(name){
+      const clean=(name || "Profesional sin brief").trim();
+      const parts=clean.split(/\s+/).filter(Boolean);
+
+      if(parts.length===0) return "PS";
+      if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+
+      return `${parts[0][0]}${parts[parts.length-1][0]}`.toUpperCase();
+    }
+
     function renderProfile(){
-      document.getElementById('avatar').textContent=(state.name[0]||"P").toUpperCase();
+      document.getElementById('avatar').textContent=initialsFromName(state.name).slice(0,1);
       document.getElementById('profileName').textContent=state.name;
       document.getElementById('profileRole').textContent=`${currentRole()} · Año ${state.year} de carrera`;
       document.getElementById('salaryValue').textContent=formatMoney(state.salary);
       document.getElementById('workplaceValue').textContent=state.workplace;
       document.getElementById('agencyTierValue').textContent=tierLabel(state.agencyTier);
-      document.getElementById('overallValue').textContent=careerOverall();
+      document.getElementById('overallValue').textContent=initialsFromName(state.name);
       document.getElementById('careerYearValue').textContent=state.year;
 
       const salaryStage=document.getElementById('salaryStageValue');
