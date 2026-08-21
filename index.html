@@ -241,26 +241,47 @@
     }
     .live-award{
       flex:0 0 auto;
-      min-width:112px;max-width:160px;
+      width:210px;
+      min-height:58px;
       border-radius:11px;
-      padding:8px 10px;
+      padding:9px 11px;
       background:#191922;
       border:1px solid #2d2d3a;
-      display:flex;align-items:center;gap:8px;
+      display:flex;
+      align-items:flex-start;
+      gap:9px;
     }
     .live-award-icon{
-      font-size:1.22rem;line-height:1
+      flex:0 0 auto;
+      font-size:1.22rem;
+      line-height:1.2;
+      margin-top:2px;
     }
     .live-award-copy{
-      min-width:0
+      min-width:0;
+      flex:1;
     }
     .live-award-copy strong{
-      display:block;color:#f2f2f5;font-size:.68rem;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+      display:block;
+      color:#f2f2f5;
+      font-size:.68rem;
+      line-height:1.25;
+      white-space:normal;
+      overflow:visible;
+      text-overflow:clip;
+      overflow-wrap:anywhere;
     }
     .live-award-copy small{
-      display:block;color:var(--accent);font-size:.6rem;font-weight:850;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px
+      display:block;
+      color:var(--accent);
+      font-size:.61rem;
+      line-height:1.25;
+      font-weight:850;
+      white-space:normal;
+      overflow:visible;
+      text-overflow:clip;
+      overflow-wrap:anywhere;
+      margin-top:4px;
     }
     .live-awards-empty{
       color:#676776;font-size:.69rem;padding:3px 1px
@@ -682,16 +703,6 @@
       grid-template-columns:1fr 1fr;
       gap:9px;
       margin-top:10px;
-    }
-    .share-helper{
-      margin-top:12px;
-      padding:11px 12px;
-      border-radius:12px;
-      background:#101017;
-      border:1px solid #292936;
-      color:#9292a2;
-      font-size:.72rem;
-      line-height:1.45;
     }
     .share-status{
       min-height:20px;
@@ -1167,10 +1178,6 @@
 
       <div class="share-status" id="shareStatus"></div>
 
-      <div class="share-helper">
-        <strong>Importante:</strong> “Compartir foto” funciona mejor en un sitio HTTPS, por ejemplo Vercel. Si pruebas el HTML como archivo local o el navegador no permite compartir archivos, el botón guardará el PNG automáticamente.
-      </div>
-
       <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="closeShareModal()">Cerrar</button>
     </div>
   </div>
@@ -1189,7 +1196,7 @@
       selectedAgencyTier: "",
       showAllStartingAgencies: false,
       year: 1,
-      maxYears: 12,
+      maxYears: 15,
       questionInYear: 1,
       questionsPerYear: 1,
       salary: 650000,
@@ -1201,6 +1208,8 @@
       pendingAgencyOffers: [],
       pendingNextYearSalary: null,
       skipAgencyDecisionThisYear: false,
+      pendingCareerEnd: false,
+      forcedResult: null,
       roleIndex: 0,
       usedEvents: [],
       history: [],
@@ -1214,7 +1223,9 @@
         recovery:false,
         award:false,
         viral:false,
-        fired:false
+        fired:false,
+        independentExit:false,
+        industryExit:false
       },
       stats: {
         carrera: 32,
@@ -2924,7 +2935,7 @@
       state.startExperienceYears=0;
       state.year=1;
       state.careerStartYear=1;
-      state.maxYears=13;
+      state.maxYears=15;
       if(usesAutomaticYearProgression()){
         state.roleIndex=automaticRoleIndexForYear(state.year);
       }
@@ -3136,7 +3147,7 @@
         badge.innerHTML=`
           <span class="live-award-icon">${award.icon}</span>
           <span class="live-award-copy">
-            <strong>${award.short}</strong>
+            <strong>${award.name}</strong>
             <small>${award.level}</small>
           </span>
         `;
@@ -3300,7 +3311,7 @@
 
     function shouldShowAwardOpportunity(){
       if(state.year<3) return false;
-      if(![4,7,10,13].includes(state.year)) return false;
+      if(![4,7,10,14].includes(state.year)) return false;
       if(awardPerformanceScore()<50) return false;
       return eligibleAwardOpportunities().length>0;
     }
@@ -3480,6 +3491,66 @@
       });
     }
 
+    function specialCareerDecisionForYear(){
+      if(state.year===6){
+        return {
+          id:"career-fork-year-6",
+          title:"¿Quieres seguir trabajando en agencias o prefieres independizarte?",
+          text:"Ya llevas varios años sobreviviendo briefs, cambios de última hora y cierres de campaña. Aparece una decisión que puede cambiar por completo tu carrera.",
+          quote:"No todo crecimiento profesional tiene que ocurrir dentro de una agencia.",
+          specialCareerDecision:true,
+          options:[
+            {
+              text:"Seguir trabajando en agencias.",
+              consequence:"Decides continuar en el circuito de agencias y seguir construyendo tu carrera desde ahí.",
+              effects:{carrera:4,reputacion:2,portafolio:2}
+            },
+            {
+              text:"Independizarme.",
+              consequence:"Cierras tu etapa trabajando en agencias y decides construir tu camino de manera independiente. Tu carrera en el simulador termina aquí.",
+              effects:{carrera:5,vida:8,salud:5},
+              endCareer:true,
+              endFlag:"independentExit",
+              endResult:{
+                title:"Te independizaste",
+                copy:"En el Año 6 decidiste cerrar tu etapa trabajando en agencias y comenzar un camino independiente. Hasta aquí llega esta carrera dentro del simulador; lo que sigue ya depende completamente de ti."
+              }
+            }
+          ]
+        };
+      }
+
+      if(state.year===13){
+        return {
+          id:"career-fork-year-13",
+          title:"¿Quieres seguir en publicidad o prefieres cambiar de rubro?",
+          text:"Llegaste a una etapa avanzada de tu carrera. Puedes seguir en publicidad y completar los 15 años del simulador, o cerrar este capítulo y comenzar desde cero en otro rubro.",
+          quote:"A veces crecer también significa saber cuándo cambiar de camino.",
+          specialCareerDecision:true,
+          options:[
+            {
+              text:"Seguir en publicidad hasta completar mi carrera.",
+              consequence:"Decides seguir. Todavía quedan años, decisiones, campañas y oportunidades antes del cierre definitivo.",
+              effects:{carrera:4,reputacion:3}
+            },
+            {
+              text:"Retirarme de publicidad y cambiar de rubro.",
+              consequence:"Decides cerrar tu etapa en publicidad y llevar toda tu experiencia a un nuevo camino profesional. Tu carrera en el simulador termina aquí.",
+              effects:{vida:10,salud:7,carrera:2},
+              endCareer:true,
+              endFlag:"industryExit",
+              endResult:{
+                title:"Cambiaste de rubro",
+                copy:"Después de 13 años decidiste retirarte de publicidad y comenzar una nueva etapa profesional. Tu experiencia, campañas y reconocimientos quedan como parte de una carrera que elegiste cerrar en tus propios términos."
+              }
+            }
+          ]
+        };
+      }
+
+      return null;
+    }
+
     function loadEvent(){
       state.lastAwardResult=null;
       document.getElementById('consequence').classList.remove('active');
@@ -3487,11 +3558,11 @@
       optionsEl.innerHTML="";
       renderDecisionProgress();
 
-      // Priorizar evento de burnout o consumo cuando corresponda.
+      // Los hitos estructurales de carrera tienen prioridad sobre cualquier otro evento.
       let pool=validEvents();
-      let chosen=null;
+      let chosen=specialCareerDecisionForYear();
 
-      if(shouldShowAwardOpportunity()){
+      if(!chosen && shouldShowAwardOpportunity()){
         const award=pickAwardOpportunity();
         if(award) chosen=buildAwardEvent(award);
       }
@@ -3512,7 +3583,7 @@
       }
 
       state.currentEvent=chosen;
-      state.usedEvents.push(chosen.id);
+      if(!state.usedEvents.includes(chosen.id)) state.usedEvents.push(chosen.id);
 
       document.getElementById('eventKicker').textContent=`AÑO ${state.year} · ${state.workplace.toUpperCase()}`;
       document.getElementById('yearPill').textContent=`Año ${state.year}`;
@@ -3552,6 +3623,16 @@
           state.workplace=opt.workplace;
         }
       }
+      if(opt.endCareer){
+        state.pendingCareerEnd=true;
+        state.forcedResult=opt.endResult || {
+          title:"Carrera cerrada",
+          copy:"Decidiste cerrar tu carrera en este punto."
+        };
+        if(opt.endFlag) state.flags[opt.endFlag]=true;
+        state.skipAgencyDecisionThisYear=true;
+      }
+
       if(opt.flag){
         state.flags[opt.flag]=true;
         if(opt.flag==="freelance"){
@@ -3613,7 +3694,9 @@
         state.stats.salud<=0 ||
         state.stats.riesgo>=100;
 
-      if(closesCareer){
+      if(state.pendingCareerEnd){
+        nextBtn.textContent="Ver resumen de carrera";
+      }else if(closesCareer){
         nextBtn.textContent="Cerrar carrera";
       }else if(
         state.skipAgencyDecisionThisYear ||
@@ -3633,6 +3716,12 @@
     }
 
     function proceedAfterDecision(){
+      if(state.pendingCareerEnd){
+        state.pendingCareerEnd=false;
+        finishGame();
+        return;
+      }
+
       if(state.questionInYear<state.questionsPerYear){
         state.questionInYear++;
         loadEvent();
@@ -3881,6 +3970,10 @@
       const s=state.stats;
       const role=currentRole();
 
+      if(state.forcedResult){
+        return state.forcedResult;
+      }
+
       if(s.riesgo>=80){
         return {
           title:"La carrera te pasó la cuenta",
@@ -3964,6 +4057,8 @@
         <p>Última agencia: <strong>${state.workplace}</strong></p>
         <p>Años jugados: <strong>${Math.max(1,state.year-state.careerStartYear+1)}</strong></p>
         <p>Premios / reconocimientos: <strong>${state.awards.length}</strong></p>
+        ${state.flags.independentExit ? `<p>Decisión final: <strong>Independizarte</strong></p>` : ""}
+        ${state.flags.industryExit ? `<p>Decisión final: <strong>Cambiar de rubro</strong></p>` : ""}
       `;
 
       const fs=document.getElementById('finalStats');
@@ -4194,8 +4289,8 @@
           ctx.fillStyle="#b8ff42";
           drawFittedCanvasText(
             ctx,
-            `${award.icon} ${award.short}`,
-            x+20,y+34,cardWidth-40,21,15,900
+            `${award.icon} ${award.name}`,
+            x+20,y+34,cardWidth-40,19,10,900
           );
 
           ctx.fillStyle="#f5f5f7";
