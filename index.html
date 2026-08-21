@@ -700,10 +700,40 @@
       font-size:.72rem;
       font-weight:800;
     }    .share-preview{
-      display:block;width:min(260px,70%);aspect-ratio:4/5;object-fit:cover;
+      display:block;width:min(260px,70%);aspect-ratio:4/5;object-fit:contain;
       margin:14px auto 4px;border-radius:15px;border:1px solid #30303e;
       background:#0d0d13;box-shadow:0 16px 45px rgba(0,0,0,.25);
     }
+    #shareModal{
+      overflow-y:auto;
+      align-items:start;
+    }
+    #shareModal .modal-card{
+      position:relative;
+      width:min(620px,100%);
+      max-height:calc(100vh - 32px);
+      overflow-y:auto;
+      margin:auto;
+      padding-top:34px;
+    }
+    .share-close-x{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      border:1px solid #343443;
+      background:#111118;
+      color:#f4f4f7;
+      display:grid;
+      place-items:center;
+      font-size:1.05rem;
+      font-weight:900;
+      cursor:pointer;
+      z-index:3;
+    }
+    .share-close-x:hover{background:#242433}
     .share-apps{
       display:flex;justify-content:center;gap:12px;color:#a6a6b4;
       font-size:.78rem;margin-top:9px;
@@ -842,7 +872,7 @@
           <div class="setup-head">
             <div class="eyebrow">CREA TU PERSONAJE</div>
             <h2>Tu carrera comienza con una mala decisión vocacional.</h2>
-            <p>Elige carrera, área, especialidad, cargo inicial y la agencia donde partirás. Después podrás cambiarte, ascender, irte al lado del cliente o trabajar por tu cuenta.</p>
+            <p>Elige carrera, área, especialidad y la agencia donde harás tu práctica. Después podrás cambiarte, ascender, irte al lado del cliente o trabajar por tu cuenta.</p>
           </div>
 
           <div class="field">
@@ -880,7 +910,7 @@
           </div>
 
           <div class="field hidden" id="agencyField">
-            <label>4. ¿En qué agencia quieres hacer tu práctica?</label>
+            <label id="agencyFieldLabel">4. ¿En qué agencia quieres hacer tu práctica?</label>
             <p id="agencyHelp" style="color:var(--muted);margin:0 0 12px;line-height:1.5"></p>
             <div class="choice-grid" id="agencyChoices"></div>
             <div style="display:flex;justify-content:center;margin-top:14px">
@@ -1115,6 +1145,7 @@
 
   <div id="shareModal" class="modal">
     <div class="modal-card">
+      <button class="share-close-x" type="button" aria-label="Cerrar sin compartir" onclick="closeShareModal()">✕</button>
       <div class="eyebrow">COMPARTE TU CARRERA</div>
       <h3>Tu resumen está listo como foto 📸</h3>
       <p>
@@ -1169,6 +1200,7 @@
       agencyTier: "boutique",
       pendingAgencyOffers: [],
       pendingNextYearSalary: null,
+      skipAgencyDecisionThisYear: false,
       roleIndex: 0,
       usedEvents: [],
       history: [],
@@ -2749,6 +2781,13 @@
 
       document.getElementById("experienceField").classList.add("hidden");
 
+      const agencyLabel=document.getElementById("agencyFieldLabel");
+      if(agencyLabel){
+        agencyLabel.textContent=subareas[state.area]
+          ? "4. ¿En qué agencia quieres hacer tu práctica?"
+          : "3. ¿En qué agencia quieres hacer tu práctica?";
+      }
+
       // Todas las carreras comienzan obligatoriamente en práctica.
       renderStartingAgencies();
     }
@@ -2825,6 +2864,7 @@
         const isRecommended=agency.tier===recommendedTier;
         const btn=document.createElement("button");
         btn.className="choice-card";
+        if(agency.name===state.selectedAgency) btn.classList.add("selected");
         btn.dataset.agency=agency.name;
         btn.dataset.tier=agency.tier;
 
@@ -3316,24 +3356,20 @@
 
     function awardLevelForScore(award,score){
       const delta=score-award.minScore;
-      const levels=award.levels;
-
       if(delta<0) return null;
 
-      if(levels.length===2){
-        return delta>=11 ? levels[1] : levels[0];
-      }
-      if(levels.length===3){
-        if(delta>=22) return levels[2];
-        if(delta>=8) return levels[1];
-        return levels[0];
-      }
+      const winningLevels=(award.levels || []).filter(level=>
+        level!=="Finalista" && level!=="Shortlist"
+      );
 
-      if(delta>=28) return levels[Math.min(4,levels.length-1)];
-      if(delta>=19) return levels[Math.min(3,levels.length-1)];
-      if(delta>=11) return levels[Math.min(2,levels.length-1)];
-      if(delta>=5) return levels[Math.min(1,levels.length-1)];
-      return levels[0];
+      if(!winningLevels.length) return null;
+      if(winningLevels.length===1) return winningLevels[0];
+
+      const index=Math.min(
+        winningLevels.length-1,
+        Math.floor(Math.max(0,delta)/8)
+      );
+      return winningLevels[index];
     }
 
     function addCareerAward(award,level,score,year=state.year,category=simulatedAwardCategory(award)){
@@ -3445,6 +3481,7 @@
     }
 
     function loadEvent(){
+      state.lastAwardResult=null;
       document.getElementById('consequence').classList.remove('active');
       const optionsEl=document.getElementById('options');
       optionsEl.innerHTML="";
@@ -3460,10 +3497,11 @@
       }
 
       if(!chosen && state.track!=="Medios" && state.stats.salud<35){
-        chosen=pool.find(e=>e.id==="burnout");
+        chosen=events.find(e=>e.id==="burnout" && !state.usedEvents.includes(e.id));
       }
       if(state.track!=="Medios" && !chosen && state.stats.riesgo>45){
-        chosen=pool.find(e=>e.id==="burnout") || pool.find(e=>e.id==="afteroffice");
+        chosen=events.find(e=>e.id==="burnout" && !state.usedEvents.includes(e.id))
+          || events.find(e=>e.id==="afteroffice" && !state.usedEvents.includes(e.id));
       }
       if(!chosen){
         if(pool.length===0){
@@ -3505,6 +3543,7 @@
       let actualSalaryChange=0;
       if(opt.salary) actualSalaryChange=applySalaryDelta(opt.salary);
       if(opt.workplace){
+        state.skipAgencyDecisionThisYear=true;
         if(opt.workplace==="Agencia grande"){
           const destination=pickAgency("global");
           state.workplace=destination.name;
@@ -3518,10 +3557,12 @@
         if(opt.flag==="freelance"){
           state.workplace="Freelance";
           state.agencyTier="freelance";
+          state.skipAgencyDecisionThisYear=true;
         }
         if(opt.flag==="clientSide"){
           state.workplace="Equipo interno de marca";
           state.agencyTier="brand";
+          state.skipAgencyDecisionThisYear=true;
         }
       }
 
@@ -3567,7 +3608,22 @@
       renderProfile();
 
       const nextBtn=document.getElementById("consequenceNextBtn");
-      nextBtn.textContent="Ver 2 ofertas y cerrar el año";
+      const closesCareer=
+        state.year>=state.maxYears ||
+        state.stats.salud<=0 ||
+        state.stats.riesgo>=100;
+
+      if(closesCareer){
+        nextBtn.textContent="Cerrar carrera";
+      }else if(
+        state.skipAgencyDecisionThisYear ||
+        state.agencyTier==="brand" ||
+        state.agencyTier==="freelance"
+      ){
+        nextBtn.textContent="Cerrar el año";
+      }else{
+        nextBtn.textContent="Ver 2 ofertas y cerrar el año";
+      }
 
       document.getElementById('consequence').classList.add('active');
 
@@ -3583,6 +3639,27 @@
         window.scrollTo({top:0,behavior:"smooth"});
         return;
       }
+
+      if(
+        state.year>=state.maxYears ||
+        state.stats.salud<=0 ||
+        state.stats.riesgo>=100
+      ){
+        state.skipAgencyDecisionThisYear=false;
+        completeYear();
+        return;
+      }
+
+      if(
+        state.skipAgencyDecisionThisYear ||
+        state.agencyTier==="brand" ||
+        state.agencyTier==="freelance"
+      ){
+        state.skipAgencyDecisionThisYear=false;
+        completeYear();
+        return;
+      }
+
       openAgencyDecision();
     }
 
@@ -3664,6 +3741,11 @@
     }
 
     function openAgencyDecision(){
+      if(state.year>=state.maxYears || state.stats.salud<=0 || state.stats.riesgo>=100){
+        completeYear();
+        return;
+      }
+
       const marketLevel=currentMarketLevel();
       let eligible=Object.values(agencyPools)
         .flat()
@@ -3836,10 +3918,18 @@
           copy:"No sacrificaste toda tu vida por el cargo. Conservaste relaciones, descanso y criterio. Puede que este sea el mejor final."
         };
       }
-      if(state.flags.award && s.portafolio>75){
+      if(state.awards.length && s.portafolio>75){
+        const wins=state.awards.filter(item=>!item.isShortlist);
+        const recognitions=wins.length ? wins : state.awards;
+        const best=[...recognitions].sort((a,b)=>(b.score||0)-(a.score||0))[0];
+
         return {
-          title:"Nombre de festival",
-          copy:"Tu portafolio abre puertas y tus campañas circulan en presentaciones. El premio ayudó, pero tus decisiones sostuvieron la carrera."
+          title:wins.length
+            ? `Carrera premiada · ${best.short}`
+            : "Carrera reconocida",
+          copy:wins.length
+            ? `Tu portafolio consiguió reconocimiento en ${best.name} (${best.level}). El premio ayudó a abrir puertas, pero el resto de la carrera lo construyeron tus decisiones.`
+            : "Tu trabajo llegó a shortlist y acumuló reconocimiento de industria. No hubo metal esta vez, pero tu portafolio sí dejó huella."
         };
       }
       if(s.carrera<35 && s.salud>55){
@@ -3914,10 +4004,79 @@
       });
     }
 
+    function fitCanvasFont(ctx,text,maxWidth,startSize,minSize=16,weight=900,family="Arial"){
+      let size=startSize;
+      const safeText=String(text ?? "");
+      while(size>minSize){
+        ctx.font=`${weight} ${size}px ${family}`;
+        if(ctx.measureText(safeText).width<=maxWidth) break;
+        size-=2;
+      }
+      return size;
+    }
+
+    function canvasTextLines(ctx,text,maxWidth,maxLines=99){
+      const words=String(text ?? "").trim().split(/\s+/).filter(Boolean);
+      if(!words.length) return [""];
+
+      const lines=[];
+      let line="";
+      let cursor=0;
+
+      for(; cursor<words.length; cursor++){
+        const word=words[cursor];
+        const test=line ? `${line} ${word}` : word;
+
+        if(ctx.measureText(test).width<=maxWidth || !line){
+          line=test;
+        }else{
+          lines.push(line);
+          line=word;
+          if(lines.length>=maxLines-1){
+            cursor++;
+            break;
+          }
+        }
+      }
+
+      if(line && lines.length<maxLines) lines.push(line);
+
+      if(cursor<words.length && lines.length){
+        let last=lines[lines.length-1];
+        while(last.length && ctx.measureText(`${last}…`).width>maxWidth){
+          last=last.slice(0,-1);
+        }
+        lines[lines.length-1]=`${last.trim()}…`;
+      }
+
+      return lines;
+    }
+
+    function drawCanvasLines(ctx,text,x,y,maxWidth,lineHeight,maxLines=99){
+      const lines=canvasTextLines(ctx,text,maxWidth,maxLines);
+      lines.forEach((line,index)=>ctx.fillText(line,x,y+(index*lineHeight)));
+      return {lines,bottom:y+((lines.length-1)*lineHeight)};
+    }
+
+    function drawFittedCanvasText(ctx,text,x,y,maxWidth,startSize,minSize,weight=900){
+      const size=fitCanvasFont(ctx,text,maxWidth,startSize,minSize,weight);
+      ctx.font=`${weight} ${size}px Arial`;
+      ctx.fillText(String(text ?? ""),x,y);
+      return size;
+    }
+
     function generateCard(){
       const canvas=document.getElementById('shareCanvas');
       const ctx=canvas.getContext('2d');
-      const w=canvas.width,h=canvas.height;
+
+      canvas.width=1080;
+      canvas.height=1350;
+      const w=canvas.width;
+      const h=canvas.height;
+
+      ctx.clearRect(0,0,w,h);
+      ctx.textAlign="left";
+      ctx.textBaseline="alphabetic";
 
       const grad=ctx.createLinearGradient(0,0,w,h);
       grad.addColorStop(0,"#171725");
@@ -3926,124 +4085,163 @@
       ctx.fillStyle=grad;
       ctx.fillRect(0,0,w,h);
 
-      // Decorative shapes.
-      ctx.globalAlpha=.16;
+      ctx.globalAlpha=.14;
       ctx.strokeStyle="#b8ff42";
       ctx.lineWidth=38;
       ctx.beginPath();
-      ctx.arc(980,90,175,0,Math.PI*2);
+      ctx.arc(988,82,170,0,Math.PI*2);
       ctx.stroke();
       ctx.globalAlpha=1;
 
+      const left=64;
+      const right=1016;
+      const contentWidth=right-left;
+
       ctx.fillStyle="#b8ff42";
-      roundRect(ctx,65,62,225,45,22,true,false);
+      roundRect(ctx,left,54,225,44,22,true,false);
       ctx.fillStyle="#0b0b10";
-      ctx.font="900 20px Arial";
-      ctx.fillText("FIN DE CARRERA",92,92);
+      ctx.font="900 19px Arial";
+      ctx.fillText("FIN DE CARRERA",91,83);
 
       ctx.fillStyle="#85859a";
-      ctx.font="800 19px Arial";
-      ctx.fillText("VIDA DE AGENCIA · CAREER CARD",65,152);
+      ctx.font="800 18px Arial";
+      ctx.fillText("VIDA DE AGENCIA · CAREER CARD",left,143);
 
       ctx.fillStyle="#f6f6f8";
-      ctx.font="900 68px Arial";
-      wrapText(ctx,state.name,65,245,790,76);
+      drawFittedCanvasText(ctx,state.name,left,235,720,66,38,900);
 
       ctx.fillStyle="#9b8cff";
-      ctx.font="900 27px Arial";
-      ctx.fillText(`${state.profession.toUpperCase()} · ${state.track.toUpperCase()}`,65,330);
+      drawFittedCanvasText(
+        ctx,
+        `${state.profession.toUpperCase()} · ${state.track.toUpperCase()}`,
+        left,304,720,27,18,900
+      );
 
       ctx.fillStyle="#f6f6f8";
-      ctx.font="900 45px Arial";
-      wrapText(ctx,currentRole(),65,410,780,54);
+      ctx.font="900 43px Arial";
+      const roleBlock=drawCanvasLines(ctx,currentRole(),left,370,700,49,2);
 
       ctx.textAlign="right";
       ctx.fillStyle="#ffffff";
-      ctx.font="900 108px Arial";
-      ctx.fillText(String(careerOverall()),1015,248);
+      ctx.font="900 100px Arial";
+      ctx.fillText(String(careerOverall()),1008,224);
       ctx.fillStyle="#7b7b8c";
-      ctx.font="900 18px Arial";
-      ctx.fillText("NIVEL FINAL",1015,278);
+      ctx.font="900 17px Arial";
+      ctx.fillText("NIVEL FINAL",1008,255);
       ctx.textAlign="left";
 
-      // Career outcome.
-      ctx.fillStyle="#111119";
-      roundRect(ctx,65,480,950,160,26,true,false);
-      ctx.fillStyle="#6e6e80";
-      ctx.font="800 18px Arial";
-      ctx.fillText("RESULTADO DE CARRERA",95,522);
-      ctx.fillStyle="#f5f5f7";
-      ctx.font="900 39px Arial";
-      wrapText(ctx,state.result.title,95,574,860,45);
-      ctx.fillStyle="#bdbdca";
-      ctx.font="24px Arial";
-      ctx.fillText(`${state.workplace} · ${formatMoney(state.salary)}`,95,616);
+      const resultTop=Math.max(455,roleBlock.bottom+58);
 
-      // Awards shelf.
+      ctx.font="900 34px Arial";
+      const resultTitleLines=canvasTextLines(
+        ctx,
+        state.result?.title || "Carrera completada",
+        contentWidth-56,
+        2
+      );
+
+      const resultTitleY=resultTop+86;
+      const resultTitleBottom=resultTitleY+((resultTitleLines.length-1)*39);
+      const workplaceY=resultTitleBottom+39;
+      const resultHeight=(workplaceY-resultTop)+31;
+
+      ctx.fillStyle="#111119";
+      roundRect(ctx,left,resultTop,contentWidth,resultHeight,25,true,false);
+      ctx.fillStyle="#6e6e80";
+      ctx.font="800 17px Arial";
+      ctx.fillText("RESULTADO DE CARRERA",left+28,resultTop+39);
+
+      ctx.fillStyle="#f5f5f7";
+      ctx.font="900 34px Arial";
+      resultTitleLines.forEach((line,index)=>{
+        ctx.fillText(line,left+28,resultTitleY+(index*39));
+      });
+
+      ctx.fillStyle="#bdbdca";
+      drawFittedCanvasText(
+        ctx,
+        `${state.workplace} · ${formatMoney(state.salary)}`,
+        left+28,workplaceY,contentWidth-56,22,15,700
+      );
+
+      const awardsTitleY=resultTop+resultHeight+47;
       ctx.fillStyle="#7b7b8c";
-      ctx.font="900 19px Arial";
-      ctx.fillText("VITRINA DE PREMIOS",65,710);
+      ctx.font="900 18px Arial";
+      ctx.fillText("VITRINA DE PREMIOS",left,awardsTitleY);
 
       const awards=state.awards.slice(0,6);
+      const gap=16;
+      const cardWidth=(contentWidth-gap)/2;
+      const cardHeight=126;
+      const awardsStartY=awardsTitleY+28;
+
       if(!awards.length){
         ctx.fillStyle="#171720";
-        roundRect(ctx,65,740,950,130,22,true,false);
+        roundRect(ctx,left,awardsStartY,contentWidth,116,20,true,false);
         ctx.fillStyle="#777789";
-        ctx.font="25px Arial";
-        ctx.fillText("Sin premios simulados en esta carrera.",95,817);
+        ctx.font="24px Arial";
+        ctx.fillText("Sin premios simulados en esta carrera.",left+28,awardsStartY+68);
       }else{
         awards.forEach((award,index)=>{
           const col=index%2;
           const row=Math.floor(index/2);
-          const x=65+col*480;
-          const y=740+row*150;
+          const x=left+col*(cardWidth+gap);
+          const y=awardsStartY+row*(cardHeight+14);
 
           ctx.fillStyle="#171720";
-          roundRect(ctx,x,y,455,130,20,true,false);
+          roundRect(ctx,x,y,cardWidth,cardHeight,18,true,false);
 
           ctx.fillStyle="#b8ff42";
-          ctx.font="900 23px Arial";
-          ctx.fillText(`${award.icon} ${award.short}`,x+24,y+38);
+          drawFittedCanvasText(
+            ctx,
+            `${award.icon} ${award.short}`,
+            x+20,y+34,cardWidth-40,21,15,900
+          );
 
           ctx.fillStyle="#f5f5f7";
-          ctx.font="800 22px Arial";
-          wrapText(ctx,award.level,x+24,y+72,395,26);
+          ctx.font="800 19px Arial";
+          drawCanvasLines(ctx,award.level,x+20,y+67,cardWidth-40,22,2);
 
           ctx.fillStyle="#737384";
-          ctx.font="16px Arial";
-          ctx.fillText(`${award.category || "Campaña"} · Año ${award.year}`,x+24,y+108);
+          drawFittedCanvasText(
+            ctx,
+            `${award.category || "Campaña"} · Año ${award.year}`,
+            x+20,y+105,cardWidth-40,14,10,700
+          );
         });
       }
 
-      const shelfBottom=awards.length ? 740 + Math.ceil(awards.length/2)*150 : 890;
+      const awardRows=awards.length ? Math.ceil(awards.length/2) : 1;
+      const awardsBottom=awards.length
+        ? awardsStartY+(awardRows*cardHeight)+((awardRows-1)*14)
+        : awardsStartY+116;
+
+      const metricY=Math.min(1174,awardsBottom+24);
+      const metricH=82;
 
       ctx.fillStyle="#8d6bff";
-      roundRect(ctx,65,Math.min(1190,shelfBottom+25),950,90,22,true,false);
+      roundRect(ctx,left,metricY,contentWidth,metricH,20,true,false);
+
       ctx.fillStyle="#ffffff";
-      ctx.font="900 23px Arial";
-      ctx.fillText(`CARRERA ${Math.round(state.stats.carrera)}/100`,95,Math.min(1245,shelfBottom+80));
-      ctx.fillText(`REPUTACIÓN ${Math.round(state.stats.reputacion)}/100`,380,Math.min(1245,shelfBottom+80));
-      ctx.fillText(`PORTAFOLIO ${Math.round(state.stats.portafolio)}/100`,705,Math.min(1245,shelfBottom+80));
+      drawFittedCanvasText(ctx,`CARRERA ${Math.round(state.stats.carrera)}/100`,left+25,metricY+50,275,19,13,900);
+      drawFittedCanvasText(ctx,`REPUTACIÓN ${Math.round(state.stats.reputacion)}/100`,left+350,metricY+50,300,19,13,900);
+      drawFittedCanvasText(ctx,`PORTAFOLIO ${Math.round(state.stats.portafolio)}/100`,left+690,metricY+50,285,19,13,900);
 
       ctx.fillStyle="#b8ff42";
-      ctx.font="900 23px Arial";
-      ctx.fillText("VIDA DE AGENCIA",65,1310);
+      ctx.font="900 20px Arial";
+      ctx.fillText("VIDA DE AGENCIA",left,1306);
+
+      ctx.fillStyle="#727282";
+      ctx.font="800 14px Arial";
+      ctx.textAlign="right";
+      ctx.fillText("YUSY CLUB · PAULO FUENTEALBA",right,1306);
+      ctx.textAlign="left";
 
       return canvas;
     }
 
     function wrapText(ctx,text,x,y,maxWidth,lineHeight){
-      const words=text.split(' ');
-      let line='';
-      for(let n=0;n<words.length;n++){
-        const test=line+words[n]+' ';
-        if(ctx.measureText(test).width>maxWidth && n>0){
-          ctx.fillText(line,x,y);
-          line=words[n]+' ';
-          y+=lineHeight;
-        }else line=test;
-      }
-      ctx.fillText(line,x,y);
+      return drawCanvasLines(ctx,text,x,y,maxWidth,lineHeight,99);
     }
 
     function roundRect(ctx,x,y,width,height,radius,fill,stroke){
@@ -4128,7 +4326,22 @@
 
     function closeShareModal(){
       document.getElementById("shareModal").classList.remove("active");
+      setShareStatus("");
     }
+
+    document.getElementById("shareModal")?.addEventListener("click",event=>{
+      if(event.target.id==="shareModal") closeShareModal();
+    });
+
+    document.addEventListener("keydown",event=>{
+      if(event.key==="Escape"){
+        const shareModal=document.getElementById("shareModal");
+        if(shareModal?.classList.contains("active")) closeShareModal();
+
+        const awardModal=document.getElementById("awardCelebrationModal");
+        if(awardModal?.classList.contains("active")) closeAwardCelebration();
+      }
+    });
 
     function shareCareerImage(){
       let file;
@@ -4136,7 +4349,8 @@
         file=buildCareerShareFile();
       }catch(error){
         console.error(error);
-        setShareStatus("No se pudo generar la imagen.",true);
+        setShareStatus("No se pudo abrir el menú nativo. Intentaremos guardar el PNG.",true);
+        downloadCareerImage();
         return;
       }
 
