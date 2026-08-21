@@ -172,17 +172,30 @@
       flex-direction:column;
       justify-content:center;
     }
-    .identity-line{
-      display:flex;
-      align-items:center;
-      gap:0;
-      flex-wrap:wrap;
+    .player-identity::before,
+    .player-identity::after,
+    .player-summary::before,
+    .player-summary::after{
+      content:none!important;
+      display:none!important;
     }
     .player-identity h3{
       margin:0;
       font-size:1.2rem;
       line-height:1.1;
       letter-spacing:-.03em;
+    }
+    .player-agency-line{
+      display:flex;
+      align-items:baseline;
+      gap:4px;
+      flex-wrap:wrap;
+    }
+    .player-agency-line #workplaceValue{
+      color:#f2f2f5;
+    }
+    .agency-separator{
+      color:var(--muted);
     }
     .player-identity p{
       margin:7px 0 0;
@@ -893,13 +906,12 @@
                 </div>
 
                 <div class="player-identity">
-                  <div class="identity-line">
-                    <h3 id="profileName">Publicista</h3>
-                  </div>
+                  <h3 id="profileName">Publicista</h3>
                   <p id="profileRole">Práctica</p>
-                  <p>
-                    <strong id="workplaceValue" style="color:#f2f2f5">Agencia inicial</strong>
-                    · <span id="agencyTierValue">Boutique / independiente</span>
+                  <p class="player-agency-line">
+                    <strong id="workplaceValue">Agencia inicial</strong>
+                    <span class="agency-separator">·</span>
+                    <span id="agencyTierValue">Boutique / independiente</span>
                   </p>
                 </div>
 
