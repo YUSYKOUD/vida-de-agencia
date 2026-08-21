@@ -627,6 +627,72 @@
     }
     .share-network span{display:block;font-size:1.3rem;margin-bottom:5px}
     .share-network small{display:block;color:#9090a2;font-size:.68rem;margin-top:5px;font-weight:700}
+    .share-primary{
+      width:100%;
+      min-height:62px;
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(135deg,#b8ff42,#7dffb0);
+      color:#0b0b10;
+      font-weight:950;
+      font-size:.96rem;
+      margin-top:14px;
+    }
+    .share-primary small{
+      display:block;
+      margin-top:4px;
+      font-size:.7rem;
+      font-weight:750;
+      opacity:.72;
+    }
+    .share-fallback{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:10px;
+    }
+    .share-helper{
+      margin-top:12px;
+      padding:11px 12px;
+      border-radius:12px;
+      background:#101017;
+      border:1px solid #292936;
+      color:#9292a2;
+      font-size:.72rem;
+      line-height:1.45;
+    }
+    .share-status{
+      min-height:20px;
+      margin-top:10px;
+      color:var(--accent);
+      font-size:.72rem;
+      font-weight:800;
+    }    .share-preview{
+      display:block;width:min(260px,70%);aspect-ratio:4/5;object-fit:cover;
+      margin:14px auto 4px;border-radius:15px;border:1px solid #30303e;
+      background:#0d0d13;box-shadow:0 16px 45px rgba(0,0,0,.25);
+    }
+    .share-apps{
+      display:flex;justify-content:center;gap:12px;color:#a6a6b4;
+      font-size:.78rem;margin-top:9px;
+    }
+
+    .network-openers{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-top:12px;
+    }
+    .network-openers button{
+      flex:1 1 120px;
+      border:1px solid #30303e;
+      background:#15151d;
+      color:#ededf2;
+      border-radius:11px;
+      padding:10px;
+      font-size:.72rem;
+      font-weight:800;
+    }
 
     .modal{
       position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:20px;z-index:30;
@@ -944,7 +1010,7 @@
 
           <div class="result-actions">
             <button class="btn btn-ghost" onclick="discardCareerCard()">Descartar</button>
-            <button class="btn btn-share" onclick="openShareModal()">Compartir en redes sociales</button>
+            <button class="btn btn-share" onclick="openShareModal()">Compartir tarjeta como foto</button>
             <button class="btn btn-secondary" onclick="restartGame()">Volver al inicio</button>
           </div>
 
@@ -1003,15 +1069,30 @@
   <div id="shareModal" class="modal">
     <div class="modal-card">
       <div class="eyebrow">COMPARTE TU CARRERA</div>
-      <h3>¿Dónde quieres mostrar tu vitrina?</h3>
+      <h3>Tu resumen está listo como foto 📸</h3>
       <p>
-        La tarjeta se compartirá como imagen con tu cargo final, agencia, nivel y premios simulados obtenidos durante la partida.
+        En celular, el botón principal abre el menú nativo con el PNG adjunto. Desde ahí puedes elegir Instagram, WhatsApp, LinkedIn u otra app instalada.
       </p>
-      <div class="share-grid">
-        <button class="share-network" onclick="shareInstagram()"><span>📸</span>Instagram<br><small>Compartir imagen</small></button>
-        <button class="share-network" onclick="shareWhatsApp()"><span>💬</span>WhatsApp<br><small>Compartir imagen</small></button>
-        <button class="share-network" onclick="shareLinkedIn()"><span>💼</span>LinkedIn<br><small>Compartir imagen</small></button>
+
+      <img id="shareImagePreview" class="share-preview" alt="Vista previa de la tarjeta final de carrera">
+      <div class="share-apps">📸 Instagram · 💬 WhatsApp · 💼 LinkedIn</div>
+
+      <button class="share-primary" onclick="shareCareerImage()">
+        📤 Compartir foto
+        <small>Recomendado en iPhone y Android</small>
+      </button>
+
+      <div class="share-fallback">
+        <button class="btn btn-secondary" onclick="copyCareerImage()">📋 Copiar imagen</button>
+        <button class="btn btn-secondary" onclick="downloadCareerImage()">⬇️ Guardar PNG</button>
       </div>
+
+      <div class="share-status" id="shareStatus"></div>
+
+      <div class="share-helper">
+        <strong>Importante:</strong> “Compartir foto” funciona mejor en un sitio HTTPS, por ejemplo Vercel. Si pruebas el HTML como archivo local o el navegador no permite compartir archivos, el botón guardará el PNG automáticamente.
+      </div>
+
       <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="closeShareModal()">Cerrar</button>
     </div>
   </div>
@@ -1040,6 +1121,7 @@
       workplace: "",
       agencyTier: "boutique",
       pendingAgencyOffers: [],
+      pendingNextYearSalary: null,
       roleIndex: 0,
       usedEvents: [],
       history: [],
@@ -1304,20 +1386,23 @@
         {label:"Director/a de Cuentas", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1500000, statEffects:{carrera:36,reputacion:35,portafolio:20,salud:-6,vida:-5}}
       ],
       "Content Creator": [
-        {label:"Práctica de Content", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
-        {label:"Content Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:4,portafolio:8}},
-        {label:"Content Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:2, baseSalary:1500000, statEffects:{carrera:20,reputacion:18,portafolio:22,salud:-4,vida:-3}}
+        {label:"Práctica de Content", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
+        {label:"Content Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:5,reputacion:4,portafolio:8}},
+        {label:"Content Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:12,reputacion:11,portafolio:14,salud:-2}},
+        {label:"Content Senior", years:"Años 5 a 7", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:20,reputacion:18,portafolio:22,salud:-4,vida:-3}},
+        {label:"Supervisor/a de Contenidos", years:"Años 8 a 9", startYears:7, careerYear:8, roleIndex:4, baseSalary:1250000, statEffects:{carrera:28,reputacion:26,portafolio:26,salud:-5,vida:-4}},
+        {label:"Director/a de Contenidos", years:"Año 10 en adelante", startYears:9, careerYear:10, roleIndex:5, baseSalary:1500000, statEffects:{carrera:36,reputacion:34,portafolio:30,salud:-6,vida:-5}}
       ],
       "Redactor": [
-        {label:"Práctica de Redacción", years:"3 a 6 meses", startYears:0.5, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
-        {label:"Redactor Jr", years:"1 a 3 años", startYears:1, careerYear:1, roleIndex:1, baseSalary:700000, statEffects:{carrera:5,reputacion:4,portafolio:7}},
-        {label:"Redactor Mid", years:"3 a 5 años", startYears:3, careerYear:3, roleIndex:2, baseSalary:1000000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
-        {label:"Redactor Senior", years:"5 años o más", startYears:5, careerYear:5, roleIndex:3, baseSalary:1350000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
-        {label:"Director Creativo Asociado", years:"7 años o más", startYears:7, careerYear:7, roleIndex:4, baseSalary:1700000, statEffects:{carrera:29,reputacion:27,portafolio:25,salud:-5,vida:-4}},
-        {label:"Director Creativo", years:"9 años o más", startYears:9, careerYear:9, roleIndex:5, baseSalary:2200000, statEffects:{carrera:38,reputacion:36,portafolio:30,salud:-7,vida:-5}}
+        {label:"Práctica de Redacción", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-5,reputacion:-4,portafolio:-2,salud:6,vida:6}},
+        {label:"Redactor Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:5,reputacion:4,portafolio:7}},
+        {label:"Redactor Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:12,reputacion:10,portafolio:14,salud:-2}},
+        {label:"Redactor Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:20,reputacion:18,portafolio:20,salud:-4,vida:-3}},
+        {label:"Director Creativo Asociado", years:"Años 6 a 12", startYears:5, careerYear:6, roleIndex:4, baseSalary:1250000, statEffects:{carrera:29,reputacion:27,portafolio:25,salud:-5,vida:-4}},
+        {label:"Director Creativo", years:"Año 13 en adelante", startYears:12, careerYear:13, roleIndex:5, baseSalary:1500000, statEffects:{carrera:38,reputacion:36,portafolio:30,salud:-7,vida:-5}}
       ],
       "Medios": [
-        {label:"Práctica de Medios", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:300000, statEffects:{carrera:-4,reputacion:-4,portafolio:-3,salud:6,vida:6}},
+        {label:"Práctica de Medios", years:"Año 1", startYears:0, careerYear:1, roleIndex:0, baseSalary:280000, statEffects:{carrera:-4,reputacion:-4,portafolio:-3,salud:6,vida:6}},
         {label:"Media Planner Jr", years:"Año 2", startYears:1, careerYear:2, roleIndex:1, baseSalary:600000, statEffects:{carrera:5,reputacion:5,portafolio:5}},
         {label:"Media Planner Mid", years:"Años 3 a 4", startYears:2, careerYear:3, roleIndex:2, baseSalary:800000, statEffects:{carrera:13,reputacion:12,portafolio:10,salud:-2}},
         {label:"Media Planner Senior", years:"Año 5", startYears:4, careerYear:5, roleIndex:3, baseSalary:1000000, statEffects:{carrera:21,reputacion:20,portafolio:15,salud:-4,vida:-3}},
@@ -1330,8 +1415,8 @@
       "Designer":[1,2,3,5,6,13],
       "Community Manager":[1,2,3,5,6,13],
       "Cuentas":[1,2,3,5,6,13],
-      "Content Creator":[0.5,1,5],
-      "Redactor":[0.5,1,3,5,7,9],
+      "Content Creator":[1,2,3,5,8,10],
+      "Redactor":[1,2,3,5,6,13],
       "Medios":[1,2,3,5,6,13]
     };
 
@@ -1341,7 +1426,7 @@
         copy:"Equipo compacto y responsabilidades amplias.",
         startSalary:0,
         startEffects:{portafolio:3,salud:2,vida:2},
-        raise:[0.015,0.035],
+        raise:[0.01,0.025],
         effects:{carrera:2,reputacion:2,portafolio:3,salud:1}
       },
       independent: {
@@ -1349,7 +1434,7 @@
         copy:"Más exposición y cuentas de mayor escala.",
         startSalary:30000,
         startEffects:{carrera:3,reputacion:2},
-        raise:[0.025,0.05],
+        raise:[0.015,0.035],
         effects:{carrera:4,reputacion:3,portafolio:3,salud:-1}
       },
       global: {
@@ -1357,7 +1442,7 @@
         copy:"Mayor escala, procesos regionales y marcas grandes.",
         startSalary:60000,
         startEffects:{carrera:4,reputacion:4,salud:-2},
-        raise:[0.035,0.065],
+        raise:[0.02,0.045],
         effects:{carrera:5,reputacion:5,portafolio:3,salud:-2,vida:-1}
       }
     };
@@ -1367,7 +1452,7 @@
       "Medios": ["Práctica de Medios","Media Planner Jr","Media Planner Mid","Media Planner Senior","Supervisor/a de Medios","Director/a de Medios"],
       "Community Manager": ["Práctica de CM","CM Jr","CM Mid","CM Senior","Social Media Manager","Director Digital"],
       "Redactor": ["Práctica de Redacción","Redactor Jr","Redactor Mid","Redactor Senior","Director Creativo Asociado","Director Creativo"],
-      "Content Creator": ["Práctica de Content","Content Jr","Content Senior"],
+      "Content Creator": ["Práctica de Content","Content Jr","Content Mid","Content Senior","Supervisor/a de Contenidos","Director/a de Contenidos"],
       "RRSS": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
       "Branding": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
       "Motion": ["Práctica de Diseño","Diseñador Jr","Diseñador Mid","Diseñador Senior","Supervisor de Arte","Head of Art"],
@@ -2742,12 +2827,8 @@
 
       const startMeta=agencyTierMeta[state.selectedAgencyTier];
 
-      state.salary=experience.baseSalary;
-      // La práctica siempre parte con el sueldo de práctica del área.
-      // Los bonos por tipo de agencia comienzan a influir después.
-      if(usesAutomaticYearProgression()){
-        state.salary=Math.max(state.salary,automaticSalaryFloorForYear(1));
-      }
+      state.salary=clampSalaryToBand(experience.baseSalary,1);
+      state.pendingNextYearSalary=null;
 
       state.roleIndex=0;
       state.questionInYear=1;
@@ -2756,7 +2837,7 @@
       state.startExperienceYears=0;
       state.year=1;
       state.careerStartYear=1;
-      state.maxYears=usesAutomaticYearProgression() ? 13 : 12;
+      state.maxYears=13;
       if(usesAutomaticYearProgression()){
         state.roleIndex=automaticRoleIndexForYear(state.year);
       }
@@ -2804,34 +2885,52 @@
       return min + Math.random()*(max-min);
     }
 
+    const standardCareerStages = [
+      {from:1, roleIndex:0, floor:280000, ceiling:350000, annualStep:0},
+      {from:2, roleIndex:1, floor:600000, ceiling:700000, annualStep:18000},
+      {from:3, roleIndex:2, floor:800000, ceiling:950000, annualStep:25000},
+      {from:5, roleIndex:3, floor:1000000, ceiling:1200000, annualStep:25000},
+      {from:6, roleIndex:4, floor:1250000, ceiling:1450000, annualStep:30000},
+      {from:13, roleIndex:5, floor:1500000, ceiling:1800000, annualStep:35000}
+    ];
+
+    const contentCareerStages = [
+      {from:1, roleIndex:0, floor:280000, ceiling:350000, annualStep:0},
+      {from:2, roleIndex:1, floor:600000, ceiling:700000, annualStep:18000},
+      {from:3, roleIndex:2, floor:800000, ceiling:950000, annualStep:25000},
+      {from:5, roleIndex:3, floor:1000000, ceiling:1150000, annualStep:25000},
+      {from:8, roleIndex:4, floor:1250000, ceiling:1450000, annualStep:30000},
+      {from:10, roleIndex:5, floor:1500000, ceiling:1800000, annualStep:35000}
+    ];
+
+    function careerStagesForTrack(track=state.track){
+      return track==="Content Creator" ? contentCareerStages : standardCareerStages;
+    }
+
+    function careerStageForYear(year,track=state.track){
+      const stages=careerStagesForTrack(track);
+      let current=stages[0];
+      stages.forEach(stage=>{ if(year>=stage.from) current=stage; });
+      return current;
+    }
+
     function usesAutomaticYearProgression(){
-      return state.track==="Community Manager" ||
-             state.track==="Cuentas" ||
-             state.track==="Medios" ||
-             designerTracks.includes(state.track);
+      return Boolean(roleLadders[state.track]);
     }
 
     function automaticRoleIndexForYear(year){
-      if(year>=13) return 5;
-      if(year>=6) return 4;
-      if(year>=5) return 3;
-      if(year>=3) return 2;
-      if(year>=2) return 1;
-      return 0;
+      return careerStageForYear(year).roleIndex;
     }
 
     function syncAutomaticRole(){
-      if(!usesAutomaticYearProgression()) return false;
       const previousIndex=state.roleIndex;
       state.roleIndex=automaticRoleIndexForYear(state.year);
       return previousIndex!==state.roleIndex;
     }
 
-    function currentRole(){
-      const ladder=roleLadders[state.track]||["Junior","Profesional","Senior","Líder","Director"];
-      const index=usesAutomaticYearProgression()
-        ? automaticRoleIndexForYear(state.year)
-        : state.roleIndex;
+    function currentRole(year=state.year){
+      const ladder=roleLadders[state.track]||["Práctica","Junior","Mid","Senior","Supervisor","Director"];
+      const index=careerStageForYear(year).roleIndex;
       return ladder[Math.min(index,ladder.length-1)];
     }
 
@@ -2840,22 +2939,44 @@
     }
 
     function automaticSalaryFloorForYear(year){
-      if(year>=13) return 1500000;
-      if(year>=6) return 1250000;
-      if(year>=5) return 1000000;
-      if(year>=3) return 800000;
-      if(year>=2) return 600000;
-      return 0;
+      return careerStageForYear(year).floor;
+    }
+
+    function automaticSalaryCeilingForYear(year){
+      return careerStageForYear(year).ceiling;
+    }
+
+    function clampSalaryToBand(value,year=state.year){
+      const stage=careerStageForYear(year);
+      return Math.max(stage.floor,Math.min(stage.ceiling,Math.round(value)));
+    }
+
+    function applySalaryDelta(delta){
+      const before=state.salary;
+      state.salary=clampSalaryToBand(state.salary+delta,state.year);
+      return state.salary-before;
+    }
+
+    function calculateNextYearSalary(agencyPct=0){
+      const nextYear=Math.min(state.year+1,state.maxYears);
+      const currentStage=careerStageForYear(state.year);
+      const nextStage=careerStageForYear(nextYear);
+      let base;
+
+      if(nextStage.roleIndex!==currentStage.roleIndex){
+        base=nextStage.floor;
+      }else{
+        base=Math.max(state.salary,nextStage.floor)+nextStage.annualStep;
+      }
+
+      if(agencyPct>0) base=Math.round(base*(1+agencyPct));
+      return clampSalaryToBand(base,nextYear);
     }
 
     function applyRoleSalaryFloor(){
-      if(!usesAutomaticYearProgression()) return 0;
-      const floor=automaticSalaryFloorForYear(state.year);
-      if(!floor || state.salary>=floor) return 0;
-
-      const increase=floor-state.salary;
-      state.salary=floor;
-      return increase;
+      const before=state.salary;
+      state.salary=clampSalaryToBand(state.salary,state.year);
+      return state.salary-before;
     }
 
     function careerOverall(){
@@ -2957,20 +3078,11 @@
       document.getElementById('careerYearValue').textContent=state.year;
 
       const salaryStage=document.getElementById('salaryStageValue');
-      if(state.experienceYears<1){
-        salaryStage.textContent="Práctica · luego aprox. $600.000";
+      const stage=careerStageForYear(state.year);
+      if(state.year===1){
+        salaryStage.textContent=`Práctica · ${formatMoney(stage.floor)} simulado`;
       }else{
-        if(state.year>=13){
-          salaryStage.textContent="Dirección · desde $1.500.000";
-        }else if(state.year>=6){
-          salaryStage.textContent="Liderazgo · desde $1.250.000";
-        }else if(state.year>=5){
-          salaryStage.textContent="Senior · desde $1.000.000";
-        }else if(state.year>=3){
-          salaryStage.textContent="Mid · desde $800.000";
-        }else{
-          salaryStage.textContent="Junior · desde $600.000";
-        }
+        salaryStage.textContent=`${currentRole()} · desde ${formatMoney(stage.floor)}`;
       }
 
       const statsEl=document.getElementById('stats');
@@ -3344,7 +3456,8 @@
       Object.entries(opt.effects||{}).forEach(([k,v])=>{
         state.stats[k]=(state.stats[k]||0)+v;
       });
-      if(opt.salary) state.salary+=opt.salary;
+      let actualSalaryChange=0;
+      if(opt.salary) actualSalaryChange=applySalaryDelta(opt.salary);
       if(opt.workplace){
         if(opt.workplace==="Agencia grande"){
           const destination=pickAgency("global");
@@ -3385,10 +3498,10 @@
         c.textContent=`${statsMeta[k]?.label||k}: ${v>0?'+':''}${v}`;
         chips.appendChild(c);
       });
-      if(opt.salary){
+      if(opt.salary && actualSalaryChange!==0){
         const c=document.createElement('span');
-        c.className='chip good';
-        c.textContent=`Sueldo: +${formatMoney(opt.salary)}`;
+        c.className=actualSalaryChange>0 ? 'chip good' : 'chip bad';
+        c.textContent=`Sueldo: ${actualSalaryChange>0?'+':''}${formatMoney(actualSalaryChange)}`;
         chips.appendChild(c);
       }
       if(opt.awardAttempt && state.awards.length){
@@ -3457,25 +3570,8 @@
 
     function applyAnnualSalaryProgression(){
       const previous=state.salary;
-      const justFinishedPractice=state.startExperienceYears<1 && state.completedYears===0;
-
-      if(justFinishedPractice){
-        state.salary=600000;
-        addHistory(`Fin de práctica · Pasas a contrato junior con sueldo simulado de ${formatMoney(state.salary)}.`);
-        return;
-      }
-
-      const years=Math.max(1,state.experienceYears);
-      let growthRate=0.025;
-      if(years>=3) growthRate=0.03;
-      if(years>=5) growthRate=0.035;
-      if(years>=7) growthRate=0.04;
-
-      const minimumIncrease=years<3 ? 18000 : years<5 ? 25000 : years<7 ? 32000 : 40000;
-      const increase=Math.max(minimumIncrease,Math.round(state.salary*growthRate));
-      state.salary+=increase;
-
-      addHistory(`Ajuste salarial anual · ${formatMoney(previous)} → ${formatMoney(state.salary)}.`);
+      state.pendingNextYearSalary=calculateNextYearSalary(0);
+      return state.pendingNextYearSalary-previous;
     }
 
     function annualReview(){
@@ -3493,10 +3589,10 @@
 
         if(score>62 && canBePromoted && Math.random()<0.55){
           state.roleIndex++;
-          const promotionIncrease=45000 + state.roleIndex*12000;
-          state.salary+=promotionIncrease;
+          const requestedIncrease=45000 + state.roleIndex*12000;
+          const promotionIncrease=applySalaryDelta(requestedIncrease);
           state.stats.carrera+=5;
-          note=`Ascendiste a ${currentRole()} y sumaste ${formatMoney(promotionIncrease)} por promoción.`;
+          note=`Ascendiste a ${currentRole()}${promotionIncrease>0 ? ` y sumaste ${formatMoney(promotionIncrease)} por promoción` : ""}.`;
         }else{
           const nextRole=ladder[nextRoleIndex];
           if(nextRole && state.experienceYears<requiredYears){
@@ -3545,7 +3641,8 @@
       const offers=selected.map(agency=>{
         const meta=agencyTierMeta[agency.tier];
         const pct=randomBetween(meta.raise[0],meta.raise[1]);
-        return {agency:agency.name,tier:agency.tier,pct};
+        const projectedSalary=calculateNextYearSalary(pct);
+        return {agency:agency.name,tier:agency.tier,pct,projectedSalary};
       });
       state.pendingAgencyOffers=offers;
 
@@ -3559,13 +3656,13 @@
       holder.innerHTML="";
       offers.forEach((offer,index)=>{
         const meta=agencyTierMeta[offer.tier];
-        const projected=Math.round(state.salary*(1+offer.pct));
+        const projected=offer.projectedSalary;
         const btn=document.createElement("button");
         btn.className="agency-offer";
         btn.innerHTML=`
           <strong><span style="color:var(--text);margin:0">Oferta ${index+1}: ${offer.agency}</span><span style="color:var(--accent);margin:0">${meta.label}</span></strong>
           <span>${meta.copy}</span>
-          <small>Sueldo simulado: ${formatMoney(projected)} · aumento aprox. ${Math.round(offer.pct*100)}%</small>
+          <small>Próximo año: ${formatMoney(projected)} · cambio de agencia ${Math.round(offer.pct*100)}%</small>
         `;
         btn.onclick=()=>acceptAgencyOffer(index);
         holder.appendChild(btn);
@@ -3581,7 +3678,7 @@
 
       state.workplace=offer.agency;
       state.agencyTier=offer.tier;
-      state.salary=Math.round(state.salary*(1+offer.pct));
+      state.pendingNextYearSalary=offer.projectedSalary;
       Object.entries(meta.effects).forEach(([k,v])=>state.stats[k]=(state.stats[k]||0)+v);
       state.flags.jobSearch=false;
       clampStats();
@@ -3591,6 +3688,7 @@
     }
 
     function chooseToStay(){
+      state.pendingNextYearSalary=calculateNextYearSalary(0);
       state.stats.reputacion+=1;
       state.stats.salud+=1;
       state.flags.jobSearch=false;
@@ -3601,43 +3699,45 @@
     }
 
     function completeYear(){
-      const closingYear=state.year;
       const previousRole=currentRole();
+      const previousSalary=state.salary;
 
-      applyAnnualSalaryProgression();
+      if(state.pendingNextYearSalary===null && state.year<state.maxYears){
+        state.pendingNextYearSalary=calculateNextYearSalary(0);
+      }
+
       state.completedYears+=1;
       state.experienceYears+=1;
       annualReview();
 
-      state.year++;
-      state.questionInYear=1;
-
-      if(usesAutomaticYearProgression()){
-        syncAutomaticRole();
-        const newRole=currentRole();
-
-        if(newRole!==previousRole){
-          const roleIncrease=applyRoleSalaryFloor();
-
-          state.stats.carrera=Math.min(100,state.stats.carrera+5);
-          state.stats.reputacion=Math.min(100,state.stats.reputacion+3);
-
-          const salaryMessage=roleIncrease>0
-            ? ` y tu sueldo se ajusta a ${formatMoney(state.salary)}`
-            : "";
-          addHistory(`Inicio año ${state.year} · Pasas automáticamente de ${previousRole} a ${newRole}${salaryMessage}.`);
-        }
-      }
-
-      if(state.year<=state.maxYears){
-        recordCareerSnapshot(state.year);
-      }
-      renderProfile();
-
-      if(shouldEnd()){
+      if(state.year>=state.maxYears || state.stats.salud<=0 || state.stats.riesgo>=100){
+        state.pendingNextYearSalary=null;
+        renderProfile();
         finishGame();
         return;
       }
+
+      state.year++;
+      state.questionInYear=1;
+      state.salary=clampSalaryToBand(
+        state.pendingNextYearSalary ?? automaticSalaryFloorForYear(state.year),
+        state.year
+      );
+      state.pendingNextYearSalary=null;
+
+      syncAutomaticRole();
+      const newRole=currentRole();
+
+      if(newRole!==previousRole){
+        state.stats.carrera=Math.min(100,state.stats.carrera+5);
+        state.stats.reputacion=Math.min(100,state.stats.reputacion+3);
+        addHistory(`Inicio año ${state.year} · Pasas automáticamente de ${previousRole} a ${newRole}. Sueldo: ${formatMoney(state.salary)}.`);
+      }else if(state.salary!==previousSalary){
+        addHistory(`Inicio año ${state.year} · Ajuste salarial a ${formatMoney(state.salary)}.`);
+      }
+
+      recordCareerSnapshot(state.year);
+      renderProfile();
       loadEvent();
       window.scrollTo({top:0,behavior:"smooth"});
     }
@@ -3919,78 +4019,139 @@
 
     function shareText(){
       const trophyText=state.awards.length
-        ? ` Reconocimientos: ${state.awards.map(a=>`${a.short} (${a.level} · ${a.category || "Campaña"})`).join(", ")}.`
+        ? ` Reconocimientos: ${state.awards.map(a=>`${a.short} (${a.level})`).join(", ")}.`
         : "";
-      return `Mi carrera en Vida de Agencia terminó como ${currentRole()} en ${state.workplace}. Nivel ${careerOverall()}/100.${trophyText}`;
+      return `Mi carrera en Vida de Agencia terminó como ${currentRole()} en ${state.workplace}.${trophyText}`;
+    }
+
+    function setShareStatus(message,isError=false){
+      const el=document.getElementById("shareStatus");
+      if(!el) return;
+      el.textContent=message;
+      el.style.color=isError ? "#ff8ca1" : "var(--accent)";
+    }
+
+    function careerCardDataURL(){
+      return generateCard().toDataURL("image/png",1);
+    }
+
+    function dataURLToBlob(dataURL){
+      const parts=dataURL.split(",");
+      const mimeMatch=parts[0].match(/:(.*?);/);
+      const mime=mimeMatch ? mimeMatch[1] : "image/png";
+      const binary=atob(parts[1]);
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+      return new Blob([bytes],{type:mime});
+    }
+
+    function buildCareerShareFile(){
+      const blob=dataURLToBlob(careerCardDataURL());
+      return new File([blob],"vida-de-agencia-carrera.png",{type:"image/png"});
+    }
+
+    function browserCanShareFile(file){
+      try{
+        return Boolean(
+          window.isSecureContext &&
+          navigator.share &&
+          navigator.canShare &&
+          navigator.canShare({files:[file]})
+        );
+      }catch(e){
+        return false;
+      }
+    }
+
+    function prepareSharePreview(){
+      const preview=document.getElementById("shareImagePreview");
+      if(!preview) return;
+      try{ preview.src=careerCardDataURL(); }
+      catch(error){ console.error(error); }
     }
 
     function openShareModal(){
       document.getElementById("shareModal").classList.add("active");
+      prepareSharePreview();
+      setShareStatus(
+        window.isSecureContext
+          ? "La foto está preparada. Pulsa Compartir foto."
+          : "Vista local/no segura: si el menú nativo no está disponible, guardaremos el PNG."
+      );
     }
 
     function closeShareModal(){
       document.getElementById("shareModal").classList.remove("active");
     }
 
-    function canvasToBlob(canvas){
-      return new Promise(resolve=>canvas.toBlob(resolve,"image/png",1));
-    }
+    function shareCareerImage(){
+      let file;
+      try{
+        file=buildCareerShareFile();
+      }catch(error){
+        console.error(error);
+        setShareStatus("No se pudo generar la imagen.",true);
+        return;
+      }
 
-    async function shareImageToNetwork(network){
-      const canvas=generateCard();
-      const blob=await canvasToBlob(canvas);
-      const file=new File([blob],"vida-de-agencia-carrera.png",{type:"image/png"});
-      const shareCopyMap={
-        instagram:"Mi resumen de carrera en Vida de Agencia",
-        whatsapp:"Mi resumen de carrera en Vida de Agencia",
-        linkedin:"Mi resumen de carrera en Vida de Agencia"
-      };
-      const text=shareCopyMap[network] || "Mi resumen de carrera en Vida de Agencia";
-
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        try{
-          await navigator.share({
-            files:[file],
-            title:"Vida de Agencia · Resumen de carrera",
-            text
+      if(browserCanShareFile(file)){
+        navigator.share({files:[file]})
+          .then(()=>setShareStatus("Foto enviada al menú de compartir ✓"))
+          .catch(error=>{
+            if(error?.name==="AbortError"){
+              setShareStatus("Compartir cancelado.");
+              return;
+            }
+            console.error(error);
+            setShareStatus("El navegador rechazó el envío. Guardaremos el PNG.",true);
+            downloadCareerImage();
           });
-          return;
-        }catch(e){
-          if(e.name==="AbortError") return;
+        return;
+      }
+
+      setShareStatus("Este navegador no puede adjuntar la foto directamente. Guardando PNG...",true);
+      downloadCareerImage();
+    }
+
+    function downloadCareerImage(){
+      try{
+        const dataURL=careerCardDataURL();
+        const link=document.createElement("a");
+        link.href=dataURL;
+        link.download="vida-de-agencia-carrera.png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setShareStatus("PNG listo ✓ Puedes subirlo a Instagram, WhatsApp o LinkedIn.");
+      }catch(error){
+        console.error(error);
+        setShareStatus("No se pudo guardar la imagen.",true);
+      }
+    }
+
+    function copyCareerImage(){
+      let file;
+      try{
+        file=buildCareerShareFile();
+      }catch(error){
+        setShareStatus("No se pudo preparar la imagen.",true);
+        return;
+      }
+
+      if(!window.isSecureContext || !navigator.clipboard || typeof ClipboardItem==="undefined"){
+        setShareStatus("Este navegador no permite copiar imágenes. Usa Guardar PNG.",true);
+        return;
+      }
+
+      navigator.clipboard.write([
+        new ClipboardItem({"image/png":file})
+      ]).then(
+        ()=>setShareStatus("Imagen copiada ✓"),
+        error=>{
+          console.error(error);
+          setShareStatus("No se pudo copiar. Usa Guardar PNG.",true);
         }
-      }
-
-      const url=URL.createObjectURL(blob);
-      const link=document.createElement("a");
-      link.href=url;
-      link.download=`vida-de-agencia-${network}.png`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-
-      if(network==="instagram"){
-        window.open("https://www.instagram.com/","_blank","noopener,noreferrer");
-        alert("Tu resumen se descargó como imagen. Súbelo en Instagram como publicación o historia.");
-      }else if(network==="whatsapp"){
-        window.open("https://web.whatsapp.com/","_blank","noopener,noreferrer");
-        alert("Tu resumen se descargó como imagen. Ahora puedes adjuntarlo en WhatsApp.");
-      }else if(network==="linkedin"){
-        window.open("https://www.linkedin.com/feed/","_blank","noopener,noreferrer");
-        alert("Tu resumen se descargó como imagen. Ahora puedes publicarlo en LinkedIn.");
-      }
-    }
-
-    async function shareInstagram(){
-      await shareImageToNetwork("instagram");
-    }
-
-    async function shareWhatsApp(){
-      await shareImageToNetwork("whatsapp");
-    }
-
-    async function shareLinkedIn(){
-      await shareImageToNetwork("linkedin");
+      );
     }
 
     function discardCareerCard(){
